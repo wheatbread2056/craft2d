@@ -57,6 +57,7 @@ const blocknames = { // blocks without a proper name will use their ID in the bl
     bricks: 'Bricks',
     stonebricks: 'Stone Bricks',
     dirtbricks: 'Dirt Bricks',
+    goldbricks: 'Gold Bricks',
     cactus: 'Cactus',
     crate: 'Wooden Crate',
     glass: 'Glass',
@@ -77,7 +78,7 @@ const allblocks = ['dirt','grass1','grassbg1','grassbg2','grassbg3','grassbg4','
 const nocollision = ['grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6a','grassbg6b','grassbg7a','grassbg7b','watertop','water','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8'];
 
 // selectable blocks
-const selblocks = allblocks;
+const selblocks = ['dirt','planks1','planks2','planks3','glass','crate','bricks','stonebricks','dirtbricks','goldbricks','log1','log2','log3','sand','stone1','stone2','stone3','water','grass1','grass2','grass3','cactus','leaves1','leaves2','leaves3','leaves4','leaves5','leaves6','sand','grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6','grassbg7','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8'];
 
 // generate block images
 for (const i in allblocks) {
