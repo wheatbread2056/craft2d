@@ -835,7 +835,6 @@ function tick() {
     moveCamera();
     renderWorld(camera.x, camera.y);
     renderInfoText();
-    blockModification();
     ticknum++;
 }
 
@@ -844,6 +843,7 @@ spawnPlayer(Math.round((mapstart / 2) + (mapend / 2))); // should just be 0
 tick();
 
 var clock = setInterval(tick, 1000/tickrate);
+var blockModificationTick = setInterval(blockModification, 0); // do block modification seperately to feel smoother
 
 function killClock() {
 	clearInterval(clock);
