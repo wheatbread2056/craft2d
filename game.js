@@ -87,6 +87,64 @@ for (const i in allblocks) {
     blockimages[imagekey].src = `images/block_${blk}.png`;
 }
 
+// set up html
+
+// canvas + ctx
+const canvas = document.createElement('canvas');
+canvas.style = `position:absolute;top:0;left:0;margin:0`;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const globalCtx = canvas.getContext('2d');
+globalCtx.imageSmoothingEnabled = false;
+document.body.appendChild(canvas);
+
+// info text
+const infoLn1 = document.createElement('p');
+infoLn1.setAttribute('class', 'infotext');
+infoLn1.innerHTML = 'Coordinates: (x, y)';
+document.body.appendChild(infoLn1);
+
+const infoLn2 = document.createElement('p');
+infoLn2.setAttribute('class', 'infotext');
+infoLn2.setAttribute('style', 'top:24px');
+infoLn2.innerHTML = 'Time: hh:mm';
+document.body.appendChild(infoLn2);
+
+const infoLn3 = document.createElement('p');
+infoLn3.setAttribute('class', 'infotext');
+infoLn3.setAttribute('style', 'top:48px');
+infoLn3.innerHTML = 'Camera scale: 1.23x';
+document.body.appendChild(infoLn3);
+
+// version text
+const versionText = document.createElement('p');
+versionText.setAttribute('class', 'infotext2');
+versionText.innerHTML = version
+document.body.appendChild(versionText);
+
+// controls text
+const controlsKeybind = document.createElement('p');
+controlsKeybind.setAttribute('class', 'infotext3');
+controlsKeybind.innerHTML = 'press <b>q</b> for controls.';
+document.body.appendChild(controlsKeybind);
+
+const controlsList = document.createElement('pre');
+controlsList.setAttribute('class', 'infotext3');
+controlsList.innerHTML = `<b>move</b>: WASD / arrows
+<b>delete block</b>: z
+<b>place block</b>: x
+<b>toggle fly mode</b>: c
+<b>choose block</b>: n / m
+<b>change zoom</b>: - / 0 / +`;
+document.body.appendChild(controlsList);
+
+// block selector (replacing soon)
+const blockSelector = document.createElement('p');
+blockSelector.setAttribute('class', 'blockselector');
+blockSelector.innerHTML = 'Block (1/99)';
+document.body.appendChild(blockSelector);
+
 // key events (keydown)
 window.addEventListener('keydown', (event) => {
     keys[event.key] = true;
@@ -441,15 +499,11 @@ function worldGen(start, end) {
 }
 
 function renderWorld(camx, camy) {
-    document.body.innerHTML = ' '
     blocksRendered = 0;
 
-    const canvas = document.createElement('canvas');
-    canvas.style = `position:absolute;top:0;left:0;margin:0`;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
+    globalCtx.imageSmoothingEnabled = false;
 
     const camx2 = camx - Math.floor(camx);
     const camy2 = camy - Math.floor(camy);
@@ -463,23 +517,22 @@ function renderWorld(camx, camy) {
                 worldGen(mapend, mapend + 64);
             }
             if (-y + Math.floor(camy) < -26) {
-                showBlock(ctx, x - camx2, -y - camy2, 'stone4');
+                showBlock(globalCtx, x - camx2, -y - camy2, 'stone4');
                 blocksRendered++;
             } else {
                 const block = getBlock(x + Math.floor(camx), -y + Math.floor(camy))[0];
                 if (!(block == null)) {
                     if (block == 'watertop') { // show water animated
-                        showBlock(ctx, x - camx2, -y - camy2, waterimg);
+                        showBlock(globalCtx, x - camx2, -y - camy2, waterimg);
                     } else {
-                        showBlock(ctx, x - camx2, -y - camy2, block);
+                        showBlock(globalCtx, x - camx2, -y - camy2, block);
                     }
                     blocksRendered++;
                 }
             }
         }
     }
-    renderPlayer(ctx, camera.x, camera.y);
-    document.body.appendChild(canvas);
+    renderPlayer(globalCtx, camera.x, camera.y);
 }
 
 function spawnPlayer(spawnx) {
@@ -692,65 +745,33 @@ function playerPhysics() {
 
 function renderInfoText() {
     if (debug == true) {
-        const infotext1 = document.createElement('p');
-        infotext1.setAttribute('class', 'infotext');
-        infotext1.innerHTML = `player: x ${Math.round(player.x * 100) / 100}; y ${Math.round(player.y * 100) / 100}; mx ${Math.round(player.mx * 100) / 100}; my ${Math.round(player.my * 100) / 100}; air ${player.air}; acc ${player.acc}; fly ${player.fly}; water ${player.inWater}`
-        document.body.appendChild(infotext1);
-        const infotext2 = document.createElement('p');
-        infotext2.setAttribute('class', 'infotext');
-        infotext2.setAttribute('style', 'top:24px');
-        infotext2.innerHTML = `world: ${blocksRendered} blocks rendered; ${blocks.size} total blocks; ${mapxsize} map size; ${camera.scale} scale`
-        document.body.appendChild(infotext2);
-        const infotext3 = document.createElement('p');
-        infotext3.setAttribute('class', 'infotext');
-        infotext3.setAttribute('style', 'top:48px');
-        infotext3.innerHTML = `time: tick ${ticknum}; env ${envTime}; target rate ${tickrate}; rate ${tickrateComputed}; max ${tickrateHigh}; min ${tickrateLow}`
-        document.body.appendChild(infotext3);
+        infoLn1.innerHTML = `player: x ${Math.round(player.x * 100) / 100}; y ${Math.round(player.y * 100) / 100}; mx ${Math.round(player.mx * 100) / 100}; my ${Math.round(player.my * 100) / 100}; air ${player.air}; acc ${player.acc}; fly ${player.fly}; water ${player.inWater}`;
+        infoLn2.innerHTML = `world: ${blocksRendered} blocks rendered; ${blocks.size} total blocks; ${mapxsize} map size; ${camera.scale} scale`;
+        infoLn3.innerHTML = `time: tick ${ticknum}; env ${envTime}; target rate ${tickrate}; rate ${tickrateComputed}; max ${tickrateHigh}; min ${tickrateLow}`;
     } else {
-        const infotext1 = document.createElement('p');
-        infotext1.setAttribute('class', 'infotext');
-        infotext1.innerHTML = `Coordinates: (${Math.round(player.x)}, ${Math.round(player.y)})`
-        document.body.appendChild(infotext1);
-        const infotext2 = document.createElement('p');
-        infotext2.setAttribute('class', 'infotext');
-        infotext2.setAttribute('style', 'top:24px');
+        infoLn1.innerHTML = `Coordinates: (${Math.round(player.x)}, ${Math.round(player.y)})`;
+
+        // 100% readable code
         var timestring1 = envTime.toString().padStart(5,'0');
         var timestring2 = Math.floor(timestring1.slice(2,5) / 1000 * 60).toString().padStart(2,'0');
         var timestring = `${timestring1.slice(0,2)}:${timestring2}`;
-        infotext2.innerHTML = `Time: ${timestring}`;
-        document.body.appendChild(infotext2);
+
+        infoLn2.innerHTML = `Time: ${timestring}`;
+
         if (!(camera.scale == 1)) {
-            const infotext3 = document.createElement('p');
-            infotext3.setAttribute('class', 'infotext');
-            infotext3.setAttribute('style', 'top:48px');
-            infotext3.innerHTML = `Camera scale: ${camera.scale}x`
-            document.body.appendChild(infotext3);
+            infoLn3.innerHTML = `Camera scale: ${camera.scale}x`;
+        } else {
+            infoLn3.innerHTML = '';
         }
     }
-    const infotext4 = document.createElement('p');
-    infotext4.setAttribute('class', 'infotext2');
-    infotext4.innerHTML = `${version}`
-    document.body.appendChild(infotext4);
-    const infotext5 = document.createElement('p');
-    infotext5.setAttribute('class', 'blockselector');
-    infotext5.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length})`;
-    document.body.appendChild(infotext5);
     if (!keys.q) {
-        const controlk = document.createElement('p');
-        controlk.setAttribute('class', 'infotext3');
-        controlk.innerHTML = `show controls: q`;
-        document.body.appendChild(controlk);
+        controlsKeybind.setAttribute('style', 'opacity:1');
+        controlsList.setAttribute('style', 'opacity:0');
     } else {
-        const controlk = document.createElement('pre');
-        controlk.setAttribute('class', 'infotext3');
-        controlk.textContent = `move: WASD / arrows
-delete block: z
-place block: x
-toggle fly mode: c
-choose block: n / m
-change zoom: - / 0 / +`;
-        document.body.appendChild(controlk);
+        controlsKeybind.setAttribute('style', 'opacity:0');
+        controlsList.setAttribute('style', 'opacity:1');
     }
+    blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length})`;
 }
 
 function getColor(c1, c2, p1, p2) {
