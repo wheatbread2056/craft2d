@@ -1,4 +1,4 @@
-const version = "Alpha 1.7";
+const version = "Alpha 1.8-dev";
 const blocks = new Map(); // will be replaced with chunk loading at some point (2025)
 var envTime = 0; // 0 to 23999 (24000+ just gets set back to 0)
 var player = {x: 0, y: 0, mx: 0, my: 0, air: false, acc: false, fly: false, flyx: false, flyy: false, inWater: false, speedmult: 1, jumpmult: 1, noclip: false};
@@ -795,20 +795,22 @@ function updateTime() {
 }
 
 function blockModification() {
+    let blockx = Math.floor(mx/64 / camera.scale + camera.x);
+    let blocky = Math.ceil(-my/64 / camera.scale + camera.y);
     if (keys.z) { // destroy block
-        if (!(getBlock(Math.floor(mx/64 / camera.scale + camera.x), Math.ceil(-my/64 / camera.scale + camera.y))[0] == 'stone4')) {
-            deleteBlock(Math.floor(mx/64 / camera.scale + camera.x), Math.ceil(-my/64 / camera.scale + camera.y));
+        if (!(getBlock(blockx, blocky)[0] == 'stone4')) {
+            deleteBlock(blockx, blocky);
         }
     }
     if (keys.x) { // place block
         // rules for special blocks
-        if (!(getBlockCollision(Math.floor(mx/64 / camera.scale + camera.x), Math.ceil(-my/64 / camera.scale + camera.y)) == 'stone4' || Math.ceil(-my/64 / camera.scale + camera.y) < -26 || (Math.round(player.x) == Math.floor(mx/64 / camera.scale + camera.x) && Math.round(player.y) == Math.ceil(-my/64 / camera.scale + camera.y)))) {
+        if (!(getBlock(blockx, blocky)[0] == 'stone4' || blocky < -26 || (Math.round(player.x) == blockx && Math.round(player.y) == blocky))) {
             if (selblocks[currentblock] == 'grassbg6' || selblocks[currentblock] == 'grassbg7') {
-                setBlock(Math.floor(mx/64 / camera.scale + camera.x), Math.ceil(-my/64 / camera.scale + camera.y), selblocks[currentblock]+'a');
-                setBlock(Math.floor(mx/64 / camera.scale + camera.x), Math.ceil(-my/64 / camera.scale + camera.y)+1, selblocks[currentblock]+'b');
+                setBlock(blockx, blocky, selblocks[currentblock]+'a');
+                setBlock(blockx, blocky+1, selblocks[currentblock]+'b');
             }
             else {
-                setBlock(Math.floor(mx/64 / camera.scale + camera.x), Math.ceil(-my/64 / camera.scale + camera.y), selblocks[currentblock]);
+                setBlock(blockx, blocky, selblocks[currentblock]);
             }
         }
     }
