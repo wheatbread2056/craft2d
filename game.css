@@ -44,8 +44,17 @@ blue {
 purple {
     color: darkviolet;
 }
+magenta {
+    color: magenta;
+}
 pink {
     color: violet;
+}
+true {
+    color: lime;
+}
+false {
+    color: red;
 }
 /* everything else */
 .infotext {

@@ -127,12 +127,13 @@ document.body.appendChild(versionText);
 // controls text
 const controlsKeybind = document.createElement('p');
 controlsKeybind.setAttribute('class', 'infotext3');
-controlsKeybind.innerHTML = 'press <b>q</b> for controls.';
+controlsKeybind.innerHTML = 'hold <b>q</b> for controls.';
 document.body.appendChild(controlsKeybind);
 
 const controlsList = document.createElement('pre');
 controlsList.setAttribute('class', 'infotext3');
-controlsList.innerHTML = `<b>move</b>: WASD / arrows
+controlsList.innerHTML = `blocks are deleted and placed at the <b>mouse</b>
+<b>move</b>: WASD / arrows
 <b>delete block</b>: z
 <b>place block</b>: x
 <b>toggle fly mode</b>: c
@@ -746,21 +747,21 @@ function playerPhysics() {
 
 function renderInfoText() {
     if (debug == true) {
-        infoLn1.innerHTML = `player: x ${Math.round(player.x * 100) / 100}; y ${Math.round(player.y * 100) / 100}; mx ${Math.round(player.mx * 100) / 100}; my ${Math.round(player.my * 100) / 100}; air ${player.air}; acc ${player.acc}; fly ${player.fly}; water ${player.inWater}`;
-        infoLn2.innerHTML = `world: ${blocksRendered} blocks rendered; ${blocks.size} total blocks; ${mapxsize} map size; ${camera.scale} scale`;
-        infoLn3.innerHTML = `time: tick ${ticknum}; env ${envTime}; target rate ${tickrate}; rate ${tickrateComputed}; max ${tickrateHigh}; min ${tickrateLow}`;
+        infoLn1.innerHTML = `<b>player</b>: (<red>${Math.round(player.x * 100) / 100}</red>, <cyan>${Math.round(player.y * 100) / 100}</cyan>) | momentum (<yellow>${Math.round(player.mx * 100) / 100}</yellow>, <yellow>${Math.round(player.my * 100) / 100}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
+        infoLn2.innerHTML = `<b>world</b>: <yellow>${blocksRendered}</yellow> blocks rendered, <yellow>${blocks.size}</yellow> blocks stored, <yellow>${mapxsize}</yellow> map x size, <yellow>${camera.scale}</yellow> camera scale`;
+        infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow>, env tick <yellow>${envTime}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red>`;
     } else {
-        infoLn1.innerHTML = `Coordinates: (${Math.round(player.x)}, ${Math.round(player.y)})`;
+        infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
         // 100% readable code
         var timestring1 = envTime.toString().padStart(5,'0');
         var timestring2 = Math.floor(timestring1.slice(2,5) / 1000 * 60).toString().padStart(2,'0');
         var timestring = `${timestring1.slice(0,2)}:${timestring2}`;
 
-        infoLn2.innerHTML = `Time: ${timestring}`;
+        infoLn2.innerHTML = `Time: <yellow>${timestring}<yellow>`;
 
         if (!(camera.scale == 1)) {
-            infoLn3.innerHTML = `Camera scale: ${camera.scale}x`;
+            infoLn3.innerHTML = `Camera scale: <yellow>${camera.scale}x</yellow>`;
         } else {
             infoLn3.innerHTML = '';
         }
