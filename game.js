@@ -268,18 +268,18 @@ var cells1d = [[],[],[],[],[],[]]; // 6 levels of noise
 var scale1d = [];
 var biome1d = [];
 for (var i1 = 0; i1 < cells1d.length; i1++) {
-    for (var i = 0; i < 32768; i++) {
+    for (var i = 0; i < 131072; i++) {
         cells1d[i1].push(mapgenrandom(-10 + (i / 100000)));
     }
     console.log(`${Math.floor(i1/(cells1d.length)*100)}% finished generating map noise (${i1+1}/${cells1d.length+1})`);
 }
 // do something similar for scale1d (256 blocks per integer)
-for (var i = 0; i < 32768; i++) {
+for (var i = 0; i < 131072; i++) {
     scale1d.push(mapgenrandom(-9 + (i / 100000)));
 }
 
 // do something similar for biome1d (512 blocks per integer)
-for (var i = 0; i < 32768; i++) {
+for (var i = 0; i < 131072; i++) {
     biome1d.push(mapgenrandom(-19 + (i / 100000)));
 }
 console.log(`100% finished generating map noise (7/7)`);
@@ -289,12 +289,12 @@ const waterlevel = 48;
 function worldGen(start, end) {
     worldgen = {x:start, y:0, scale:1, treedelay:0, biome:0};
     for (var z = start; z < end; z++) {
-        worldgen.y = (noise1d(cells1d[0], 16384 + worldgen.x / 128) * 64); // 128 blocks per integer, 64 blocks range
+        worldgen.y = (noise1d(cells1d[0], 65536 + worldgen.x / 128) * 64); // 128 blocks per integer, 64 blocks range
         for (var noiselayer = 1; noiselayer < cells1d.length; noiselayer++) {
-            worldgen.y += (noise1d(cells1d[noiselayer], 16384 + worldgen.x / (128/(2 ** noiselayer))) * (32/(2 ** noiselayer)));
+            worldgen.y += (noise1d(cells1d[noiselayer], 65536 + worldgen.x / (128/(2 ** noiselayer))) * (32/(2 ** noiselayer)));
         }
-        worldgen.scale = noise1d(scale1d, 16384 + worldgen.x / 256) * 1.2 + 0.8;
-		worldgen.biome = Math.floor(noise1d(biome1d, 16384 + worldgen.x / 512) * 4)
+        worldgen.scale = noise1d(scale1d, 65536 + worldgen.x / 256) * 1.2 + 0.8;
+		worldgen.biome = Math.floor(noise1d(biome1d, 65536 + worldgen.x / 512) * 4)
 		// biome 0 = autumn hills, biome 1 = meadows, biome 2 = desert, biome 3 = woods
         worldgen.y *= worldgen.scale;
         worldgen.y = Math.floor(worldgen.y);
