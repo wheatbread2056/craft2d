@@ -21,6 +21,7 @@ var debug = false;
 var mx = 0; // mouse x
 var my = 0; // mouse y
 const keys = {
+    // example keys
     'a': false,
     'w': false,
     'd': false,
@@ -28,7 +29,12 @@ const keys = {
     'ArrowRight': false,
     'ArrowUp': false,
     'Space': false,
-}
+};
+const movementKeys = {
+    'left': false,
+    'right': false,
+    'jump': false,
+};
 
 var currentblock = 0; // current block in the block selector
 const blocknames = { // blocks without a proper name will use their ID in the block selector
@@ -147,64 +153,83 @@ blockSelector.setAttribute('class', 'blockselector');
 blockSelector.innerHTML = 'Block (1/99)';
 document.body.appendChild(blockSelector);
 
-// key events (keydown)
-window.addEventListener('keydown', (event) => {
-    keys[event.key] = true;
-    if (event.key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
+// key events . part 1
+function keydownEvent(key) {
+    if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
         keys.Space = true;
     }
-    if (event.key == '`') { // debug mode toggle
+    if (key == '`') { // debug mode toggle
         if (debug == false) {
             debug = true;
         } else {
             debug = false;
         }
     }
-    if (event.key == 'c') { // fly mode toggle
+    if (key == 'c') { // fly mode toggle
         if (player.fly) {
             player.fly = false;
         } else {
             player.fly = true;
         }
     }
-    if (event.key == 'm') { // next block
+    if (key == 'm') { // next block
         currentblock++;
         if (currentblock >= selblocks.length) {
             currentblock = 0;
         }
     }
-    if (event.key == 'n') { // previous block
+    if (key == 'n') { // previous block
         currentblock--;
         if (currentblock < 0) {
             currentblock = selblocks.length - 1;
         }
     }
-    if (event.key == '-') { // zoom out
+    if (key == '-') { // zoom out
         camera.scale *= 0.5;
         if (camera.scale < 0.25) {
             camera.scale = 0.25;
         }
         camera.scale = Math.round(camera.scale*1000)/1000;
     }
-    if (event.key == '=') { // zoom in
+    if (key == '=') { // zoom in
         camera.scale *= 2;
         if (camera.scale > 2) {
             camera.scale = 2;
         }
         camera.scale = Math.round(camera.scale*1000)/1000;
     }
-    if (event.key == '0') { // reset zoom
+    if (key == '0') { // reset zoom
         camera.scale = 1;
     }
-})
-
-// key events (keyup)
-window.addEventListener('keyup', (event) => {
-    keys[event.key] = false;
-    if (event.key == ' ') {
-        keys.Space = false;
+    // fixes for capslock / shift
+    if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed
+        for (possiblyLowerKey in keys) { // check all the keys in the object
+            if (possiblyLowerKey == possiblyLowerKey.toLowerCase()) { // see if the keys are lowercase
+                keyupEvent(possiblyLowerKey); // if the keys are lowercase, set them to false
+            }
+        }
     }
-})
+    keys[key] = true;
+}
+
+function keyupEvent(key) {
+    keys[key] = false;
+    if (key == ' ') {
+        keys.Space = false; 
+    }
+}
+
+// key events
+window.addEventListener('keydown', (event) => {keydownEvent(event.key)});
+window.addEventListener('keyup', (event) => {keyupEvent(event.key)})
+
+// ensure that movement keys get updated
+function updateMovementKeys() {
+    movementKeys.left = (keys.a || keys.A || keys.ArrowLeft);
+    movementKeys.right = (keys.d || keys.D || keys.ArrowRight);
+    movementKeys.up = (keys.Space || keys.w || keys.W || keys.ArrowUp);
+    movementKeys.down = (keys.s || keys.S || keys.ArrowDown);
+}
 
 // update mouse pos
 document.addEventListener('mousemove', (event) => {
@@ -596,14 +621,14 @@ function playerPhysics() {
         player.air = false;
     }
     if (player.fly == false) {
-        if (keys.ArrowLeft == true || keys.a == true) {
+        if (movementKeys.left) {
             player.mx += -0.04 * player.speedmult;
             if (player.mx < -0.12 * player.speedmult) {
                 player.mx = -0.12 * player.speedmult;
             }
             player.acc = true;
         }
-        if (keys.ArrowRight == true || keys.d == true) {
+        if (movementKeys.right) {
             player.mx += 0.04 * player.speedmult;
             if (player.mx > 0.12 * player.speedmult) {
                 player.mx = 0.12 * player.speedmult;
@@ -611,17 +636,17 @@ function playerPhysics() {
             player.acc = true;
         }
         if (!inWater) {
-            if ((keys.ArrowUp == true || keys.w == true || keys.Space == true) && player.air == false) {
+            if (movementKeys.up && player.air == false) {
                 player.my = 0.2 * player.jumpmult;
                 player.air = true;
             }
         }
         // water movement (up/down)
         else {
-            if (keys.ArrowUp == true || keys.w == true || keys.Space == true) {
+            if (movementKeys.up) {
                 player.my += 0.005 * player.jumpmult;
             }
-            if (keys.ArrowDown == true || keys.s == true ) {
+            if (movementKeys.down) {
                 player.my -= 0.01 * player.jumpmult;
             }
         }
@@ -630,28 +655,28 @@ function playerPhysics() {
     // fly movement
 
     else {
-        if (keys.ArrowLeft || keys.a) {
+        if (movementKeys.left) {
             player.mx += -0.12 * player.speedmult;
             if (player.mx < -0.4 * player.speedmult) {
                 player.mx = -0.4 * player.speedmult;
             }
             player.flyx = true;
         }
-        if (keys.ArrowRight || keys.d) {
+        if (movementKeys.right) {
             player.mx += 0.12 * player.speedmult;
             if (player.mx > 0.4 * player.speedmult) {
                 player.mx = 0.4 * player.speedmult;
             }
             player.flyx = true;
         }
-        if (keys.ArrowUp || keys.w || keys.Space) {
+        if (movementKeys.up) {
             player.my += 0.04 * player.jumpmult;
             if (player.my > 0.2 * player.jumpmult) {
                 player.my = 0.2 * player.jumpmult;
             }
             player.flyy = true;
         }
-        if (keys.ArrowDown || keys.s) {
+        if (movementKeys.down) {
             player.my -= 0.04 * player.jumpmult;
             if (player.my < -0.2 * player.jumpmult) {
                 player.my = -0.2 * player.jumpmult;
@@ -662,14 +687,14 @@ function playerPhysics() {
 
     // disable acceleration mode when needed (prevents endless sliding)
     if (player.fly == false) {
-        if (!((keys.ArrowLeft == true || keys.a == true) || (keys.ArrowRight == true || keys.d == true))) {
+        if (!(movementKeys.left || movementKeys.right)) {
             player.acc = false;
         }
     } else {
-        if (!((keys.ArrowLeft == true || keys.a == true) || (keys.ArrowRight == true || keys.d == true))) {
+        if (!(movementKeys.left || movementKeys.right)) {
             player.flyx = false;
         }
-        if (!((keys.ArrowUp == true || keys.w == true) || (keys.ArrowDown == true || keys.s == true) || keys.Space)) {
+        if (!(movementKeys.up || movementKeys.down)) {
             player.flyy = false;
         }
     }
@@ -853,9 +878,10 @@ function tick() {
     }
     lastTick = Date.now();
     // non-visible (functional)
-    updateTime();
+    updateMovementKeys();
     playerPhysics();
     // visible
+    updateTime();
     moveCamera();
     renderWorld(camera.x, camera.y);
     renderInfoText();
