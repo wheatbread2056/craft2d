@@ -759,6 +759,10 @@ function playerPhysics() {
         player.air = false;
         player.my = 0;
         player.y = Math.ceil(player.y);
+    } else {
+        if (!inWater) {
+            player.air = true;
+        }
     }
     playerTopTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.floor(playertop + 1)) || getBlockCollision(Math.floor(playerright) - (1/8), Math.floor(playertop + 1)))
     if (playerTopTouching && !playerBottomTouching) {
