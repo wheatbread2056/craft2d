@@ -636,8 +636,11 @@ function playerPhysics() {
             player.acc = true;
         }
         if (!inWater) {
+            // took me an insanely long amount of time to find this
+            // but this is for the player ** JUMP **
             if (movementKeys.up && player.air == false) {
-                player.my = 0.2 * player.jumpmult;
+                // 0.21 y vel = around 2.1 block jump height
+                player.my = 0.21 * player.jumpmult;
                 player.air = true;
             }
         }
@@ -733,7 +736,7 @@ function playerPhysics() {
         
     }
     
-    // COLLISION CODE
+    // COLLISION
     // rewritten in alpha 1.8 - should be much better
     // this is actually AMAZING.
     playertop = player.y;
