@@ -733,41 +733,34 @@ function playerPhysics() {
         
     }
     
-    // basic collision (buggy)
-    playertop = player.y + 0.5;
-    playerbottom = player.y - 0.5;
-    playerleft = player.x - 0.5;
-    playerright = player.x + 0.5;
-
-    if (!(player.noclip == true)) {
-        // right of player collides with left of right block
-        if (!(getBlockCollision(Math.round(playerright),Math.round(player.y)) == null)) {
-            player.mx = 0;
-            player.x = Math.round(playerright) - 1;
-        }
-
-        // left of player collides with right of left block
-        else if (!(getBlockCollision(Math.round(playerleft),Math.round(player.y)) == null)) {
-            player.mx = 0;
-            player.x = Math.round(playerleft) + 1;
-        }
-
-        // bottom of player collides with top of bottom block
-        if ((!(getBlockCollision(Math.round(playerright - 0.001), Math.round(playerbottom)) == null) || !(getBlockCollision(Math.round(playerleft + 0.001), Math.round(playerbottom)) == null)) && (player.air == false || player.my < 0)) {
-            player.air = false;
-            player.my = 0;
-            player.y = Math.round(playerbottom) + 1;
-        } else {
-            if (!inWater) {
-                player.air = true;
-            }
-        }
-
-        // top of player collides with bottom of top block
-        if (!(getBlockCollision(Math.round(player.x),Math.round(playertop)) == null)) {
-            player.my = 0;
-            player.y = Math.round(playertop) - 1;
-        }
+    // COLLISION CODE
+    // rewritten in alpha 1.8 - should be much better
+    // this is actually AMAZING.
+    playertop = player.y;
+    playerbottom = player.y - 1;
+    playerleft = player.x;
+    playerright = player.x + 1;
+    playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(player.y)));
+    playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(player.y)));
+    // player bottom collision
+    if (playerLeftTouching) {
+        player.mx = 0;
+        player.x = Math.ceil(playerleft);
+    }
+    if (playerRightTouching) {
+        player.mx = 0;
+        player.x = Math.floor(playerleft);
+    }
+    playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
+    if (playerBottomTouching) {
+        player.air = false;
+        player.my = 0;
+        player.y = Math.ceil(player.y);
+    }
+    playerTopTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.floor(playertop + 1)) || getBlockCollision(Math.floor(playerright) - (1/8), Math.floor(playertop + 1)))
+    if (playerTopTouching && !playerBottomTouching) {
+        player.my = 0;
+        player.y = Math.ceil(playerbottom);
     }
 }
 
