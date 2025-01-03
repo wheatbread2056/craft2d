@@ -1,8 +1,29 @@
 const version = "Alpha 1.8-dev";
 const blocks = new Map(); // will be replaced with chunk loading at some point (2025)
-var envTime = 0; // 0 to 23999 (24000+ just gets set back to 0)
-var player = {x: 0, y: 0, mx: 0, my: 0, air: false, acc: false, fly: false, flyx: false, flyy: false, inWater: false, speedmult: 1, jumpmult: 1, noclip: false};
-var camera = {x: 0, y: 0, scale: 1};
+const player = {
+    x: 0, // player x position
+    y: 0, // player y position
+    mx: 0, // player x velocity per tick
+    my: 0, // player y velocity per tick
+    air: false, // if in midair
+    acc: false, // if accelerating
+    fly: false, // if flying / has alternate physics
+    flyx: false, // if accelerating horizontally during flight
+    flyy: false, // if accelerating vertically during flight
+    inWater: false, // if underwater
+    speedmult: 1, // speed velocity multiplier of the player
+    jumpmult: 1, // jump velocity multiplier of the player - does not correspond to blocks, meaning a 20% increase could cause a 50% height increase
+    noclip: false, // toggle collision with the player and blocks
+    maxhealth: 1000, // player's maximum health
+    health: 1000, // player's current health
+    insurance: true, // if the player will respawn
+    controlAllowed: true, // if the user is allowed to control the player
+};
+const camera = {
+    x: 0,
+    y: 0, 
+    scale: 1
+};
 const blockimages = {}
 var tickrate = 60;
 var mapseed = Math.round(Math.random() * (2147483647*2) - 2147483647);
@@ -612,80 +633,98 @@ function moveCamera() {
     }
 }
 
+// do stuff for player health
+function handlePlayerHealth() {
+    if (player.health <= 0) {
+        player.health = 0;
+        if (player.insurance) {
+            alert('You have died. (press OK to play again)');
+            spawnPlayer(0);
+            player.health = player.maxhealth;
+        } else {
+            alert('You have died. (player respawn is disabled - reload or enable respawn, then run managePlayerHealth() in the console');
+            player.controlAllowed = false;
+        }
+    }
+}
+
 // manages both physics/collision and movement
 function playerPhysics() {
-    // movement
-    var inWater = getBlock(Math.round(player.x),Math.floor(player.y))[0] == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5))[0] == 'watertop';
-    player.inWater = inWater;
-    if (inWater) {
-        player.air = false;
-    }
-    if (player.fly == false) {
-        if (movementKeys.left) {
-            player.mx += -0.04 * player.speedmult;
-            if (player.mx < -0.12 * player.speedmult) {
-                player.mx = -0.12 * player.speedmult;
+    // user-triggered actions aka movement
+    if (player.controlAllowed) {
+        if (player.fly == false) {
+            if (movementKeys.left) {
+                player.mx += -0.04 * player.speedmult;
+                if (player.mx < -0.12 * player.speedmult) {
+                    player.mx = -0.12 * player.speedmult;
+                }
+                player.acc = true;
             }
-            player.acc = true;
-        }
-        if (movementKeys.right) {
-            player.mx += 0.04 * player.speedmult;
-            if (player.mx > 0.12 * player.speedmult) {
-                player.mx = 0.12 * player.speedmult;
+            if (movementKeys.right) {
+                player.mx += 0.04 * player.speedmult;
+                if (player.mx > 0.12 * player.speedmult) {
+                    player.mx = 0.12 * player.speedmult;
+                }
+                player.acc = true;
             }
-            player.acc = true;
-        }
-        if (!inWater) {
-            // took me an insanely long amount of time to find this
-            // but this is for the player ** JUMP **
-            if (movementKeys.up && player.air == false) {
-                // 0.21 y vel = around 2.1 block jump height
-                player.my = 0.21 * player.jumpmult;
-                player.air = true;
+            if (!player.inWater) {
+                // took me an insanely long amount of time to find this
+                // but this is for the player ** JUMP **
+                if (movementKeys.up && player.air == false) {
+                    // 0.21 y vel = around 2.1 block jump height and 0.2 is under 2 blocks
+                    player.my = 0.21 * player.jumpmult;
+                    player.air = true;
+                }
+            }
+            else {
+                if (movementKeys.up) {
+                    player.my += 0.005 * player.jumpmult;
+                }
+                if (movementKeys.down) {
+                    console.log('DOWN');
+                    player.my -= 0.01 * player.jumpmult;
+                }
             }
         }
-        // water movement (up/down)
+        
+        // fly movement
+
         else {
+            if (movementKeys.left) {
+                player.mx += -0.12 * player.speedmult;
+                if (player.mx < -0.4 * player.speedmult) {
+                    player.mx = -0.4 * player.speedmult;
+                }
+                player.flyx = true;
+            }
+            if (movementKeys.right) {
+                player.mx += 0.12 * player.speedmult;
+                if (player.mx > 0.4 * player.speedmult) {
+                    player.mx = 0.4 * player.speedmult;
+                }
+                player.flyx = true;
+            }
             if (movementKeys.up) {
-                player.my += 0.005 * player.jumpmult;
+                player.my += 0.04 * player.jumpmult;
+                if (player.my > 0.2 * player.jumpmult) {
+                    player.my = 0.2 * player.jumpmult;
+                }
+                player.flyy = true;
             }
             if (movementKeys.down) {
-                player.my -= 0.01 * player.jumpmult;
+                player.my -= 0.04 * player.jumpmult;
+                if (player.my < -0.2 * player.jumpmult) {
+                    player.my = -0.2 * player.jumpmult;
+                }
+                player.flyy = true;
             }
         }
     }
-    
-    // fly movement
 
-    else {
-        if (movementKeys.left) {
-            player.mx += -0.12 * player.speedmult;
-            if (player.mx < -0.4 * player.speedmult) {
-                player.mx = -0.4 * player.speedmult;
-            }
-            player.flyx = true;
-        }
-        if (movementKeys.right) {
-            player.mx += 0.12 * player.speedmult;
-            if (player.mx > 0.4 * player.speedmult) {
-                player.mx = 0.4 * player.speedmult;
-            }
-            player.flyx = true;
-        }
-        if (movementKeys.up) {
-            player.my += 0.04 * player.jumpmult;
-            if (player.my > 0.2 * player.jumpmult) {
-                player.my = 0.2 * player.jumpmult;
-            }
-            player.flyy = true;
-        }
-        if (movementKeys.down) {
-            player.my -= 0.04 * player.jumpmult;
-            if (player.my < -0.2 * player.jumpmult) {
-                player.my = -0.2 * player.jumpmult;
-            }
-            player.flyy = true;
-        }
+    // check if in water
+    player.inWater = getBlock(Math.round(player.x),Math.floor(player.y))[0] == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5))[0] == 'watertop';
+    if (player.inWater) {
+        player.air = false;
     }
 
     // disable acceleration mode when needed (prevents endless sliding)
@@ -705,7 +744,7 @@ function playerPhysics() {
 
     // gravity
     if (player.fly == false) {
-        if (inWater) { // buoyancy
+        if (player.inWater) { // buoyancy
             player.my += 0.005;
             player.my *= 0.98;
         } else {
@@ -757,11 +796,16 @@ function playerPhysics() {
         }
         playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
         if (playerBottomTouching) {
+            if (player.my < -0.36) {
+                // fall damage based on the player's vertical velocity
+                player.health -= ((player.my*2) * (player.my*2) * (player.my*2) * (player.my*2)) * 160;
+                handlePlayerHealth();
+            };
             player.air = false;
             player.my = 0;
             player.y = Math.ceil(player.y);
         } else {
-            if (!inWater) {
+            if (!player.inWater) {
                 player.air = true;
             }
         }
@@ -777,16 +821,11 @@ function renderInfoText() {
     if (debug == true) {
         infoLn1.innerHTML = `<b>player</b>: (<red>${Math.round(player.x * 100) / 100}</red>, <cyan>${Math.round(player.y * 100) / 100}</cyan>) | momentum (<yellow>${Math.round(player.mx * 100) / 100}</yellow>, <yellow>${Math.round(player.my * 100) / 100}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
         infoLn2.innerHTML = `<b>world</b>: <yellow>${blocksRendered}</yellow> blocks rendered, <yellow>${blocks.size}</yellow> blocks stored, <yellow>${mapxsize}</yellow> map x size, <yellow>${camera.scale}</yellow> camera scale`;
-        infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow>, env tick <yellow>${envTime}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red>`;
+        infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red>`;
     } else {
         infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
-        // 100% readable code
-        var timestring1 = envTime.toString().padStart(5,'0');
-        var timestring2 = Math.floor(timestring1.slice(2,5) / 1000 * 60).toString().padStart(2,'0');
-        var timestring = `${timestring1.slice(0,2)}:${timestring2}`;
-
-        infoLn2.innerHTML = `Time: <yellow>${timestring}<yellow>`;
+        infoLn2.innerHTML = `Time: <yellow>${Math.floor(ticknum/60*10)/10}</yellow> seconds`;
 
         if (!(camera.scale == 1)) {
             infoLn3.innerHTML = `Camera scale: <yellow>${camera.scale}x</yellow>`;
@@ -801,9 +840,10 @@ function renderInfoText() {
         controlsKeybind.setAttribute('style', 'opacity:0');
         controlsList.setAttribute('style', 'opacity:1');
     }
-    blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length})`;
+    blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length}) | hp ${Math.ceil(player.health)}/${player.maxhealth} (${Math.round(player.health/player.maxhealth*1000)/10}%)`;
 }
 
+// not currently used - but might be useful later
 function getColor(c1, c2, p1, p2) {
     const r = Math.round((c1.r * p1) + (c2.r * p2));
     const g = Math.round((c1.g * p1) + (c2.g * p2));
@@ -813,36 +853,6 @@ function getColor(c1, c2, p1, p2) {
 
 function updateTime() {
     waterimg = `watertop_render${Math.floor(ticknum/8+1)-(Math.floor(ticknum/32)*4)}`;
-
-    // day 36, 125, 207
-    // night 56, 15, 122
-    // sunset/sunrise 143, 61, 7
-    if (envTime >= 0 && envTime <= 11999) {
-        document.body.style.backgroundColor = `rgb(36, 125, 207)`;
-    }
-    if (envTime >= 16000 && envTime <= 16999) { // sunset stage 1
-        const c = getColor({r:36,g:125,b:207},{r:143,g:61,b:7},(16999-envTime)/1000,(envTime-16000)/1000);
-        document.body.style.backgroundColor = `rgb(${c.r},${c.g},${c.b})`;
-    }
-    if (envTime >= 17000 && envTime <= 17999) { // sunset stage 2
-        const c = getColor({r:143,g:61,b:7},{r:56,g:15,b:122},(17999-envTime)/1000,(envTime-17000)/1000);
-        document.body.style.backgroundColor = `rgb(${c.r},${c.g},${c.b})`;
-    }
-    if (envTime >= 18000 && envTime <= 21999) {
-        document.body.style.backgroundColor = `rgb(56, 15, 122)`;
-    }
-    if (envTime >= 22000 && envTime <= 22999) { // sunrise stage 1
-        const c = getColor({r:56,g:15,b:122},{r:143,g:61,b:7},(22999-envTime)/1000,(envTime-22000)/1000);
-        document.body.style.backgroundColor = `rgb(${c.r},${c.g},${c.b})`;
-    }
-    if (envTime >= 23000 && envTime <= 23999) { // sunrise stage 2
-        const c = getColor({r:143,g:61,b:7},{r:36,g:125,b:207},(23999-envTime)/1000,(envTime-23000)/1000);
-        document.body.style.backgroundColor = `rgb(${c.r},${c.g},${c.b})`;
-    }
-    if (envTime >= 24000) {
-        envTime = 0;
-    }
-    envTime += 1;
 }
 
 function blockModification() {
@@ -882,6 +892,10 @@ function tick() {
     // non-visible (functional)
     updateMovementKeys();
     playerPhysics();
+    player.health += (7.5/60);
+    if (player.health > player.maxhealth) {
+        player.health = player.maxhealth;
+    }
     // visible
     updateTime();
     moveCamera();
