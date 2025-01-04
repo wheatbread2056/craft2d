@@ -1,5 +1,21 @@
 const version = "Alpha 1.8-dev";
 const blocks = new Map(); // will be replaced with chunk loading at some point (2025)
+const env = {
+    global: {
+        gravity: -0.6,
+        respawnEnabled: true,
+        flyAllowed: true,
+        baseSpeedVelocity: 7.2,
+        baseJumpVelocity: 12.6,
+    },
+    player: {
+        defaultMaxHealth: 1000,
+        defaultSpeedMultiplier: 1,
+        defaultJumpMultiplier: 1,
+        defaultInvincibility: false,
+        defaultRegenRate: 7.5,
+    },
+};
 const player = {
     x: 0, // player x position
     y: 0, // player y position
@@ -11,13 +27,14 @@ const player = {
     flyx: false, // if accelerating horizontally during flight
     flyy: false, // if accelerating vertically during flight
     inWater: false, // if underwater
-    speedmult: 1, // speed velocity multiplier of the player
-    jumpmult: 1, // jump velocity multiplier of the player - does not correspond to blocks, meaning a 20% increase could cause a 50% height increase
+    speedMult: env.player.defaultSpeedMultiplier, // speed velocity multiplier of the player
+    jumpMult: env.player.defaultJumpMultiplier, // jump velocity multiplier of the player - does not correspond to blocks, meaning a 20% increase could cause a 50% height increase
     noclip: false, // toggle collision with the player and blocks
-    maxhealth: 1000, // player's maximum health
-    health: 1000, // player's current health
-    insurance: true, // if the player will respawn
+    maxHealth: env.player.defaultMaxHealth, // player's maximum health
+    health: env.player.defaultMaxHealth, // player's current health
     controlAllowed: true, // if the user is allowed to control the player
+    invulnerable: env.player.defaultInvincibility, // true = no damage & infinite regen rate
+    regenRate: env.player.defaultRegenRate, // hp regenerated every second
 };
 const camera = {
     x: 0,
@@ -186,7 +203,7 @@ function keydownEvent(key) {
             debug = false;
         }
     }
-    if (key == 'c') { // fly mode toggle
+    if (key == 'c' && env.global.flyAllowed) { // fly mode toggle
         if (player.fly) {
             player.fly = false;
         } else {
@@ -637,10 +654,10 @@ function moveCamera() {
 function handlePlayerHealth() {
     if (player.health <= 0) {
         player.health = 0;
-        if (player.insurance) {
+        if (env.global.respawnEnabled) {
             alert('You have died. (press OK to play again)');
             spawnPlayer(0);
-            player.health = player.maxhealth;
+            player.health = player.maxHealth;
         } else {
             alert('You have died. (player respawn is disabled - reload or enable respawn, then run managePlayerHealth() in the console');
             player.controlAllowed = false;
@@ -654,16 +671,16 @@ function playerPhysics() {
     if (player.controlAllowed) {
         if (player.fly == false) {
             if (movementKeys.left) {
-                player.mx += -0.04 * player.speedmult;
-                if (player.mx < -0.12 * player.speedmult) {
-                    player.mx = -0.12 * player.speedmult;
+                player.mx += -env.global.baseSpeedVelocity / 3 * player.speedMult;
+                if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
+                    player.mx = -env.global.baseSpeedVelocity * player.speedMult;
                 }
                 player.acc = true;
             }
             if (movementKeys.right) {
-                player.mx += 0.04 * player.speedmult;
-                if (player.mx > 0.12 * player.speedmult) {
-                    player.mx = 0.12 * player.speedmult;
+                player.mx += env.global.baseSpeedVelocity / 3 * player.speedMult;
+                if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
+                    player.mx = env.global.baseSpeedVelocity * player.speedMult;
                 }
                 player.acc = true;
             }
@@ -672,17 +689,16 @@ function playerPhysics() {
                 // but this is for the player ** JUMP **
                 if (movementKeys.up && player.air == false) {
                     // 0.21 y vel = around 2.1 block jump height and 0.2 is under 2 blocks
-                    player.my = 0.21 * player.jumpmult;
+                    player.my = env.global.baseJumpVelocity * player.jumpMult;
                     player.air = true;
                 }
             }
-            else {
+            else { // water movement
                 if (movementKeys.up) {
-                    player.my += 0.005 * player.jumpmult;
+                    player.my += 0.1 * player.jumpMult;
                 }
                 if (movementKeys.down) {
-                    console.log('DOWN');
-                    player.my -= 0.01 * player.jumpmult;
+                    player.my -= 0.2 * player.jumpMult;
                 }
             }
         }
@@ -691,30 +707,30 @@ function playerPhysics() {
 
         else {
             if (movementKeys.left) {
-                player.mx += -0.12 * player.speedmult;
-                if (player.mx < -0.4 * player.speedmult) {
-                    player.mx = -0.4 * player.speedmult;
+                player.mx += -7.2 * player.speedMult;
+                if (player.mx < -24 * player.speedMult) {
+                    player.mx = -24 * player.speedMult;
                 }
                 player.flyx = true;
             }
             if (movementKeys.right) {
-                player.mx += 0.12 * player.speedmult;
-                if (player.mx > 0.4 * player.speedmult) {
-                    player.mx = 0.4 * player.speedmult;
+                player.mx += 7.2 * player.speedMult;
+                if (player.mx > 24 * player.speedMult) {
+                    player.mx = 24 * player.speedMult;
                 }
                 player.flyx = true;
             }
             if (movementKeys.up) {
-                player.my += 0.04 * player.jumpmult;
-                if (player.my > 0.2 * player.jumpmult) {
-                    player.my = 0.2 * player.jumpmult;
+                player.my += 2.4 * player.jumpMult;
+                if (player.my > 12 * player.jumpMult) {
+                    player.my = 12 * player.jumpMult;
                 }
                 player.flyy = true;
             }
             if (movementKeys.down) {
-                player.my -= 0.04 * player.jumpmult;
-                if (player.my < -0.2 * player.jumpmult) {
-                    player.my = -0.2 * player.jumpmult;
+                player.my -= 2.4 * player.jumpMult;
+                if (player.my < -12 * player.jumpMult) {
+                    player.my = -12 * player.jumpMult;
                 }
                 player.flyy = true;
             }
@@ -745,19 +761,19 @@ function playerPhysics() {
     // gravity
     if (player.fly == false) {
         if (player.inWater) { // buoyancy
-            player.my += 0.005;
+            player.my += 0.03;
             player.my *= 0.98;
         } else {
-            player.my -= 0.01;
+            player.my += env.global.gravity;
         }
     }
     
     // momentum & friction
-    player.x += player.mx;
-    player.y += player.my;
+    player.x += player.mx / 60;
+    player.y += player.my / 60;
     if (player.fly == false) { // normal non-flying friction
         if (player.acc == false) {
-            if (player.air && (player.mx > 0.12 || player.mx < -0.12)) { // air friction (fast)
+            if (player.air && (player.mx > 7.2 || player.mx < -7.2)) { // air friction (fast)
                 player.mx *= 0.97;
             } else if (player.air) { // air friction
                 player.mx *= 0.65;
@@ -796,9 +812,9 @@ function playerPhysics() {
         }
         playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
         if (playerBottomTouching) {
-            if (player.my < -0.36) {
+            if (player.my < -21.6 && !player.invulnerable) {
                 // fall damage based on the player's vertical velocity
-                player.health -= ((player.my*2) * (player.my*2) * (player.my*2) * (player.my*2)) * 160;
+                player.health -= ((player.my*2/60) * (player.my*2/60) * (player.my*2/60) * (player.my*2/60)) * 160;
                 handlePlayerHealth();
             };
             player.air = false;
@@ -819,7 +835,7 @@ function playerPhysics() {
 
 function renderInfoText() {
     if (debug == true) {
-        infoLn1.innerHTML = `<b>player</b>: (<red>${Math.round(player.x * 100) / 100}</red>, <cyan>${Math.round(player.y * 100) / 100}</cyan>) | momentum (<yellow>${Math.round(player.mx * 100) / 100}</yellow>, <yellow>${Math.round(player.my * 100) / 100}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
+        infoLn1.innerHTML = `<b>player</b>: (<red>${player.x.toFixed(2)}</red>, <cyan>${player.y.toFixed(2)}</cyan>) | velocity (<yellow>${player.mx.toFixed(2)}</yellow>, <yellow>${player.my.toFixed(2)}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
         infoLn2.innerHTML = `<b>world</b>: <yellow>${blocksRendered}</yellow> blocks rendered, <yellow>${blocks.size}</yellow> blocks stored, <yellow>${mapxsize}</yellow> map x size, <yellow>${camera.scale}</yellow> camera scale`;
         infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red>`;
     } else {
@@ -840,7 +856,7 @@ function renderInfoText() {
         controlsKeybind.setAttribute('style', 'opacity:0');
         controlsList.setAttribute('style', 'opacity:1');
     }
-    blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length}) | hp ${Math.ceil(player.health)}/${player.maxhealth} (${Math.round(player.health/player.maxhealth*1000)/10}%)`;
+    blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length}) | hp ${Math.ceil(player.health)}/${player.maxHealth} (${Math.round(player.health/player.maxHealth*1000)/10}%)`;
 }
 
 // not currently used - but might be useful later
@@ -892,9 +908,9 @@ function tick() {
     // non-visible (functional)
     updateMovementKeys();
     playerPhysics();
-    player.health += (7.5/60);
-    if (player.health > player.maxhealth) {
-        player.health = player.maxhealth;
+    player.health += (player.regenRate/60); if (player.invulnerable) {player.health = player.maxHealth}
+    if (player.health > player.maxHealth) {
+        player.health = player.maxHealth;
     }
     // visible
     updateTime();
