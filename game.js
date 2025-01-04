@@ -81,9 +81,10 @@ const blocknames = { // blocks without a proper name will use their ID in the bl
     stone3: 'Very Dark Stone',
     stone4: 'Unbreakable Stone',
     dirt: 'Dirt',
-    grass1: 'Grass',
+    grass1: 'Autumn Grass',
     grass2: 'Meadow Grass',
     grass3: 'Woods Grass',
+    grass4: 'Snowy Grass',
     sand: 'Sand',
     log1: 'Autumn Log',
     log2: 'Meadow Log',
@@ -98,6 +99,7 @@ const blocknames = { // blocks without a proper name will use their ID in the bl
     leaves4: 'Bright Yellow Autumn Leaves',
     leaves5: 'Green Meadow Leaves',
     leaves6: 'Dark Woods Leaves',
+    leaves7: 'Snowy Leaves',
     bricks: 'Bricks',
     stonebricks: 'Stone Bricks',
     dirtbricks: 'Dirt Bricks',
@@ -116,13 +118,13 @@ const blocknames = { // blocks without a proper name will use their ID in the bl
 }
 
 // all blocks (required to generate block images for rendering)
-const allblocks = ['dirt','grass1','grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6a','grassbg6b','grassbg7a','grassbg7b','leaves1','leaves2','leaves3','leaves4','log1','log2','log3','player','sand','stone1','stone2','stone3','stone4','test','water','watertop_render1','watertop_render2','watertop_render3','watertop_render4','watertop','leaves5','leaves6','bricks','stonebricks','dirtbricks','goldbricks','cactus','crate','grass2','grass3','glass','planks1','planks2','planks3','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8'];
+const allblocks = ['dirt','grass1','grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6a','grassbg6b','grassbg7a','grassbg7b','leaves1','leaves2','leaves3','leaves4','log1','log2','log3','player','sand','stone1','stone2','stone3','stone4','test','water','watertop_render1','watertop_render2','watertop_render3','watertop_render4','watertop','leaves5','leaves6','bricks','stonebricks','dirtbricks','goldbricks','cactus','crate','grass2','grass3','glass','planks1','planks2','planks3','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8','leaves7','grass4'];
 
 // blocks that never have collision
 const nocollision = ['grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6a','grassbg6b','grassbg7a','grassbg7b','watertop','water','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8'];
 
 // selectable blocks
-const selblocks = ['dirt','planks1','planks2','planks3','glass','crate','bricks','stonebricks','dirtbricks','goldbricks','log1','log2','log3','sand','stone1','stone2','stone3','water','grass1','grass2','grass3','cactus','leaves1','leaves2','leaves3','leaves4','leaves5','leaves6','sand','grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6','grassbg7','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8'];
+const selblocks = ['dirt','planks1','planks2','planks3','glass','crate','bricks','stonebricks','dirtbricks','goldbricks','log1','log2','log3','sand','stone1','stone2','stone3','water','grass1','grass2','grass3','grass4','cactus','leaves1','leaves2','leaves3','leaves4','leaves5','leaves6','leaves7','sand','grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6','grassbg7','flower1','flower2','flower3','flower4','flower5','flower6','flower7','flower8'];
 
 // generate block images
 for (const i in allblocks) {
@@ -384,13 +386,21 @@ function worldGen(start, end) {
         // layers of the world
         if (!underwater) {
 			if (worldgen.biome == 0) { // autumn hills
-				setBlock(worldgen.x, worldgen.y, 'grass1');
+                if (worldgen.y >= 128) {
+                    setBlock(worldgen.x, worldgen.y, 'grass4');
+                } else {
+				    setBlock(worldgen.x, worldgen.y, 'grass1');
+                }
 				for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
 					setBlock(worldgen.x, i, 'dirt');
 				}
 			}
 			if (worldgen.biome == 1) { // meadows
-				setBlock(worldgen.x, worldgen.y, 'grass2');
+                if (worldgen.y >= 128) {
+				    setBlock(worldgen.x, worldgen.y, 'grass4');
+                } else {
+                    setBlock(worldgen.x, worldgen.y, 'grass2');
+                }
 				for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
 					setBlock(worldgen.x, i, 'dirt');
 				}
@@ -404,7 +414,11 @@ function worldGen(start, end) {
 				}
 			}
 			if (worldgen.biome == 3) { // Woods
-				setBlock(worldgen.x, worldgen.y, 'grass3');
+                if (worldgen.y >= 128) {
+				    setBlock(worldgen.x, worldgen.y, 'grass4');
+                } else {
+                    setBlock(worldgen.x, worldgen.y, 'grass3');
+                }
 				for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
 					setBlock(worldgen.x, i, 'dirt');
 				}
@@ -450,11 +464,19 @@ function worldGen(start, end) {
 					var leaftype = Math.round(mapgenrandom(11) * 3 + 1);
 					for (var a = 0; a < 2; a++) {
 						for (var b = 0; b < 3; b++) {
-							setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves${leaftype}`, true);
+                            if (worldgen.y >= 128) {
+                                setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves7`, true);
+                            } else {
+                                setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves${leaftype}`, true);
+                            }
 						}
 					}
-					setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves${leaftype}`, true);
-					worldgen.treedelay = 4;
+                    if (worldgen.y >= 128) {
+                        setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves7`, true);
+                    } else {
+                        setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves${leaftype}`, true);
+                    }
+                    worldgen.treedelay = 4;
 				}
 				if (worldgen.biome == 1) { // meadow trees
 					// log 
@@ -465,10 +487,18 @@ function worldGen(start, end) {
 					// leaves 
 					for (var a = 0; a < 2; a++) {
 						for (var b = 0; b < 3; b++) {
-							setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves5', true);
+                            if (worldgen.y >= 128) {
+                                setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves7', true);
+                            } else {
+                                setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves5', true);
+                            }
 						}
 					}
-					setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves5', true);
+                    if (worldgen.y >= 128) {
+                        setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves7', true);
+                    } else {
+                        setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves5', true);
+                    }
 					worldgen.treedelay = 4;
 				}
 				if (worldgen.biome == 2) { // desert cactus
@@ -495,13 +525,25 @@ function worldGen(start, end) {
 					}
 					for (var leaf1 = 0; leaf1 < leafamount; leaf1++) {
 						for (var i = 0; i < 6; i++) {
-							setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves6', true);
+                            if (worldgen.y >= 128) {
+                                setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves7', true);
+                            } else {
+                                setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves6', true);
+                            }
 						}
 						for (var i = 0; i < 4; i++) {
-							setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves6', true);
+                            if (worldgen.y >= 128) {
+                                setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves7', true);
+                            } else {
+                                setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves6', true);
+                            }
 						}
 						for (var i = 0; i < 2; i++) {
-							setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves6', true);
+                            if (worldgen.y >= 128) {
+                                setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves7', true);
+                            } else {
+                                setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves6', true);
+                            }
 						}
 					}
 					worldgen.treedelay = 7;
