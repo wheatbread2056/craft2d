@@ -8,6 +8,7 @@ const env = {
         flyAllowed: true,
         baseSpeedVelocity: 7.2,
         baseJumpVelocity: 12.6,
+        worldSeaLevel: 48,
     },
     player: {
         defaultMaxHealth: 1000,
@@ -351,7 +352,6 @@ for (var i = 0; i < 65536; i++) {
 }
 console.log(`100% finished generating map noise (7/7)`);
 var treerate = 0.12;
-const waterlevel = 48;
 
 function worldGen(start, end) {
     worldgen = {x:start, y:0, scale:1, treedelay:0, biome:0};
@@ -376,7 +376,7 @@ function worldGen(start, end) {
         const treerng = mapgenrandom(2) // if this number is lower than treerate, a tree WILL spawn
 
         underwater = false;
-        if (worldgen.y <= waterlevel) {
+        if (worldgen.y <= env.global.worldSeaLevel) {
             underwater = true;
         }
         
@@ -425,9 +425,9 @@ function worldGen(start, end) {
 				}
 			}
         } else {
-            setBlock(worldgen.x, waterlevel, 'watertop');
+            setBlock(worldgen.x, env.global.worldSeaLevel, 'watertop');
             setBlock(worldgen.x, worldgen.y, 'sand');
-            for (var i = waterlevel - 1; i > worldgen.y; i--) {
+            for (var i = env.global.worldSeaLevel - 1; i > worldgen.y; i--) {
                 setBlock(worldgen.x, i, 'water');
             }
             for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
