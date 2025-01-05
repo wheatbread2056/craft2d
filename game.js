@@ -4,6 +4,7 @@ const env = {
     global: {
         gravity: -0.6,
         respawnEnabled: true,
+        walljumpEnabled: false,
         flyAllowed: true,
         baseSpeedVelocity: 7.2,
         baseJumpVelocity: 12.6,
@@ -712,19 +713,28 @@ function playerPhysics() {
     // user-triggered actions aka movement
     if (player.controlAllowed) {
         if (player.fly == false) {
-            if (movementKeys.left) {
-                player.mx += -env.global.baseSpeedVelocity / 3 * player.speedMult;
-                if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
-                    player.mx = -env.global.baseSpeedVelocity * player.speedMult;
+            if (!player.air) {
+                if (movementKeys.left) {
+                    player.mx += -env.global.baseSpeedVelocity / 3 * player.speedMult;
+                    if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
+                        player.mx = -env.global.baseSpeedVelocity * player.speedMult;
+                    }
+                    player.acc = true;
                 }
-                player.acc = true;
-            }
-            if (movementKeys.right) {
-                player.mx += env.global.baseSpeedVelocity / 3 * player.speedMult;
-                if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
-                    player.mx = env.global.baseSpeedVelocity * player.speedMult;
+                if (movementKeys.right) {
+                    player.mx += env.global.baseSpeedVelocity / 3 * player.speedMult;
+                    if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
+                        player.mx = env.global.baseSpeedVelocity * player.speedMult;
+                    }
+                    player.acc = true;
                 }
-                player.acc = true;
+            } else {
+                if (movementKeys.left) {
+                    player.mx += -env.global.baseSpeedVelocity / 24 * player.speedMult;
+                }
+                if (movementKeys.right) {
+                    player.mx += env.global.baseSpeedVelocity / 24 * player.speedMult;
+                }
             }
             if (!player.inWater) {
                 // took me an insanely long amount of time to find this
@@ -747,7 +757,7 @@ function playerPhysics() {
         
         // fly movement
 
-        else {
+        else if (player.fly == true) {
             if (movementKeys.left) {
                 player.mx += -7.2 * player.speedMult;
                 if (player.mx < -24 * player.speedMult) {
@@ -814,14 +824,10 @@ function playerPhysics() {
     player.x += player.mx / 60;
     player.y += player.my / 60;
     if (player.fly == false) { // normal non-flying friction
-        if (player.acc == false) {
-            if (player.air && (player.mx > 7.2 || player.mx < -7.2)) { // air friction (fast)
-                player.mx *= 0.97;
-            } else if (player.air) { // air friction
-                player.mx *= 0.65;
-            } else { // ground friction
-                player.mx *= 0.5;
-            }
+        if (player.air) { // air friction
+            player.mx *= 0.98;
+        } else if (!player.acc) { // ground friction
+            player.mx *= 0.5;
         }
     } else { // flying friction
         if (player.flyx == false) {
@@ -871,6 +877,21 @@ function playerPhysics() {
         if (playerTopTouching && !playerBottomTouching) {
             player.my = 0;
             player.y = Math.ceil(playerbottom);
+        }
+    }
+    // walljumping
+    if (env.global.walljumpEnabled) {
+        if (playerLeftTouching && movementKeys.up && movementKeys.left && player.air) {
+            console.log('left walljump.');
+            player.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
+            player.my = env.global.baseJumpVelocity * player.jumpMult;
+            player.air = true;
+        }
+        if (playerRightTouching && movementKeys.up && movementKeys.right && player.air) {
+            console.log('rigyht walljump.');
+            player.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
+            player.my = env.global.baseJumpVelocity * player.jumpMult;
+            player.air = true;
         }
     }
 }
