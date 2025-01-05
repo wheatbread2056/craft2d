@@ -882,13 +882,11 @@ function playerPhysics() {
     // walljumping
     if (env.global.walljumpEnabled) {
         if (playerLeftTouching && movementKeys.up && movementKeys.left && player.air) {
-            console.log('left walljump.');
             player.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
             player.my = env.global.baseJumpVelocity * player.jumpMult;
             player.air = true;
         }
         if (playerRightTouching && movementKeys.up && movementKeys.right && player.air) {
-            console.log('rigyht walljump.');
             player.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
             player.my = env.global.baseJumpVelocity * player.jumpMult;
             player.air = true;
