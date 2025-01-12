@@ -10,6 +10,9 @@ const env = {
         baseJumpVelocity: 12.6,
         worldSeaLevel: 48,
         worldGenType: 'normal',
+        worldBottomEnabled: true,
+        worldBottomBlock: 'stone4',
+        worldBottomImmutable: true,
     },
     player: {
         defaultMaxHealth: 1000,
@@ -284,13 +287,18 @@ function setBlock(x, y, block = 'test', bg = false) {
     blocks.set(`${x},${y}`, [block, bg]);
 }
 function getBlock(x, y) {
-    return blocks.get(`${x},${y}`) || [null, true];
+    let block = blocks.get(`${x},${y}`) || [null, true]
+    if (y <= -27 && env.global.worldBottomEnabled && block[0] == null) { // for world bottom
+        return [env.global.worldBottomBlock, false];
+    } else {
+        return block;
+    }
 }
 function deleteBlock(x, y) {
     blocks.delete(`${x},${y}`);
 }
 function getBlockCollision(x, y) {
-    const block = getBlock(x,y);
+    let block = getBlock(x,y);
     if (nocollision.includes(block[0])) {
         return null;
     } else if (block[1] == true) {
@@ -716,10 +724,7 @@ function renderWorld(camx, camy) {
             if (x + Math.floor(camx) > mapend) {
                 worldGen(mapend, mapend + 64);
             }
-            if (-y + Math.floor(camy) < -26) {
-                showBlock(globalCtx, x - camx2, -y - camy2, 'stone4');
-                blocksRendered++;
-            } else {
+            else {
                 const block = getBlock(x + Math.floor(camx), -y + Math.floor(camy))[0];
                 if (!(block == null)) {
                     if (block == 'watertop') { // show water animated
@@ -1033,7 +1038,7 @@ function blockModification() {
     }
     if (keys.x) { // place block
         // rules for special blocks
-        if (!(getBlock(blockx, blocky)[0] == 'stone4' || blocky < -26 || (Math.round(player.x) == blockx && Math.round(player.y) == blocky))) {
+        if (!(getBlock(blockx, blocky)[0] == 'stone4' || (blocky < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable) || (Math.round(player.x) == blockx && Math.round(player.y) == blocky))) {
             if (selblocks[currentblock] == 'grassbg6' || selblocks[currentblock] == 'grassbg7') {
                 setBlock(blockx, blocky, selblocks[currentblock]+'a');
                 setBlock(blockx, blocky+1, selblocks[currentblock]+'b');
