@@ -808,7 +808,7 @@ function playerPhysics() {
     // user-triggered actions aka movement
     if (player.controlAllowed) {
         if (player.fly == false) {
-            if (!player.air) {
+            if (!player.air && !player.inWater) {
                 if (movementKeys.left) {
                     player.mx += -env.global.baseSpeedVelocity / 3 * player.speedMult;
                     if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
@@ -908,7 +908,7 @@ function playerPhysics() {
     // gravity
     if (player.fly == false) {
         if (player.inWater) { // buoyancy
-            player.my += 0.03;
+            player.my += 0.1;
             player.my *= 0.98;
         } else {
             player.my += env.global.gravity;
@@ -919,7 +919,7 @@ function playerPhysics() {
     player.x += player.mx / 60;
     player.y += player.my / 60;
     if (player.fly == false) { // normal non-flying friction
-        if (player.air) { // air friction
+        if (player.air || player.inWater) { // air friction
             player.mx *= 0.98;
         } else if (!player.acc) { // ground friction
             player.mx *= 0.5;
