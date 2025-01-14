@@ -1,5 +1,6 @@
 * {
     font-family: 'Consolas', monospace;
+    user-select: none;
     color: #ffffff;
 }
 body {
@@ -9,6 +10,53 @@ body {
 p, pre {
     font-size: 20px;
 }
+/* colors */
+white {
+    color: white;
+}
+gray {
+    color: gray;
+}
+brown {
+    color: chocolate;
+}
+black {
+    color: black;
+}
+red {
+    color: red;
+}
+orange {
+    color: orange;
+}
+yellow {
+    color: yellow;
+}
+green {
+    color: lime;
+}
+cyan {
+    color: cyan;
+}
+blue {
+    color: blue;
+}
+purple {
+    color: darkviolet;
+}
+magenta {
+    color: magenta;
+}
+pink {
+    color: violet;
+}
+true {
+    color: lime;
+}
+false {
+    color: red;
+}
+/* everything else */
 .infotext {
     position: absolute;
     margin: 8px;
