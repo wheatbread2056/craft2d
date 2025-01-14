@@ -1,4 +1,3 @@
-const version = "Alpha 1.8-dev";
 const blocks = new Map(); // will be replaced with chunk loading at some point (2025)
 const env = {
     global: {
@@ -1090,5 +1089,5 @@ function killClock() {
 function setTickrate(rate) {
 	tickrate = rate;
 	killClock();
-	window.clock = setInterval(tick, 1000/tickrate);
+	window.clock = setInterval(`tick`, 1000/tickrate);
 }
