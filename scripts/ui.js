@@ -47,9 +47,26 @@ document.body.appendChild(blockSelector);
 
 function renderInfoText() {
     if (debug == true) {
+        // let didn't work for this
+        if (tickrateLow >= 60) {
+            var performanceGrade = 'a';
+            var performanceColor = 'purple';
+        } else if (tickrateLow >= 45) {
+            var performanceGrade = 'b';
+            var performanceColor = 'cyan';
+        } else if (tickrateLow >= 30) {
+            var performanceGrade = 'c';
+            var performanceColor = 'green';
+        } else if (tickrateLow >= 15) {
+            var performanceGrade = 'd';
+            var performanceColor = 'orange';
+        } else {
+            var performanceGrade = 'f';
+            var performanceColor = 'red';
+        }
         infoLn1.innerHTML = `<b>player</b>: (<red>${player.x.toFixed(2)}</red>, <cyan>${player.y.toFixed(2)}</cyan>) | velocity (<yellow>${player.mx.toFixed(2)}</yellow>, <yellow>${player.my.toFixed(2)}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
         infoLn2.innerHTML = `<b>world</b>: <yellow>${blocksRendered}</yellow> blocks rendered, <yellow>${blocks.size}</yellow> blocks stored, <yellow>${mapxsize}</yellow> map x size, <yellow>${camera.scale}</yellow> camera scale`;
-        infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red>`;
+        infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red> | grade <${performanceColor}>${performanceGrade}</${performanceColor}>`;
     } else {
         infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
