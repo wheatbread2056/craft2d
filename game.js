@@ -172,7 +172,7 @@ document.body.appendChild(infoLn3);
 // version text
 const versionText = document.createElement('p');
 versionText.setAttribute('class', 'infotext2');
-versionText.innerHTML = version
+versionText.innerHTML = versionName
 document.body.appendChild(versionText);
 
 // controls text
