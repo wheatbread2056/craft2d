@@ -32,8 +32,8 @@ const controlsList = document.createElement('pre');
 controlsList.setAttribute('class', 'infotext3');
 controlsList.innerHTML = `blocks are deleted and placed at the <b>mouse</b>
 <b>move</b>: WASD / arrows
-<b>delete block</b>: z
-<b>place block</b>: x
+<b>delete block</b>: LeftClick / z
+<b>place block</b>: RightClick / x
 <b>toggle fly mode</b>: c
 <b>choose block</b>: n / m
 <b>change zoom</b>: - / 0 / +`;

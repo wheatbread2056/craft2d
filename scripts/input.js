@@ -81,18 +81,31 @@ function keyupEvent(key) {
 }
 
 // left click only for now...
-function mouseupEvent() {
-    keys.LeftClick = false;
+function mouseupEvent(event) {
+    if (event.button === 0) {
+        keys.LeftClick = false;
+    } else if (event.button === 2) {
+        keys.RightClick = false;
+    }
 }
-function mousedownEvent() {
-    keys.LeftClick = true;
+
+function mousedownEvent(event) {
+    if (event.button === 0) {
+        keys.LeftClick = true;
+    } else if (event.button === 2) {
+        keys.RightClick = true;
+    }
 }
 
 // key events
-window.addEventListener('keydown', (event) => {keydownEvent(event.key)});
-window.addEventListener('keyup', (event) => {keyupEvent(event.key)})
-window.addEventListener('mouseup', (event) => {mouseupEvent()});
-window.addEventListener('mousedown', (event) => {mousedownEvent()});
+window.addEventListener('keydown', (event) => { keydownEvent(event.key) });
+window.addEventListener('keyup', (event) => { keyupEvent(event.key) });
+window.addEventListener('mouseup', (event) => { mouseupEvent(event) });
+window.addEventListener('mousedown', (event) => { mousedownEvent(event) });
+
+window.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+});
 
 // ensure that movement keys get updated
 function updateMovementKeys() {
