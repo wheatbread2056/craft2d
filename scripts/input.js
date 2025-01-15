@@ -80,9 +80,19 @@ function keyupEvent(key) {
     }
 }
 
+// left click only for now...
+function mouseupEvent() {
+    keys.LeftClick = false;
+}
+function mousedownEvent() {
+    keys.LeftClick = true;
+}
+
 // key events
 window.addEventListener('keydown', (event) => {keydownEvent(event.key)});
 window.addEventListener('keyup', (event) => {keyupEvent(event.key)})
+window.addEventListener('mouseup', (event) => {mouseupEvent()});
+window.addEventListener('mousedown', (event) => {mousedownEvent()});
 
 // ensure that movement keys get updated
 function updateMovementKeys() {

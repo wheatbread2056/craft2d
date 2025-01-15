@@ -352,7 +352,7 @@ function blockModification() {
             deleteBlock(blockx, blocky);
         }
     }
-    if (keys.x) { // place block
+    if (keys.x || keys.LeftClick) { // place block
         // rules for special blocks
         if (!(getBlock(blockx, blocky)[0] == 'stone4' || (blocky < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable) || (Math.round(player.x) == blockx && Math.round(player.y) == blocky))) {
             if (selblocks[currentblock] == 'grassbg6' || selblocks[currentblock] == 'grassbg7') {
