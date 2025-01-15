@@ -1089,5 +1089,5 @@ function killClock() {
 function setTickrate(rate) {
 	tickrate = rate;
 	killClock();
-	window.clock = setInterval(`tick`, 1000/tickrate);
+	window.clock = setInterval(tick, 1000/tickrate);
 }

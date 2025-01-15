@@ -1,5 +1,5 @@
 // this is the only thing that needs to be manually changed
-const versionID = "a1.8.2";
+const versionID = "a1.8.3";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
