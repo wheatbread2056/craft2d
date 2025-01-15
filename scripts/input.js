@@ -1,3 +1,19 @@
+const keybinds = {
+    'left': ['a', 'A', 'ArrowLeft'],
+    'right': ['d', 'D', 'ArrowRight'],
+    'up': ['Space', 'w', 'W', 'ArrowUp'],
+    'down': ['s', 'S', 'ArrowDown'],
+    'delete': ['LeftClick', 'z'],
+    'place': ['RightClick', 'x'],
+    'fly': ['c'],
+    'nextBlock': ['m'],
+    'prevBlock': ['n'],
+    'zoomOut': ['-'],
+    'zoomIn': ['='],
+    'resetZoom': ['0'],
+    'debug': ['`'],
+    'controls': ['q'],
+}
 const keys = {
     // example keys
     'a': false,
@@ -19,52 +35,44 @@ function keydownEvent(key) {
     if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
         keys.Space = true;
     }
-    if (key == '`') { // debug mode toggle
-        if (debug == false) {
-            debug = true;
-        } else {
-            debug = false;
-        }
+    if (keybinds.debug.includes(key)) { // debug mode toggle
+        debug = !debug;
     }
-    if (key == 'c' && env.global.flyAllowed) { // fly mode toggle
-        if (player.fly) {
-            player.fly = false;
-        } else {
-            player.fly = true;
-        }
+    if (keybinds.fly.includes(key) && env.global.flyAllowed) { // fly mode toggle
+        player.fly = !player.fly;
     }
-    if (key == 'm') { // next block
+    if (keybinds.nextBlock.includes(key)) { // next block
         currentblock++;
         if (currentblock >= selblocks.length) {
             currentblock = 0;
         }
     }
-    if (key == 'n') { // previous block
+    if (keybinds.prevBlock.includes(key)) { // previous block
         currentblock--;
         if (currentblock < 0) {
             currentblock = selblocks.length - 1;
         }
     }
-    if (key == '-') { // zoom out
+    if (keybinds.zoomOut.includes(key)) { // zoom out
         camera.scale *= 0.5;
         if (camera.scale < 0.25) {
             camera.scale = 0.25;
         }
-        camera.scale = Math.round(camera.scale*1000)/1000;
+        camera.scale = Math.round(camera.scale * 1000) / 1000;
     }
-    if (key == '=') { // zoom in
+    if (keybinds.zoomIn.includes(key)) { // zoom in
         camera.scale *= 2;
         if (camera.scale > 2) {
             camera.scale = 2;
         }
-        camera.scale = Math.round(camera.scale*1000)/1000;
+        camera.scale = Math.round(camera.scale * 1000) / 1000;
     }
-    if (key == '0') { // reset zoom
+    if (keybinds.resetZoom.includes(key)) { // reset zoom
         camera.scale = 1;
     }
     // fixes for capslock / shift
     if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed
-        for (possiblyLowerKey in keys) { // check all the keys in the object
+        for (let possiblyLowerKey in keys) { // check all the keys in the object
             if (possiblyLowerKey == possiblyLowerKey.toLowerCase()) { // see if the keys are lowercase
                 keyupEvent(possiblyLowerKey); // if the keys are lowercase, set them to false
             }
@@ -109,10 +117,10 @@ window.addEventListener('contextmenu', (event) => {
 
 // ensure that movement keys get updated
 function updateMovementKeys() {
-    movementKeys.left = (keys.a || keys.A || keys.ArrowLeft);
-    movementKeys.right = (keys.d || keys.D || keys.ArrowRight);
-    movementKeys.up = (keys.Space || keys.w || keys.W || keys.ArrowUp);
-    movementKeys.down = (keys.s || keys.S || keys.ArrowDown);
+    movementKeys.left = keybinds.left.some(key => keys[key]);
+    movementKeys.right = keybinds.right.some(key => keys[key]);
+    movementKeys.up = keybinds.up.some(key => keys[key]);
+    movementKeys.down = keybinds.down.some(key => keys[key]);
 }
 
 // update mouse pos

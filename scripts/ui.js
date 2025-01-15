@@ -30,6 +30,7 @@ document.body.appendChild(controlsKeybind);
 
 const controlsList = document.createElement('pre');
 controlsList.setAttribute('class', 'infotext3');
+// controls list will be replaced with controls in settings menu (alpha 1.10)
 controlsList.innerHTML = `blocks are deleted and placed at the <b>mouse</b>
 <b>move</b>: WASD / arrows
 <b>delete block</b>: LeftClick / z
@@ -78,7 +79,7 @@ function renderInfoText() {
             infoLn3.innerHTML = '';
         }
     }
-    if (!keys.q) {
+    if (!keybinds.controls.some(key => keys[key])) {
         controlsKeybind.setAttribute('style', 'opacity:1');
         controlsList.setAttribute('style', 'opacity:0');
     } else {

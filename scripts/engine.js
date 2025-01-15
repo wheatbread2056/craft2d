@@ -347,12 +347,12 @@ function updateTime() {
 function blockModification() {
     let blockx = Math.floor(mx/64 / camera.scale + camera.x);
     let blocky = Math.ceil(-my/64 / camera.scale + camera.y);
-    if (keys.z || keys.LeftClick) { // destroy block
+    if (keybinds.delete.some(key => keys[key])) { // destroy block
         if (!(getBlock(blockx, blocky)[0] == 'stone4')) {
             deleteBlock(blockx, blocky);
         }
     }
-    if (keys.x || keys.RightClick) { // place block
+    if (keybinds.place.some(key => keys[key])) { // place block
         // rules for special blocks
         if (!(getBlock(blockx, blocky)[0] == 'stone4' || (blocky < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable) || (Math.round(player.x) == blockx && Math.round(player.y) == blocky))) {
             if (selblocks[currentblock] == 'grassbg6' || selblocks[currentblock] == 'grassbg7') {
