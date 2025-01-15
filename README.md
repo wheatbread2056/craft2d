@@ -2,9 +2,9 @@
 Craft2D is a game where there are blocks, a world, and large (not infinite) possibilities.
 
 # How to Play
-Stable version: https://wheatbread2056.github.io/craft2d
+There is currently one instance, at https://wheatbread2056.github.io/craft2d
 
-Experimental versions (latest dev updates): https://wheatbread2056.github.io/craft2d-dev
+It should always be updated to the latest commit, although that does mean that some versions may be unfinished or unstable.
 
 You can also download the latest release, if there is one. If not, just clone the repository and open index.html in a browser.
 
