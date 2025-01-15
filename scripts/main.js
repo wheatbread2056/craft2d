@@ -1,5 +1,5 @@
 function tick() {
-    tickrateComputed = Math.round(1000 / (Date.now() - lastTick));
+    tickrateComputed = Math.round(1000 / (performance.now() - lastTick));
     if (Number.isInteger(ticknum / 60)) { // every 60 ticks reset low and high
         tickrateLow = tickrate; tickrateHigh = 0;
     }
@@ -9,7 +9,7 @@ function tick() {
     if (tickrateComputed > tickrateHigh) {
         tickrateHigh = tickrateComputed;
     }
-    lastTick = Date.now();
+    lastTick = performance.now();
     // non-visible (functional)
     updateMovementKeys();
     playerPhysics();

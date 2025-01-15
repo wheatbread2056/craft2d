@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.9-dev1";
+const versionID = "a1.9-dev2";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
@@ -21,6 +21,7 @@ const scripts = ['engine','data','input','render','worldgen','ui','main']; // li
 window.addEventListener('DOMContentLoaded', () => {
     const loadScript = (index) => {
         if (index >= scripts.length) return;
+
         const script = scripts[index];
         const gameScript = document.createElement('script');
         gameScript.src = `scripts/${script}.js?v=${versionID}`;
@@ -29,8 +30,10 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log(`scripts/${script}.js loaded @ ${loadTime}s`);
             loadScript(index + 1);
         };
+
         document.body.appendChild(gameScript);
     };
+
     loadScript(0);
 });
 
