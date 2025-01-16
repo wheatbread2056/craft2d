@@ -18,11 +18,13 @@ function tick() {
         player.health = player.maxHealth;
     }
     // visible
+    blockModification();
     updateTime();
     moveCamera();
     renderWorld(camera.x, camera.y);
     renderInfoText();
     ticknum++;
+    oldMx = mx; oldMy = my;
 }
 
 initialNoiseGeneration(16); // 2^16 size
@@ -31,4 +33,3 @@ spawnPlayer(Math.round((mapstart / 2) + (mapend / 2))); // should just be 0
 tick();
 
 var clock = setInterval(tick, 1000/tickrate);
-var blockModificationTick = setInterval(blockModification, 0); // do block modification seperately to feel smoother. replace this with the line method!!!

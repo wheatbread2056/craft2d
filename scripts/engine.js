@@ -63,6 +63,8 @@ var mapend = null;
 var debug = false;
 var mx = 0; // mouse x
 var my = 0; // mouse y
+var oldMx = 0;
+var oldMy = 0;
 var currentblock = 0; // current block in the block selector
 
 function setBlock(x, y, block = 'test', bg = false) {
@@ -345,23 +347,53 @@ function updateTime() {
 }
 
 function blockModification() {
-    let blockx = Math.floor(mx/64 / camera.scale + camera.x);
-    let blocky = Math.ceil(-my/64 / camera.scale + camera.y);
-    if (keybinds.delete.some(key => keys[key])) { // destroy block
-        if (!(getBlock(blockx, blocky)[0] == 'stone4')) {
-            deleteBlock(blockx, blocky);
+    // get the coordinates for the old and new block positions
+    let oldBlockX = Math.floor(oldMx / 64 / camera.scale + camera.x);
+    let oldBlockY = Math.ceil(-oldMy / 64 / camera.scale + camera.y);
+    let newBlockX = Math.floor(mx / 64 / camera.scale + camera.x);
+    let newBlockY = Math.ceil(-my / 64 / camera.scale + camera.y);
+
+    // use the burgerham algorhitm for line
+    let dx = Math.abs(newBlockX - oldBlockX);
+    let dy = Math.abs(newBlockY - oldBlockY);
+    let sx = (oldBlockX < newBlockX) ? 1 : -1;
+    let sy = (oldBlockY < newBlockY) ? 1 : -1;
+    let err = dx - dy;
+
+    while (true) {
+        // check if the delete key is pressed to destroy the block
+        if (keybinds.delete.some(key => keys[key])) {
+            if (getBlock(oldBlockX, oldBlockY)[0] !== 'stone4') {
+                deleteBlock(oldBlockX, oldBlockY);
+            }
         }
-    }
-    if (keybinds.place.some(key => keys[key])) { // place block
-        // rules for special blocks
-        if (!(getBlock(blockx, blocky)[0] == 'stone4' || (blocky < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable) || (Math.round(player.x) == blockx && Math.round(player.y) == blocky))) {
-            if (selblocks[currentblock] == 'grassbg6' || selblocks[currentblock] == 'grassbg7') {
-                setBlock(blockx, blocky, selblocks[currentblock]+'a');
-                setBlock(blockx, blocky+1, selblocks[currentblock]+'b');
+        // check if the place key is pressed to place a block
+        if (keybinds.place.some(key => keys[key])) {
+            let block = getBlock(oldBlockX, oldBlockY)[0];
+            let isWorldBottom = oldBlockY < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable;
+            let isPlayerPosition = Math.round(player.x) === oldBlockX && Math.round(player.y) === oldBlockY;
+
+            // place the block if it is not restricted
+            if (block !== 'stone4' && !isWorldBottom && !isPlayerPosition) {
+                if (selblocks[currentblock] === 'grassbg6' || selblocks[currentblock] === 'grassbg7') {
+                    setBlock(oldBlockX, oldBlockY, selblocks[currentblock] + 'a');
+                    setBlock(oldBlockX, oldBlockY + 1, selblocks[currentblock] + 'b');
+                } else {
+                    setBlock(oldBlockX, oldBlockY, selblocks[currentblock]);
+                }
             }
-            else {
-                setBlock(blockx, blocky, selblocks[currentblock]);
-            }
+        }
+
+        // break the loop if the end of the line is reached
+        if (oldBlockX === newBlockX && oldBlockY === newBlockY) break;
+        let e2 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            oldBlockX += sx;
+        }
+        if (e2 < dx) {
+            err += dx;
+            oldBlockY += sy;
         }
     }
 }
