@@ -23,7 +23,8 @@ function command(cmd) { // take a command input for the chatbox, then return the
 /get <yellow>name</yellow>
 /output <yellow>text</yellow>
 /crash
-/tickrate <yellow>val</yellow>`;
+/tickrate <yellow>val</yellow>
+/putils <yellow>action</yellow>`;
     }
     if (args[0] == 'tp') { // teleport player
         let x = parseInt(args[1]);
@@ -98,6 +99,35 @@ function command(cmd) { // take a command input for the chatbox, then return the
             return `tickrate set to <yellow>${args[1]}</yellow>`;
         } else {
             return `<yellow>invalid syntax</yellow>`;
+        }
+    } else if (args[0] == 'putils' || args[0] == 'p') { // player utilities
+        if (args[1] == 'heal' || args[1] == 'h') {
+            player.health = player.maxHealth;
+            return `player health set to <yellow>${player.maxHealth}</yellow>`;
+        } else if (args[1] == 'kill' || args[1] == 'k') {
+            player.health = -1;
+            handlePlayerHealth();
+            return `player health set to <red>-1</red>`;
+        } else if (args[1] == 'invulnerable' || args[1] == 'i') {
+            player.invulnerable = !player.invulnerable;
+            return `player.invulnerable set to <yellow>${player.invulnerable}</yellow>`;
+        } else if (args[1] == 'noclip' || args[1] == 'n') {
+            player.noclip = !player.noclip;
+            return `player.noclip set to <yellow>${player.noclip}</yellow>`;
+        } else if (args[1] == 'image') { // overwrite player image (dangerous)
+            try {
+                eval(`blockimages.player = blockimages.${args[2]}`);
+                return `player image overwritten with <yellow>blocks_${args[2]}.png</yellow>`;
+            } catch (e) {
+                return `<red>${e.message}</red>`;
+            }
+        } else if (args[1] == 'nf') { // noclip + fly quick shortcut
+            player.noclip = !player.noclip;
+            player.fly = !player.fly;
+            return `player.noclip set to <yellow>${player.noclip}</yellow>
+player.fly set to <yellow>${player.fly}</yellow>`;
+        } else {
+            return `(putils) valid commands: <yellow>heal, kill, invulnerable, noclip, image, nf</yellow>`;
         }
     } else {
         // return `Player: ${cmd}`; // <-- fake multiplayer
