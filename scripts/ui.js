@@ -46,6 +46,62 @@ blockSelector.setAttribute('class', 'blockselector');
 blockSelector.innerHTML = 'Block (1/99)';
 document.body.appendChild(blockSelector);
 
+var chatboxTimeout;
+var chatboxActive = false;
+var chatboxText = '';
+const chatbox = document.createElement('p');
+chatbox.setAttribute('class', 'chatbox');
+chatbox.setAttribute('style', 'opacity:0.8');
+chatbox.innerHTML = '<i>/help or /?</i>';
+document.body.appendChild(chatbox);
+
+const chathistory = document.createElement('div');
+chathistory.setAttribute('class', 'chathistory');
+chathistory.style.opacity = 0;
+chathistory.style.whiteSpace = 'pre-wrap'; // supports newlines but not text wrapping
+chathistory.style.whiteSpace = 'normal'; // supports text wrapping but not newlines
+document.body.appendChild(chathistory);
+
+function enableChatbox() {
+    chatboxActive = !chatboxActive;
+    player.controlAllowed = !chatboxActive;
+    if (chatboxActive) {
+        clearTimeout(chatboxTimeout);
+        chatbox.setAttribute('style', 'opacity:1');
+        chatboxText = '';
+        chatbox.innerHTML = '';
+        if (chathistory.innerHTML.length > 0) {
+            chathistory.style.opacity = 1;
+        }
+    } else {
+        chathistory.style.opacity = 1;
+        chatbox.setAttribute('style', 'opacity:0.8');
+        chatbox.innerHTML = '<i>/help or /?</i>';
+        chathistory.innerHTML = command(chatboxText);
+        
+        // Check if the command output contains newlines
+        if (chathistory.innerHTML.includes('\n')) {
+            chathistory.style.whiteSpace = 'pre-wrap';
+        } else {
+            chathistory.style.whiteSpace = 'normal';
+        }
+
+        clearTimeout(chatboxTimeout);
+        chatboxTimeout = setTimeout(() => {
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    chathistory.style.opacity = 0;
+                } else {
+                    opacity -= 0.1;
+                    chathistory.style.opacity = opacity;
+                }
+            }, 100);
+        }, 5000);
+    }
+}
+
 function renderInfoText() {
     if (debug == true) {
         // let didn't work for this
@@ -85,6 +141,14 @@ function renderInfoText() {
     } else {
         controlsKeybind.setAttribute('style', 'opacity:0');
         controlsList.setAttribute('style', 'opacity:1');
+    }
+    if (chatboxActive) {
+        let cursorVisible = Math.floor((ticknum / 60) * 2) % 2 === 0;
+        let cursorText = cursorVisible ? '|' : '';
+        chatbox.innerHTML = chatboxText + cursorText;
+        if (chatboxText.length <= 0) {
+            chatbox.innerHTML = '<gray>...</gray>';
+        }
     }
     blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length}) | hp ${Math.ceil(player.health)}/${player.maxHealth} (${Math.round(player.health/player.maxHealth*1000)/10}%)`;
 }

@@ -7,7 +7,7 @@ body {
     background-color: rgb(36, 125, 207);
     overflow: hidden;
 }
-p, pre {
+p, pre, div {
     font-size: 20px;
 }
 /* colors */
@@ -74,6 +74,26 @@ false {
     margin: 16px;
     bottom: 0;
     left: 0;
+}
+.chatbox {
+    position: absolute;
+    margin: 8px;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    width: 20%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.chathistory {
+    position: absolute;
+    margin: 8px;
+    bottom: 40px;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    width: 20%;
 }
 .blockselector {
     position: absolute;

@@ -13,6 +13,7 @@ const keybinds = {
     'resetZoom': ['0'],
     'debug': ['`'],
     'controls': ['q'],
+    'chat': ['/'],
 }
 const keys = {
     // example keys
@@ -32,6 +33,17 @@ const movementKeys = {
 
 // key events . part 1
 function keydownEvent(key) {
+    if (chatboxActive) {
+        if (key.length === 1) { // only add printable characters
+            chatboxText += key;
+        } else if (key == 'Enter') {
+            enableChatbox();
+        } else if (key == 'Backspace') {
+            chatboxText = chatboxText.slice(0, -1);
+        }
+        return;
+    }
+
     if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
         keys.Space = true;
     }
@@ -69,6 +81,9 @@ function keydownEvent(key) {
     }
     if (keybinds.resetZoom.includes(key)) { // reset zoom
         camera.scale = 1;
+    }
+    if (keybinds.chat.includes(key)) { // chat
+        enableChatbox();
     }
     // fixes for capslock / shift
     if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed
