@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.9.1";
+const versionID = "a1.9.2";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
@@ -18,9 +18,14 @@ document.title = `craft2D - ${versionName}`; // make the version title
 const scripts = ['engine','data','input','cmd','render','worldgen','ui','main']; // list of script files. this needs to be in the right order
 
 // wait until the document body is loaded
+// uses a different loadScript
 window.addEventListener('DOMContentLoaded', () => {
-    const loadScript = (index) => {
+    const initialLoadScript = (index) => {
         if (index >= scripts.length) return;
+
+        if (index == scripts.length-1) { // custom script loading
+            loadScript('scripts.js');
+        }
 
         const script = scripts[index];
         const gameScript = document.createElement('script');
@@ -28,13 +33,28 @@ window.addEventListener('DOMContentLoaded', () => {
         gameScript.onload = () => {
             const loadTime = (performance.now() / 1000).toFixed(3);
             console.log(`scripts/${script}.js loaded @ ${loadTime}s`);
-            loadScript(index + 1);
+            initialLoadScript(index + 1);
         };
-
         document.body.appendChild(gameScript);
     };
 
-    loadScript(0);
+    initialLoadScript(0);
 });
+
+// let other scripts load more scripts!
+function loadScript(src, version) {
+    const initTime = (performance.now() / 1000);
+    const script = document.createElement('script');
+    if (version === undefined) version = versionID;
+    script.src = `${src}?v=${version}`;
+    script.onload = () => {
+        const loadTime = (performance.now() / 1000);
+        console.log(`${src} loaded in ${(loadTime-initTime).toFixed(3)}s`);
+    };
+    script.onerror = (e) => {
+        console.warn(`custom script failed (${src}) @ ${(performance.now() / 1000).toFixed(3)}s`);
+    };
+    document.body.appendChild(script);
+}
 
 // it is like this because it makes changing the version easier
