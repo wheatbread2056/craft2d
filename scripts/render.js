@@ -3,7 +3,7 @@ for (const i in allblocks) {
     blk = allblocks[i];
     const imagekey = `block_${blk}`
     blockimages[imagekey] = new Image();
-    blockimages[imagekey].src = `images/block_${blk}.png`;
+    blockimages[imagekey].src = `images/blocks/${blk}.png`;
 }
 
 // canvas + ctx
