@@ -24,6 +24,7 @@ const keys = {
     'ArrowRight': false,
     'ArrowUp': false,
     'Space': false,
+    'Control': false,
 };
 const movementKeys = {
     'left': false,
@@ -34,13 +35,20 @@ const movementKeys = {
 // key events . part 1
 function keydownEvent(key) {
     if (chatboxActive) {
-        if (key.length === 1) { // only add printable characters
+        keys[key] = true;
+        if (key == 'v' && keys.Control) {
+            navigator.clipboard.readText().then(text => {
+                chatboxText += text;
+            }).catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
+            });
+        } else if (key.length === 1) { // only add printable characters
             chatboxText += key;
         } else if (key == 'Enter') {
             enableChatbox();
         } else if (key == 'Backspace') {
             chatboxText = chatboxText.slice(0, -1);
-        }
+        } else 
         return;
     }
 
