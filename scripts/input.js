@@ -50,58 +50,58 @@ function keydownEvent(key) {
             chatboxText = chatboxText.slice(0, -1);
         } else 
         return;
-    }
-
-    if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
-        keys.Space = true;
-    }
-    if (keybinds.debug.includes(key)) { // debug mode toggle
-        debug = !debug;
-    }
-    if (keybinds.fly.includes(key) && env.global.flyAllowed) { // fly mode toggle
-        player.fly = !player.fly;
-    }
-    if (keybinds.nextBlock.includes(key)) { // next block
-        currentblock++;
-        if (currentblock >= selblocks.length) {
-            currentblock = 0;
+    } else {
+        if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
+            keys.Space = true;
         }
-    }
-    if (keybinds.prevBlock.includes(key)) { // previous block
-        currentblock--;
-        if (currentblock < 0) {
-            currentblock = selblocks.length - 1;
+        if (keybinds.debug.includes(key)) { // debug mode toggle
+            debug = !debug;
         }
-    }
-    if (keybinds.zoomOut.includes(key)) { // zoom out
-        camera.scale *= 0.5;
-        if (camera.scale < 0.25) {
-            camera.scale = 0.25;
+        if (keybinds.fly.includes(key) && env.global.flyAllowed) { // fly mode toggle
+            player.fly = !player.fly;
         }
-        camera.scale = Math.round(camera.scale * 1000) / 1000;
-    }
-    if (keybinds.zoomIn.includes(key)) { // zoom in
-        camera.scale *= 2;
-        if (camera.scale > 2) {
-            camera.scale = 2;
-        }
-        camera.scale = Math.round(camera.scale * 1000) / 1000;
-    }
-    if (keybinds.resetZoom.includes(key)) { // reset zoom
-        camera.scale = 1;
-    }
-    if (keybinds.chat.includes(key)) { // chat
-        enableChatbox();
-    }
-    // fixes for capslock / shift
-    if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed
-        for (let possiblyLowerKey in keys) { // check all the keys in the object
-            if (possiblyLowerKey == possiblyLowerKey.toLowerCase()) { // see if the keys are lowercase
-                keyupEvent(possiblyLowerKey); // if the keys are lowercase, set them to false
+        if (keybinds.nextBlock.includes(key)) { // next block
+            currentblock++;
+            if (currentblock >= selblocks.length) {
+                currentblock = 0;
             }
         }
+        if (keybinds.prevBlock.includes(key)) { // previous block
+            currentblock--;
+            if (currentblock < 0) {
+                currentblock = selblocks.length - 1;
+            }
+        }
+        if (keybinds.zoomOut.includes(key)) { // zoom out
+            camera.scale *= 0.5;
+            if (camera.scale < 0.25) {
+                camera.scale = 0.25;
+            }
+            camera.scale = Math.round(camera.scale * 1000) / 1000;
+        }
+        if (keybinds.zoomIn.includes(key)) { // zoom in
+            camera.scale *= 2;
+            if (camera.scale > 2) {
+                camera.scale = 2;
+            }
+            camera.scale = Math.round(camera.scale * 1000) / 1000;
+        }
+        if (keybinds.resetZoom.includes(key)) { // reset zoom
+            camera.scale = 1;
+        }
+        if (keybinds.chat.includes(key)) { // chat
+            enableChatbox();
+        }
+        // fixes for capslock / shift
+        if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed
+            for (let possiblyLowerKey in keys) { // check all the keys in the object
+                if (possiblyLowerKey == possiblyLowerKey.toLowerCase()) { // see if the keys are lowercase
+                    keyupEvent(possiblyLowerKey); // if the keys are lowercase, set them to false
+                }
+            }
+        }
+        keys[key] = true;
     }
-    keys[key] = true;
 }
 
 function keyupEvent(key) {
