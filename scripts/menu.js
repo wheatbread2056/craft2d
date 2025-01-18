@@ -8,12 +8,21 @@ function showWorldSelector() {
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
         document.body.removeChild(menuTitle2);
-        document.body.style = 'background-color: rgb(36, 125, 207);'
+        document.body.style = 'background-color: black';
         
         env.global.worldGenType = type;
         console.log(env.global.worldGenType);
 
-        startGame();
+        // loading screen
+        window.loadingText = document.createElement('p');
+        window.loadingText.innerHTML = 'Loading...';
+        window.loadingText.style = 'font-size: 36px; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin:0';
+        document.body.appendChild(window.loadingText);
+
+        startGame(function() {
+            document.body.style = 'background-color: rgb(36, 125, 207);';
+            document.body.removeChild(window.loadingText);
+        });
 
         if (!(env.global.worldGenType == 'normal' || env.global.worldGenType == 'flat')) {
             env.global.worldBottomEnabled = false;
