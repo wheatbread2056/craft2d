@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.9.6";
+const versionID = "a1.10-dev1";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
@@ -15,19 +15,20 @@ const versionName = `${awerothiaergbyvze[versionID[0]]} ${versionID.slice(1)}`; 
 document.title = `craft2D - ${versionName}`; // make the version title
 
 // put the game script(s) in
-const scripts = ['engine','data','input','cmd','render','worldgen','ui','main','modloader']; // list of script files. this needs to be in the right order
+const scripts1 = ['engine','data','menu']; // stage1 (before game)
+const scripts2 = ['input','cmd','render','worldgen','ui','main','modloader']; // stage 2 (ingame)
 
 // wait until the document body is loaded
 // uses a different loadScript
-window.addEventListener('DOMContentLoaded', () => {
+function startGame() {
     const initialLoadScript = (index) => {
-        if (index >= scripts.length) return;
+        if (index >= scripts2.length) return;
 
-        if (index == scripts.length-1) { // custom script loading
+        if (index == scripts2.length-1) { // custom script loading
             loadScript('scripts.js');
         }
 
-        const script = scripts[index];
+        const script = scripts2[index];
         const gameScript = document.createElement('script');
         gameScript.src = `scripts/${script}.js?v=${versionID}`;
         gameScript.onload = () => {
@@ -39,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     initialLoadScript(0);
-});
+}
 
 // let other scripts load more scripts!
 function loadScript(src, version) {
@@ -57,4 +58,19 @@ function loadScript(src, version) {
     document.body.appendChild(script);
 }
 
-// it is like this because it makes changing the version easier
+window.addEventListener('DOMContentLoaded', () => {
+    const preGameScripts = (index) => {
+        if (index >= scripts1.length) return;
+
+        const script = scripts1[index];
+        const gameScript = document.createElement('script');
+        gameScript.src = `scripts/${script}.js?v=${versionID}`;
+        gameScript.onload = () => {
+            const loadTime = (performance.now() / 1000).toFixed(3);
+            console.log(`scripts/${script}.js loaded @ ${loadTime}s`);
+            preGameScripts(index + 1);
+        };
+        document.body.appendChild(gameScript);
+    }
+    preGameScripts(0);
+});

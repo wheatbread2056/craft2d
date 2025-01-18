@@ -8,7 +8,7 @@ const env = {
         baseSpeedVelocity: 7.2,
         baseJumpVelocity: 12.6,
         worldSeaLevel: 48,
-        worldGenType: 'normal',
+        worldGenType: 'none',
         worldBottomEnabled: true,
         worldBottomBlock: 'stone4',
         worldBottomImmutable: true,
@@ -129,6 +129,9 @@ function spawnPlayer(spawnx) {
         }
         player.x = spawnCoords[0];
         player.y = spawnCoords[1];
+    }
+    if (env.global.worldGenType == 'none') {
+        setBlock(spawnx, -1, 'stone4');
     }
     asdfhjkhagdbsf();
 }
