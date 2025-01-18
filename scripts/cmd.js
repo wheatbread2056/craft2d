@@ -117,7 +117,7 @@ function command(cmd) { // take a command input for the chatbox, then return the
         } else if (args[1] == 'image') { // overwrite player image (dangerous)
             try {
                 eval(`newimage = new Image(); newimage.src = '${args[2]}'`);
-                eval(`blockimages.block_player = newimage`);
+                eval(`blockimages.player = newimage`);
                 return `player image overwritten with <yellow>${args[2]}</yellow>`;
             } catch (e) {
                 return `<red>${e.message}</red>`;
