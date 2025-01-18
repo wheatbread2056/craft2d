@@ -1,7 +1,7 @@
 // generate block images
 for (const i in allblocks) {
     blk = allblocks[i];
-    const imagekey = `block_${blk}`
+    const imagekey = blk;
     blockimages[imagekey] = new Image();
     blockimages[imagekey].src = `images/blocks/${blk}.png`;
 }

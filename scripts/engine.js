@@ -97,7 +97,7 @@ function showBlock(ctx, x, y, block) { // x and y are relative to document
     if (isPlayer) {
         ctx.globalAlpha = 0.5;
     }
-    ctx.drawImage(blockimages['block_' + block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    ctx.drawImage(blockimages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     if (isPlayer) {
         ctx.globalAlpha = 1;
     }
