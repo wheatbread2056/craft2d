@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.10-dev2";
+const versionID = "a1.10-dev3";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
@@ -15,7 +15,7 @@ const versionName = `${awerothiaergbyvze[versionID[0]]} ${versionID.slice(1)}`; 
 document.title = `craft2D - ${versionName}`; // make the version title
 
 // put the game script(s) in
-const scripts1 = ['engine','data','menu']; // stage1 (before game)
+const scripts1 = ['engine','data','music','menu']; // stage1 (before game)
 const scripts2 = ['input','cmd','render','worldgen','ui','main','modloader']; // stage 2 (ingame)
 
 // wait until the document body is loaded

@@ -2,6 +2,7 @@ document.body.style.height = '100vh';
 document.body.style.margin = '0';
 document.body.style.backgroundImage = 'linear-gradient(to bottom right, purple, darkblue)';
 document.body.style.backgroundSize = 'cover';
+loopMusic([{src:'music/craft2d-maintheme-v1.10.mp3',speed:1}]);
 
 function showWorldSelector() {
     function openWorld(type) {
@@ -22,6 +23,10 @@ function showWorldSelector() {
         startGame(function() {
             document.body.style = 'background-color: rgb(36, 125, 207);';
             document.body.removeChild(window.loadingText);
+
+            // music stuff
+            endLoop();
+            loopMusic([{src:'music/stone4.mp3',speed:0.8}]);
         });
 
         if (!(env.global.worldGenType == 'normal' || env.global.worldGenType == 'flat')) {
