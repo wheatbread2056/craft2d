@@ -38,7 +38,7 @@ function showWorldSelector() {
 
             // music stuff
             endLoop();
-            loopMusic([{src:'music/stone4.mp3',speed:0.8}]);
+            loopMusic([{src:'music/grass1.mp3',speed:1}]);
         });
 
         if (!(env.global.worldGenType == 'normal' || env.global.worldGenType == 'flat')) {
