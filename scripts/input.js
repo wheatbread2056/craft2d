@@ -14,6 +14,7 @@ const keybinds = {
     'debug': ['`'],
     'controls': ['q'],
     'chat': ['/'],
+    'pause': ['p'],
 }
 const keys = {
     // example keys
@@ -91,6 +92,9 @@ function keydownEvent(key) {
         }
         if (keybinds.chat.includes(key)) { // chat
             enableChatbox();
+        }
+        if (keybinds.pause.includes(key)) {
+            if (env.global.paused) {unpauseGame()} else {pauseGame()};
         }
         // fixes for capslock / shift
         if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed

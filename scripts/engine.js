@@ -1,6 +1,8 @@
 const blocks = new Map(); // will be replaced with chunk loading at some point (2025)
 const env = {
     global: {
+        paused: false,
+        targetRate: 60,
         gravity: -0.6,
         respawnEnabled: true,
         walljumpEnabled: false,

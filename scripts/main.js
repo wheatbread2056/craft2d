@@ -1,6 +1,6 @@
 function tick() {
     tickrateComputed = Math.round(1000 / (performance.now() - lastTick));
-    if (Number.isInteger(ticknum / 60)) { // every 60 ticks reset low and high
+    if (Number.isInteger(ticknum / tickrate)) { // every 60 ticks reset low and high
         tickrateLow = tickrate; tickrateHigh = 0;
     }
     if (tickrateComputed < tickrateLow) {

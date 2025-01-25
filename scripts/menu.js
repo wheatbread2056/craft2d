@@ -4,6 +4,18 @@ document.body.style.backgroundImage = 'linear-gradient(to bottom right, purple, 
 document.body.style.backgroundSize = 'cover';
 loopMusic([{src:'music/craft2d-maintheme-v1.10.mp3',speed:1}]);
 
+function pauseGame() {
+    env.global.paused = true;
+    setTickrate(0.0001);
+    window.pauseDim = document.createElement('div');
+    pauseDim.style = 'position:absolute;width:100%;height:100%;top:0;left:0;margin:0;background-color:black;opacity:0.5';
+    document.body.appendChild(pauseDim);
+}
+function unpauseGame() {
+    env.global.paused = false;
+    setTickrate(env.global.targetRate);
+    document.body.removeChild(pauseDim);    
+}
 function showWorldSelector() {
     function openWorld(type) {
         document.body.removeChild(theDiv);
