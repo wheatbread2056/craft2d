@@ -359,7 +359,6 @@ function updateTime() {
     // update gravity for space
     if (player.y > 400) {
         env.global.gravity = -0.6 / (player.y/400);
-        console.log(env.global.gravity);
     } else {
         env.global.gravity = env.global.baseGravity;
     }

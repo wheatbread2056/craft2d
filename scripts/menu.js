@@ -18,6 +18,17 @@ function unpauseGame() {
 }
 function showWorldSelector() {
     function openWorld(type) {
+        let tips = [
+            "If you go up high enough, you will reach space.",
+            "Please report bugs as GitHub issues.",
+            "If you play craft2D in a local copy, you can do more.",
+            "Remember, there are no bugs, only unintentional features.",
+            "Are you having fun?",
+            "Do NOT enable walljump.",
+            "Press 'P' to pause the game.",
+            "Update 2.0 releasing March 20, 6030!",
+            "I am sorry about the very buggy collision.",
+        ]
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
         document.body.removeChild(menuTitle2);
@@ -32,9 +43,17 @@ function showWorldSelector() {
         window.loadingText.style = 'font-size: 36px; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin:0';
         document.body.appendChild(window.loadingText);
 
+        // random tip
+        let randomTip = tips[Math.floor(Math.random() * tips.length)];
+        window.tipText = document.createElement('p');
+        window.tipText.innerHTML = `<i>${randomTip}</i>`;
+        window.tipText.style = 'font-size: 24px; text-align: center; position: absolute; top: 57%; left: 50%; transform: translate(-50%, -50%); margin:0; opacity:0.8';
+        document.body.appendChild(window.tipText);
+
         startGame(function() {
             document.body.style = 'background-color: rgb(36, 125, 207);';
             document.body.removeChild(window.loadingText);
+            document.body.removeChild(window.tipText);
 
             // music stuff
             endLoop();
