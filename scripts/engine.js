@@ -3,7 +3,8 @@ const env = {
     global: {
         paused: false,
         targetRate: 60,
-        gravity: -0.6,
+        baseGravity: -0.6,
+        gravity: 0,
         respawnEnabled: true,
         walljumpEnabled: false,
         flyAllowed: true,
@@ -349,6 +350,19 @@ function getColor(c1, c2, p1, p2) {
 
 function updateTime() {
     waterimg = `watertop_render${Math.floor(ticknum/8+1)-(Math.floor(ticknum/32)*4)}`;
+
+    // sky color changes, up is space and down is void or caves idk which one
+    document.body.style.background = `linear-gradient(to bottom, rgb(0, 0, 0) ${player.y - 2500}%, rgb(28, 24, 56) ${player.y - 800}%, rgb(25, 76, 151) ${player.y - 400}%, rgb(36, 125, 207) ${player.y}%, rgb(0,0,0) ${player.y + 200}%)`;
+    document.body.style.height = '1000vh';
+    document.body.style.margin = '0';
+
+    // update gravity for space
+    if (player.y > 400) {
+        env.global.gravity = -0.6 / (player.y/400);
+        console.log(env.global.gravity);
+    } else {
+        env.global.gravity = env.global.baseGravity;
+    }
 }
 
 function blockModification() {
