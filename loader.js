@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.10-dev8";
+const versionID = "a1.10-dev9";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
@@ -21,13 +21,12 @@ const scripts2 = ['input','cmd','render','worldgen','ui','main']; // stage 2 (in
 // wait until the document body is loaded
 // uses a different loadScript
 function startGame(onLoadFunction) {
+    document.addEventListener("GameLoaded", () => {
+        loadScript('scripts.js');
+        onLoadFunction();
+    });
     const initialLoadScript = (index) => {
         if (index >= scripts2.length) return;
-
-        document.addEventListener("GameLoaded", () => {
-            loadScript('scripts.js');
-            onLoadFunction();
-        });
 
         const script = scripts2[index];
         const gameScript = document.createElement('script');
