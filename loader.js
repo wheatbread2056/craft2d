@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.10-dev9";
+const versionID = "a1.10-dev10";
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
