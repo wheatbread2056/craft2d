@@ -16,13 +16,11 @@ player.health = player.maxHealth; // update player's health
 
 // update the keybinds
 for (const key in keybinds) {
-    console.log(key);
     const storedKey = localStorage.getItem(`controls.${key}`);
     if (storedKey) {
         // split into array, and remove whitespace
         keybinds[key] = storedKey.split(',').map(k => k.trim());
     }
-    console.log(keybinds[key]);
 }
 
 function tick() {
