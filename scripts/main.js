@@ -5,6 +5,26 @@ const GameLoaded = new CustomEvent("GameLoaded", {
     }
 })
 
+// Attempt to load settings from localStorage
+// why is this so long
+player.maxHealth = parseInt(localStorage.getItem('gameplay.maxHealth')) || env.player.defaultMaxHealth;
+player.speedMult = parseInt(localStorage.getItem('gameplay.speedMultiplier'))|| env.player.defaultSpeedMultiplier;
+player.jumpMult = parseInt(localStorage.getItem('gameplay.jumpMultiplier')) || env.player.defaultJumpMultiplier;
+player.regenRate = parseInt(localStorage.getItem('gameplay.regenRate'))|| env.player.defaultRegenRate;
+player.invulnerable = localStorage.getItem('gameplay.invincibility') === 'true' || env.player.defaultInvincibility;
+player.health = player.maxHealth; // update player's health
+
+// update the keybinds
+for (const key in keybinds) {
+    console.log(key);
+    const storedKey = localStorage.getItem(`controls.${key}`);
+    if (storedKey) {
+        // split into array, and remove whitespace
+        keybinds[key] = storedKey.split(',').map(k => k.trim());
+    }
+    console.log(keybinds[key]);
+}
+
 function tick() {
     tickrateComputed = Math.round(1000 / (performance.now() - lastTick));
     if (Number.isInteger(ticknum / tickrate)) { // every 60 ticks reset low and high

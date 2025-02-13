@@ -141,11 +141,12 @@ function showSettings(divName) {
 
 const settings = [
     { id: 'audio', text: 'Audio', onclick: () => { showSettings('audio'); } },
-    { id: 'video', text: 'Graphics', onclick: () => { showSettings('video'); } },
+    // { id: 'video', text: 'Graphics', onclick: () => { showSettings('video'); } },
     { id: 'gameplay', text: 'Gameplay', onclick: () => { showSettings('gameplay'); } },
     { id: 'controls', text: 'Controls', onclick: () => { showSettings('controls'); } },
     { id: 'scripts', text: 'Scripts', onclick: () => { showSettings('scripts'); } },
-    { id: 'extra', text: 'Extra', onclick: () => { showSettings('extra'); } },
+    // { id: 'extra', text: 'Extra', onclick: () => { showSettings('extra'); } },
+    { id: 'settingmanager', text: 'Save/Load', onclick: () => { showSettings('settingmanager'); } },
     { id: 'back', text: 'Back', onclick: () => { 
         hideAllSettings();
         document.body.removeChild(settingsDiv);
@@ -177,7 +178,9 @@ overflow: auto;
     settingDivs[setting.id].appendChild(newText);
 
     // Add actual settings content based on the setting id
-    function createSetting(labelText, inputType, min, max, value) {
+    function createSetting(settingId, labelText, inputType, min, max, value, mult, rounding) {
+        if (rounding == undefined) {rounding = 0};
+        if (mult == undefined) {mult = 1};
         let container = document.createElement('div');
         container.style.display = 'flex';
         container.style.justifyContent = 'space-between';
@@ -185,13 +188,19 @@ overflow: auto;
         container.style.margin = '8px 0';
 
         let label = document.createElement('label');
-        label.innerHTML = labelText + (inputType === 'range' ? ` (${value || 0})` : '');
         label.style.flex = '1';
         label.style.marginRight = '96px';
         label.style.maxWidth = '50vw';
         container.appendChild(label);
 
         let input = document.createElement('input');
+        if (localStorage.getItem(settingId) !== null) {
+            let storedValue = localStorage.getItem(settingId);
+            value = storedValue !== null ? storedValue / mult : value;
+            if (isNaN(value)) {
+                value = storedValue;
+            }
+        }
         input.type = inputType;
         if (inputType === 'toggle') {
             input = document.createElement('button');
@@ -201,6 +210,7 @@ overflow: auto;
             input.innerHTML = value;
             input.onclick = () => {
                 input.innerHTML = input.innerHTML === min ? max : min;
+                localStorage.setItem(settingId, input.innerHTML);
             };
             input.className = 'playButton';
         }
@@ -214,9 +224,10 @@ overflow: auto;
             input.style.cursor = 'pointer';
             input.style.fontSize = '24px';
             input.addEventListener('click', () => {
-            value = !value;
-            input.innerHTML = value ? '✅' : '❌';
-            input.style.color = value ? 'green' : 'red';
+                value = !value;
+                input.innerHTML = value ? '✅' : '❌';
+                input.style.color = value ? 'green' : 'red';
+                localStorage.setItem(settingId, value);
             });
             input.style.color = value ? 'green' : 'red';
         }
@@ -228,48 +239,128 @@ overflow: auto;
             max-width: 256px;
             accent-color: #3800d3;`
             input.style.flex = '1';
+            input.addEventListener('input', () => {
+                let valueToStore = input.value * mult;
+                if (isNaN(valueToStore)) {
+                    valueToStore = input.value;
+                }
+                localStorage.setItem(settingId, valueToStore);
+            });
         }
+        label.innerHTML = labelText + (inputType === 'range' ? ` (${value * mult || 0})` : '');
         container.appendChild(input);
 
         if (inputType === 'range') {
             input.addEventListener('input', () => {
-                label.innerHTML = labelText + ` (${input.value})`;
+                label.innerHTML = labelText + ` (${(input.value * mult).toFixed(rounding)})`;
             });
         }
 
         settingDivs[setting.id].appendChild(container);
     }
+    function createCategory(categoryText) {
+        let category = document.createElement('p');
+        category.innerHTML = categoryText;
+        category.style = `
+        font-size: 24px; 
+        text-align: center;
+        width: 100%;
+        margin: 16px 0;
+        color: #ffffff;
+        max-width: 384px`;
+        settingDivs[setting.id].appendChild(category);
+    }
+    function createCategory2(categoryText) {
+        let category = document.createElement('p');
+        category.innerHTML = categoryText;
+        category.style = `
+        font-size: 24px; 
+        text-align: center;
+        width: 100%;
+        margin: 16px 0;
+        color: #ffffff;
+        `;
+        settingDivs[setting.id].appendChild(category);
+    }
 
     switch (setting.id) {
         case 'audio':
-            createSetting('Master Volume', 'range', 0, 100, 100);
-            createSetting('Music Volume', 'range', 0, 100, 100);
-            createSetting('Sfx Volume', 'range', 0, 100, 100);
-            createSetting('Music Speed', 'range', 5, 20, 10);
+            createCategory2("Reload to apply changes.")
+            createSetting('audio.masterVolume', 'Master Volume', 'range', 0, 100, 100);
+            createSetting('audio.musicVolume', 'Music Volume', 'range', 0, 100, 100);
+            // unused: createSetting('audio.sfxVolume', 'Sfx Volume', 'range', 0, 100, 100);
+            createSetting('audio.musicSpeed', 'Music Speed', 'range', 5, 20, 10, 0.1, 1);
             break;
         case 'video':
-            createSetting('Enable Antialiasing', 'checkbox', undefined, undefined, true);
-            createSetting('UI Visible', 'checkbox', undefined, undefined, true);
+            createCategory('Please provide suggestions on what to put here.');
+            createSetting('video.uiVisible', 'UI Visible', 'checkbox', undefined, undefined, true);
             break;
         case 'gameplay':
-            createSetting('Max Health', 'range', 1, 10, 1);
-            createSetting('Speed multiplier', 'range', 5, 20, 10);
-            createSetting('Jump multiplier', 'range', 5, 20, 10);
-            createSetting('Regen rate', 'range', -100, 500, 75);
-            createSetting('Invincibility', 'checkbox', undefined, undefined, false);
+            createSetting('gameplay.maxHealth', 'Max Health', 'range', 1, 10, 1, 1000);
+            createSetting('gameplay.speedMultiplier', 'Speed multiplier', 'range', 5, 20, 10, 0.1, 1);
+            createSetting('gameplay.jumpMultiplier', 'Jump multiplier', 'range', 5, 20, 10, 0.1, 1);
+            createSetting('gameplay.regenRate', 'Regen rate', 'range', -100, 500, 75, 0.1, 1);
+            createSetting('gameplay.invincibility', 'Invincibility', 'checkbox', undefined, undefined, false);
             break;
         case 'controls':
             // for each thing in keybinds (input.js), create a setting with text input.
             Object.keys(keybinds).forEach(action => {
-                createSetting(action.charAt(0).toUpperCase() + action.slice(1), 'text', undefined, undefined, keybinds[action].join(', '));
+            createSetting('controls.' + action, action.charAt(0).toUpperCase() + action.slice(1), 'text', undefined, undefined, keybinds[action].join(', '));
             });
-            createSetting('Block modification mode', 'toggle', 'Modern', 'Classic', 'skibidi toilet');
+            // createSetting('controls.blockModificationMode', 'Block modification mode', 'toggle', 'Modern', 'Classic', 'Modern');
             break;
         case 'scripts':
-            createSetting('Load custom scripts', 'checkbox', undefined, undefined, false);
+            createCategory2('adding this later');
+            createSetting('scripts.loadCustomScripts', 'Load custom scripts', 'checkbox', undefined, undefined, false);
             break;
         case 'extra':
-            createSetting('Player image', 'text', undefined, undefined, 'images/blocks/player.png');
+            // createSetting('extra.playerImage', 'Player image', 'text', undefined, undefined, 'images/blocks/player.png');
+            break;
+        case 'settingmanager':
+            const saveButton = new MenuButton({text: 'Save settings', onclick: () => {
+                const a = document.createElement('a');
+                // ???
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(localStorage)], {type: 'application/json'}));
+                a.download = 'settings.json';
+                a.click();
+            }});
+            const loadButton = new MenuButton({text: '<orange>Load settings</orange>', onclick: () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                // when the file is selected
+                input.onchange = (event) => {
+                    const file = event.target.files[0];
+                    const reader = new FileReader();
+                    // parse file and set localstorage keys
+                    reader.onload = (e) => {
+                        const settings = JSON.parse(e.target.result);
+                        Object.keys(settings).forEach(key => {
+                            localStorage.setItem(key, settings[key]);
+                        });
+                        location.reload();
+                    };
+                    reader.readAsText(file);
+                };
+                // do the click.
+                input.click();
+            }});
+            const resetButton = new MenuButton({text: '<red>Load defaults</red>', onclick: () => {
+                let a = confirm('are you really sure?');
+                if (a) {
+                    localStorage.clear();
+                    location.reload();
+                };
+            }});
+            saveButton.button.style.display = 'block';
+            saveButton.button.style.marginBottom = '8px';
+            loadButton.button.style.display = 'block';
+            loadButton.button.style.marginBottom = '8px';
+            resetButton.button.style.display = 'block';
+            resetButton.button.style.marginBottom = '8px';
+            saveButton.appendTo(settingDivs[setting.id]);
+            loadButton.appendTo(settingDivs[setting.id]);
+            resetButton.appendTo(settingDivs[setting.id]);
             break;
     }
 });

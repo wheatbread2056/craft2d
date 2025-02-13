@@ -1,4 +1,5 @@
 var MusicEnabled = false;
+var globalMusicSpeed = localStorage.getItem('audio.musicSpeed') || 1;
 let musicLoop = new Audio();
 let current = 0;
 let music = [];
@@ -14,7 +15,8 @@ function loopMusic(musicArray) {
             musicLoop = new Audio();
         }
         musicLoop.src = music[current].src;
-        musicLoop.playbackRate = music[current].speed;
+        musicLoop.volume = ((localStorage.getItem('audio.musicVolume') || 100) / 100) * ((localStorage.getItem('audio.masterVolume') || 100) / 100);
+        musicLoop.playbackRate = music[current].speed * globalMusicSpeed;
         musicLoop.preservesPitch = false;
         musicLoop.play();
     }
