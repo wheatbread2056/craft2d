@@ -47,7 +47,7 @@ function command(cmd) { // take a command input for the chatbox, then return the
         if (isNaN(x) || isNaN(y) || !block) {
             return `<yellow>invalid syntax</yellow>`;
         }
-        setBlock(x, y, block, false);
+        setBlock(x, y, block);
         return `(<red>${x}</red>, <cyan>${y}</cyan>) set to ${block}`;
     }
     else if (args[0] == 'del') { // delete block

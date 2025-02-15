@@ -1,4 +1,8 @@
-const blocks = new Map(); // will be replaced with chunk loading at some point (2025)
+// world doesn't store variables and stuff, env stores that. world stores the map
+const world = {
+    fg: new Map(),
+    bg: new Map()
+}
 const env = {
     global: {
         paused: false,
@@ -70,39 +74,42 @@ var oldMx = 0;
 var oldMy = 0;
 var currentblock = 0; // current block in the block selector
 
-function setBlock(x, y, block = 'test', bg = false) {
-    blocks.set(`${x},${y}`, [block, bg]);
+function setBlock(x, y, block = 'test', layer = 'fg') {
+    // yeah this is going to break everything.
+    world[layer].set(`${x},${y}`, block);
 }
-function getBlock(x, y) {
-    let block = blocks.get(`${x},${y}`) || [null, true]
-    if (y <= -27 && env.global.worldBottomEnabled && block[0] == null) { // for world bottom
-        return [env.global.worldBottomBlock, false];
+function getBlock(x, y, layer = 'fg') {
+    let block = world[layer].get(`${x},${y}`) || null
+    if (y <= -27 && env.global.worldBottomEnabled && block == null) { // for world bottom
+        return env.global.worldBottomBlock;
     } else {
         return block;
     }
 }
-function deleteBlock(x, y) {
-    blocks.delete(`${x},${y}`);
+function deleteBlock(x, y, layer = 'fg') {
+    world[layer].delete(`${x},${y}`);
 }
+// no layer for this one because background blocks will never have collision
 function getBlockCollision(x, y) {
     let block = getBlock(x,y);
-    if (nocollision.includes(block[0])) {
-        return null;
-    } else if (block[1] == true) {
+    if (nocollision.includes(block) || block == null) {
         return null;
     } else {
         return true;
     }
 }
-function showBlock(ctx, x, y, block) { // x and y are relative to document
+function showBlock(ctx, x, y, block, darken = false) { // x and y are relative to document
     // ctx added in alpha 1.5.5 to draw onto a canvas context
     const isPlayer = (block == 'player' && player.inWater == true && player.fly == false);
+    if (darken) {
+        ctx.globalAlpha = 0.8;
+    }
     if (isPlayer) {
         ctx.globalAlpha = 0.5;
     }
     ctx.drawImage(blockimages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
-    if (isPlayer) {
-        ctx.globalAlpha = 1;
+    if (isPlayer || darken) {
+        ctx.globalAlpha = 1.0;
     }
 }
 
@@ -112,8 +119,8 @@ function spawnPlayer(spawnx) {
         var foundBlock = false;
         var i = -1024;
         while (true) {
-            if (getBlock(spawnx,i)[0] == null && foundBlock == true) {
-                if (!(getBlock(spawnx,i-1)[0] == 'watertop')) {
+            if (getBlock(spawnx,i) == null && foundBlock == true) {
+                if (!(getBlock(spawnx,i-1) == 'watertop')) {
                     spawnCoords = [spawnx, i];
                     console.log(`Spawned player at ${spawnCoords}`);
                     break;
@@ -125,7 +132,7 @@ function spawnPlayer(spawnx) {
                     asdfhjkhagdbsf();
                     break;
                 }
-            } else if (!(getBlock(spawnx, i)[0] == null)) {
+            } else if (!(getBlock(spawnx, i) == null)) {
                 foundBlock = true;
             }
             i++;
@@ -236,7 +243,7 @@ function playerPhysics() {
     }
 
     // check if in water
-    player.inWater = getBlock(Math.round(player.x),Math.floor(player.y))[0] == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5))[0] == 'watertop';
+    player.inWater = getBlock(Math.round(player.x),Math.floor(player.y)) == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5)) == 'watertop';
     if (player.inWater) {
         player.air = false;
     }
@@ -381,13 +388,13 @@ function blockModification() {
     while (true) {
         // check if the delete key is pressed to destroy the block
         if (keybinds.delete.some(key => keys[key])) {
-            if (getBlock(oldBlockX, oldBlockY)[0] !== 'stone4') {
+            if (getBlock(oldBlockX, oldBlockY) !== 'stone4') {
                 deleteBlock(oldBlockX, oldBlockY);
             }
         }
         // check if the place key is pressed to place a block
         if (keybinds.place.some(key => keys[key])) {
-            let block = getBlock(oldBlockX, oldBlockY)[0];
+            let block = getBlock(oldBlockX, oldBlockY);
             let isWorldBottom = oldBlockY < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable;
             let isPlayerPosition = Math.round(player.x) === oldBlockX && Math.round(player.y) === oldBlockY;
 

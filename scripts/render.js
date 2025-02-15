@@ -35,12 +35,17 @@ function renderWorld(camx, camy) {
                 worldGen(mapend, mapend + 64);
             }
             else {
-                const block = getBlock(x + Math.floor(camx), -y + Math.floor(camy))[0];
+                let darken = false;
+                let block = getBlock(x + Math.floor(camx), -y + Math.floor(camy));
+                if (block == null) {
+                    block = getBlock(x + Math.floor(camx), -y + Math.floor(camy), 'bg');
+                    darken = true;
+                }
                 if (!(block == null)) {
                     if (block == 'watertop') { // show water animated
                         showBlock(globalCtx, x - camx2, -y - camy2, waterimg);
                     } else {
-                        showBlock(globalCtx, x - camx2, -y - camy2, block);
+                        showBlock(globalCtx, x - camx2, -y - camy2, block, darken);
                     }
                     blocksRendered++;
                 }

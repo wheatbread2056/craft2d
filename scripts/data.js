@@ -75,13 +75,13 @@ const initialBlockList = [
     ['grassbg7b', undefined, false],
 
     // leaves (full blocks)
-    ['leaves1', 'Yellow Autumn Leaves', false, true],
-    ['leaves2', 'Orange Autumn Leaves', false, true],
-    ['leaves3', 'Red Autumn Leaves', false, true],
-    ['leaves4', 'Bright Yellow Autumn Leaves', false, true],
-    ['leaves5', 'Green Meadow Leaves', false, true],
-    ['leaves6', 'Dark Woods Leaves', false, true],
-    ['leaves7', 'Snowy Leaves', false, true],
+    ['leaves1', 'Yellow Autumn Leaves', true, true],
+    ['leaves2', 'Orange Autumn Leaves', true, true],
+    ['leaves3', 'Red Autumn Leaves', true, true],
+    ['leaves4', 'Bright Yellow Autumn Leaves', true, true],
+    ['leaves5', 'Green Meadow Leaves', true, true],
+    ['leaves6', 'Dark Woods Leaves', true, true],
+    ['leaves7', 'Snowy Leaves', true, true],
 
     // logs
     ['log1', 'Autumn Log', true, true],

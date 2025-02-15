@@ -156,23 +156,23 @@ function worldGen(start, end) {
                         // log
                         logsize = Math.round(mapgenrandom(10) * 2 + 2) // 2 to 4
                         for (var i = 0; i < logsize; i++) {
-                            setBlock(worldgen.x, worldgen.y + i + 1, 'log1', true);
+                            setBlock(worldgen.x, worldgen.y + i + 1, 'log1', 'bg');
                         }
                         // leaves
                         var leaftype = Math.round(mapgenrandom(11) * 3 + 1);
                         for (var a = 0; a < 2; a++) {
                             for (var b = 0; b < 3; b++) {
                                 if (worldgen.y >= 128) {
-                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves7`, true);
+                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves7`, 'bg');
                                 } else {
-                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves${leaftype}`, true);
+                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, `leaves${leaftype}`, 'bg');
                                 }
                             }
                         }
                         if (worldgen.y >= 128) {
-                            setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves7`, true);
+                            setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves7`, 'bg');
                         } else {
-                            setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves${leaftype}`, true);
+                            setBlock(worldgen.x, worldgen.y + logsize + 3, `leaves${leaftype}`, 'bg');
                         }
                         worldgen.treedelay = 4;
                     }
@@ -180,22 +180,22 @@ function worldGen(start, end) {
                         // log 
                         logsize = Math.round(mapgenrandom(10) * 2 + 2) // 2 to 4
                         for (var i = 0; i < logsize; i++) {
-                            setBlock(worldgen.x, worldgen.y + i + 1, 'log2', true);
+                            setBlock(worldgen.x, worldgen.y + i + 1, 'log2', 'bg');
                         }
                         // leaves 
                         for (var a = 0; a < 2; a++) {
                             for (var b = 0; b < 3; b++) {
                                 if (worldgen.y >= 128) {
-                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves7', true);
+                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves7', 'bg');
                                 } else {
-                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves5', true);
+                                    setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves5', 'bg');
                                 }
                             }
                         }
                         if (worldgen.y >= 128) {
-                            setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves7', true);
+                            setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves7', 'bg');
                         } else {
-                            setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves5', true);
+                            setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves5', 'bg');
                         }
                         worldgen.treedelay = 4;
                     }
@@ -203,7 +203,7 @@ function worldGen(start, end) {
                         // cactus size
                         cactuslength = Math.round(mapgenrandom(10) * 2 + 1); // 1 to 3
                         for (var i = 0; i < cactuslength; i++) {
-                            setBlock(worldgen.x, worldgen.y + i + 1, 'cactus', true);
+                            setBlock(worldgen.x, worldgen.y + i + 1, 'cactus', 'bg');
                         }
                         worldgen.treedelay = 2;
                     }
@@ -211,36 +211,36 @@ function worldGen(start, end) {
                         logsize = Math.round(mapgenrandom(10) * 4 + 3); // 3 to 7
                         leafamount = Math.round(mapgenrandom(51) + 2); // 2 to 3
                         for (var i = 0; i < logsize; i++) {
-                            setBlock(worldgen.x, worldgen.y + i + 1, 'log3', true);
-                            setBlock(worldgen.x + 1, worldgen.y + i + 1, 'log3', true);
+                            setBlock(worldgen.x, worldgen.y + i + 1, 'log3', 'bg');
+                            setBlock(worldgen.x + 1, worldgen.y + i + 1, 'log3', 'bg');
                             // manually fix floating logs
-                            if (getBlock(worldgen.x + 1, worldgen.y)[0] == null) {
-                                setBlock(worldgen.x + 1, worldgen.y, 'log3', true);
+                            if (getBlock(worldgen.x + 1, worldgen.y) == null) {
+                                setBlock(worldgen.x + 1, worldgen.y, 'log3', 'bg');
                             }
-                            if (getBlock(worldgen.x + 1, worldgen.y - 1)[0] == null) {
-                                setBlock(worldgen.x + 1, worldgen.y - 1, 'log3', true);
+                            if (getBlock(worldgen.x + 1, worldgen.y - 1) == null) {
+                                setBlock(worldgen.x + 1, worldgen.y - 1, 'log3', 'bg');
                             }
                         }
                         for (var leaf1 = 0; leaf1 < leafamount; leaf1++) {
                             for (var i = 0; i < 6; i++) {
                                 if (worldgen.y >= 128) {
-                                    setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves7', true);
+                                    setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves7', 'bg');
                                 } else {
-                                    setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves6', true);
+                                    setBlock(worldgen.x - 2 + i, worldgen.y + logsize + 1 + (leaf1 * 3), 'leaves6', 'bg');
                                 }
                             }
                             for (var i = 0; i < 4; i++) {
                                 if (worldgen.y >= 128) {
-                                    setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves7', true);
+                                    setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves7', 'bg');
                                 } else {
-                                    setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves6', true);
+                                    setBlock(worldgen.x - 1 + i, worldgen.y + logsize + 2 + (leaf1 * 3), 'leaves6', 'bg');
                                 }
                             }
                             for (var i = 0; i < 2; i++) {
                                 if (worldgen.y >= 128) {
-                                    setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves7', true);
+                                    setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves7', 'bg');
                                 } else {
-                                    setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves6', true);
+                                    setBlock(worldgen.x + i, worldgen.y + logsize + 3 + (leaf1 * 3), 'leaves6', 'bg');
                                 }
                             }
                         }
@@ -253,10 +253,10 @@ function worldGen(start, end) {
                     if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 0.5))) {
                         let grasstype = Math.round(mapgenrandom(14) * 6 + 1);
                         if (grasstype == 6 || grasstype == 7) {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, true);
-                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, true);
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, 'bg');
                         } else {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, true);
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, 'bg');
                         }
                     }
                 }
@@ -265,12 +265,12 @@ function worldGen(start, end) {
                     if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 2) && worldgen.treedelay < 6)) {
                         let grasstype = Math.round(mapgenrandom(14) * 6 + 1);
                         if (grasstype == 6 || grasstype == 7) {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, true);
-                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, true);
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, 'bg');
                         } else if (grasstype == 5) {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg1`, true);
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg1`, 'bg');
                         } else {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, true);
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, 'bg');
                         }
                     }
                 }
@@ -278,13 +278,13 @@ function worldGen(start, end) {
                 if (worldgen.biome == 1) {
                     if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 0.5))) {
                         let grasstype = Math.round(mapgenrandom(14) * 7 + 1);
-                        setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, true);
+                        setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, 'bg');
                     }
                 }
                 // make bushes
                 if (worldgen.biome == 1) {
                     if (!(treerng < treerate) && mapgenrandom(25) < 0.04 && worldgen.treedelay < 1) {
-                        setBlock(worldgen.x, worldgen.y + 1, 'leaves5', true);
+                        setBlock(worldgen.x, worldgen.y + 1, 'leaves5', 'bg');
                     }
                 }
             }
@@ -344,19 +344,19 @@ function worldGen(start, end) {
                 // log 
                 logsize = Math.round(mapgenrandom(10) * 2 + 2) // 2 to 4
                 for (var i = 0; i < logsize; i++) {
-                    setBlock(worldgen.x, worldgen.y + i + 1, 'log2', true);
+                    setBlock(worldgen.x, worldgen.y + i + 1, 'log2', 'bg');
                 }
                 // leaves 
                 for (var a = 0; a < 2; a++) {
                     for (var b = 0; b < 3; b++) {
                         if (worldgen.y >= 128) {
-                            setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves7', true);
+                            setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves7', 'bg');
                         } else {
-                            setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves5', true);
+                            setBlock(worldgen.x - 1 + b, worldgen.y + logsize + 1 + a, 'leaves5', 'bg');
                         }
                     }
                 }
-                setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves5', true); // last leaf on the top
+                setBlock(worldgen.x, worldgen.y + logsize + 3, 'leaves5', 'bg'); // last leaf on the top
                 worldgen.treedelay = 4;
             }
 
@@ -364,11 +364,11 @@ function worldGen(start, end) {
             // make flowers
             if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 0.5))) {
                 let grasstype = Math.round(mapgenrandom(14) * 7 + 1);
-                setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, true);
+                setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, 'bg');
             }
             // make bushes
             if (!(treerng < treerate) && mapgenrandom(25) < 0.04 && worldgen.treedelay < 1) {
-                setBlock(worldgen.x, worldgen.y + 1, 'leaves5', true);
+                setBlock(worldgen.x, worldgen.y + 1, 'leaves5', 'bg');
             }
             
             worldgen.treedelay--;
@@ -386,5 +386,5 @@ function worldGen(start, end) {
         mapend = end;
     }
     mapxsize = Math.abs(mapstart) + Math.abs(mapend);
-    console.log(`Generated map region in ${(performance.now() / 1000 - startTime).toFixed(3)}s - new total size ${mapxsize} (${blocks.size} blocks)`);
+    console.log(`Generated map region in ${(performance.now() / 1000 - startTime).toFixed(3)}s - new total size ${mapxsize} (${world.fg.size + world.bg.size} blocks)`);
 }
