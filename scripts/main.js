@@ -22,9 +22,12 @@ for (const key in keybinds) {
         keybinds[key] = storedKey.split(',').map(k => k.trim());
     }
 }
-
+var tickrateComputed = 60; // avoid undefined errors in player physcis
 function tick() {
     tickrateComputed = Math.round(1000 / (performance.now() - lastTick));
+    if (tickrateComputed < 1) { // avoid divide by 0
+        tickrateComputed = 60;
+    }
     if (Number.isInteger(ticknum / tickrate)) { // every 60 ticks reset low and high
         tickrateLow = tickrate; tickrateHigh = 0;
     }
@@ -38,7 +41,7 @@ function tick() {
     // non-visible (functional)
     updateMovementKeys();
     playerPhysics();
-    player.health += (player.regenRate/60); if (player.invulnerable) {player.health = player.maxHealth}
+    player.health += (player.regenRate/60 / (tickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}
     if (player.health > player.maxHealth) {
         player.health = player.maxHealth;
     }
@@ -50,6 +53,7 @@ function tick() {
     renderInfoText();
     ticknum++;
     oldMx = mx; oldMy = my;
+    requestAnimationFrame(tick);
 }
 
 initialNoiseGeneration(16); // 2^16 size
@@ -58,4 +62,4 @@ spawnPlayer(Math.round((mapstart / 2) + (mapend / 2))); // should just be 0
 document.dispatchEvent(GameLoaded);
 tick();
 
-var clock = setInterval(tick, 1000/tickrate);
+// var clock = setInterval(tick, 1000/tickrate);
