@@ -24,7 +24,9 @@ function command(cmd) { // take a command input for the chatbox, then return the
 /output <yellow>text</yellow>
 /crash
 /tickrate <yellow>val</yellow>
-/putils <yellow>action</yellow>`;
+/putils <yellow>action</yellow>
+/<magenta>save</magenta> <yellow>filename</yellow>
+/<magenta>load</magenta>`;
     }
     if (args[0] == 'tp') { // teleport player
         let x = parseInt(args[1]);
@@ -130,6 +132,11 @@ player.fly set to <yellow>${player.fly}</yellow>`;
         } else {
             return `(putils) valid commands: <yellow>heal, kill, invulnerable, noclip, image, nf</yellow>`;
         }
+    } else if (args[0] == 'save') { // save world
+        let result = saveWorld(args[1]);
+        return result === undefined ? `saved as ${args[1]}.craft2d` : result;
+    } else if (args[0] == 'load') { // load world
+        return loadWorld();
     } else {
         // return `Player: ${cmd}`; // <-- fake multiplayer
         if (cmd.length > 0) {

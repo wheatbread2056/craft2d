@@ -28,6 +28,11 @@ function showWorldSelector() {
             "Press 'P' to pause the game.",
             "Update 2.0 releasing March 20, 6030!",
             "I am sorry about the very buggy collision.",
+            "You can save and load worlds with a command.",
+            "THERE ARE NO BUGS THERE ARE NO BUGS THERE ARE NO BUGS THERE ARE NO BUGS THERE ARE NO BUGS THERE ARE NO BUGS THERE ARE NO BUGS THERE ARE NO BUGS",
+            "(:",
+            "the ai allegations are NOT true",
+            "no bugs since 2038!",
         ]
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
