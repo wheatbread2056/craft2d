@@ -1,11 +1,12 @@
 function saveWorld(filename, metadata) {
     if (metadata === undefined) metadata = {};
     metadata.version = versionID;
+    metadata.spawnpoint = metadata.spawnpoint || 0;
     // metadata would be an object
     // example: {name: 'My epic world in craft2d!', author: 'me', version: '1.10-dev16'}
 
     // turn the world into a json file!
-    const blob = new Blob([JSON.stringify([metadata, ...world.fg, 'startloadingthebackgroundnow!', ...world.bg])], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify([metadata, env, [cells1d, scale1d, biome1d], ...world.fg, 'startloadingthebackgroundnow!', ...world.bg])], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
     // a
@@ -21,6 +22,7 @@ File: ${filename}.craft2d
 Size: ${(blob.size / 1024).toFixed(2)}K
 Metadata: ${JSON.stringify(metadata)}`);
 }
+
 function loadWorld(clearMap = true, tp = true) {
     const input = document.createElement('input');
     input.type = 'file';
@@ -31,11 +33,16 @@ function loadWorld(clearMap = true, tp = true) {
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
             let metadata = data[0];
-            let foreground = data.slice(1, data.indexOf('startloadingthebackgroundnow!'));
+            let envProperties = data[1];
+            [cells1d, scale1d, biome1d] = data[2];
+            let foreground = data.slice(3, data.indexOf('startloadingthebackgroundnow!'));
             let background = data.slice(data.indexOf('startloadingthebackgroundnow!') + 1);
+
             if (metadata.version !== versionID) {
                 console.warn(`World was saved in a different version (${metadata.version}, current version is ${versionID})`);
             }
+            env.global = envProperties.global;
+            env.player = envProperties.player;
             if (clearMap) {
                 world.fg = new Map();
                 world.bg = new Map();

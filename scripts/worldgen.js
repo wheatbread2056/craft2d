@@ -17,7 +17,7 @@ function noise1d(cells, x) {
 // world gen
 var worldgen = {x:0, y:0, scale:1, treedelay:0};
 function mapgenrandom(id) { // makes random number generation easier, id doesn't repeat for 100k blocks
-    return new Math.seedrandom(mapseed + worldgen.x + (id * 100000))();
+    return new Math.seedrandom(env.global.seed + worldgen.x + (id * 100000))();
 }
 // noise generation stuff (very inefficient)
 var cells1d = [[],[],[],[],[],[]]; // 6 levels of noise

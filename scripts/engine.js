@@ -19,6 +19,7 @@ const env = {
         worldBottomEnabled: true,
         worldBottomBlock: 'stone4',
         worldBottomImmutable: true,
+        seed: Math.round(Math.random() * (2147483647*2) - 2147483647),
     },
     player: {
         defaultMaxHealth: 1000,
@@ -55,7 +56,6 @@ const camera = {
 };
 const blockimages = {}
 var tickrate = 60;
-var mapseed = Math.round(Math.random() * (2147483647*2) - 2147483647);
 // var mapseed = 0;
 var ticknum = 0;
 var lastTick = Date.now();
