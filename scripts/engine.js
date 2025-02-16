@@ -266,7 +266,7 @@ function playerPhysics() {
     // gravity
     if (player.fly == false) {
         if (player.inWater) { // buoyancy
-            player.my += 0.1;
+            player.my += 0.1 / (tickrateComputed / 60);
             player.my *= Math.pow(0.98, 60 / tickrateComputed);
         } else {
             player.my += env.global.gravity * (60 / tickrateComputed);
@@ -356,7 +356,8 @@ function getColor(c1, c2, p1, p2) {
 }
 
 function updateTime() {
-    waterimg = `watertop_render${Math.floor(ticknum/8+1)-(Math.floor(ticknum/32)*4)}`;
+    const waterImages = ['watertop_render1', 'watertop_render2', 'watertop_render3', 'watertop_render4'];
+    waterimg = waterImages[Math.floor((Date.now() % 500) / 125)];
 
     // sky color changes, up is space and down is void or caves idk which one
     document.body.style.background = `linear-gradient(to bottom, rgb(0, 0, 0) ${player.y - 2500}%, rgb(28, 24, 56) ${player.y - 800}%, rgb(25, 76, 151) ${player.y - 400}%, rgb(36, 125, 207) ${player.y}%, rgb(0,0,0) ${player.y + 200}%)`;

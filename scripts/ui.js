@@ -137,7 +137,7 @@ function renderInfoText() {
     } else {
         infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
-        infoLn2.innerHTML = `Time: <yellow>${(Math.floor(ticknum/60*10)/10).toFixed(1)}</yellow> seconds`;
+        infoLn2.innerHTML = `Time: <yellow>${((Date.now() - finishedLoadTime) / 1000).toFixed(1)}</yellow> seconds`;
 
         if (!(camera.scale == 1)) {
             infoLn3.innerHTML = `Camera scale: <yellow>${camera.scale}x</yellow>`;

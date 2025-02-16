@@ -60,6 +60,7 @@ initialNoiseGeneration(16); // 2^16 size
 worldGen(-256, 256);
 spawnPlayer(Math.round((mapstart / 2) + (mapend / 2))); // should just be 0
 document.dispatchEvent(GameLoaded);
+const finishedLoadTime = Date.now();
 tick();
 
 // var clock = setInterval(tick, 1000/tickrate);
