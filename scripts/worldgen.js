@@ -253,10 +253,10 @@ function worldGen(start, end) {
                     if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 0.5))) {
                         let grasstype = Math.round(mapgenrandom(14) * 6 + 1);
                         if (grasstype == 6 || grasstype == 7) {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, 'bg');
-                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, 'fg');
+                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, 'fg');
                         } else {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, 'fg');
                         }
                     }
                 }
@@ -265,12 +265,12 @@ function worldGen(start, end) {
                     if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 2) && worldgen.treedelay < 6)) {
                         let grasstype = Math.round(mapgenrandom(14) * 6 + 1);
                         if (grasstype == 6 || grasstype == 7) {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, 'bg');
-                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}a`, 'fg');
+                            setBlock(worldgen.x, worldgen.y + 2, `grassbg${grasstype}b`, 'fg');
                         } else if (grasstype == 5) {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg1`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg1`, 'fg');
                         } else {
-                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, 'bg');
+                            setBlock(worldgen.x, worldgen.y + 1, `grassbg${grasstype}`, 'fg');
                         }
                     }
                 }
@@ -278,7 +278,7 @@ function worldGen(start, end) {
                 if (worldgen.biome == 1) {
                     if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 0.5))) {
                         let grasstype = Math.round(mapgenrandom(14) * 7 + 1);
-                        setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, 'bg');
+                        setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, 'fg');
                     }
                 }
                 // make bushes
@@ -364,7 +364,7 @@ function worldGen(start, end) {
             // make flowers
             if (!(treerng < treerate) && (mapgenrandom(12) < (mapgenrandom(13) * 0.5))) {
                 let grasstype = Math.round(mapgenrandom(14) * 7 + 1);
-                setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, 'bg');
+                setBlock(worldgen.x, worldgen.y + 1, `flower${grasstype}`, 'fg');
             }
             // make bushes
             if (!(treerng < treerate) && mapgenrandom(25) < 0.04 && worldgen.treedelay < 1) {
