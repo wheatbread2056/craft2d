@@ -48,6 +48,8 @@ const player = {
     controlAllowed: true, // if the user is allowed to control the player
     invulnerable: env.player.defaultInvincibility, // true = no damage & infinite regen rate
     regenRate: env.player.defaultRegenRate, // hp regenerated every second
+    regenAllowed: true, // player regen toggle
+    deathOverlay: false,
 };
 const camera = {
     x: 0,
@@ -150,13 +152,44 @@ function spawnPlayer(spawnx) {
 function handlePlayerHealth() {
     if (player.health <= 0) {
         player.health = 0;
-        if (env.global.respawnEnabled) {
-            alert('You have died. (press OK to play again)');
-            spawnPlayer(0);
-            player.health = player.maxHealth;
-        } else {
-            alert('You have died. (player respawn is disabled - reload or enable respawn, then run managePlayerHealth() in the console');
-            player.controlAllowed = false;
+        player.controlAllowed = false;
+        player.regenAllowed = false;
+
+        if (!player.deathOverlay) {
+            const overlay = document.createElement('div');
+            var deathTime = Date.now();
+
+            // this is too long
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(127, 0, 0, 0.5)';
+            overlay.style.zIndex = '1000';
+            overlay.innerHTML = '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white; text-align: center;">dead.</div>';
+            document.body.appendChild(overlay);
+
+            let theListener = (e) => {
+                if (Date.now() - deathTime < 5000) return;
+                spawnPlayer(0);
+                player.health = player.maxHealth;
+                player.controlAllowed = true;
+                player.regenAllowed = true;
+                player.deathOverlay = false;
+                document.body.removeChild(overlay);
+                document.removeEventListener('keydown', theListener);
+                clearInterval(updateDeathOverlayTimer);
+            };
+
+            if (env.global.respawnEnabled) {document.addEventListener('keydown', theListener)};
+            if (env.global.respawnEnabled) {
+                const updateDeathOverlayTimer = setInterval(function () {
+                    let timeLeft = Math.max(0, 5 - Math.floor((Date.now() - deathTime) / 1000));
+                    overlay.innerHTML = `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white; text-align: center;">dead (${timeLeft}s)</div>`;
+                }, 100);
+            }
+            player.deathOverlay = true;
         }
     }
 }

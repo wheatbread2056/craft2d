@@ -201,10 +201,7 @@ overflow: auto;
         let input = document.createElement('input');
         if (localStorage.getItem(settingId) !== null) {
             let storedValue = localStorage.getItem(settingId);
-            console.log(settingId);
-            console.log(storedValue);
             value = storedValue !== null ? storedValue / mult : value;
-            console.log(value);
             if (isNaN(value)) {
                 value = storedValue;
             }

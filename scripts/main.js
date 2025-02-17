@@ -41,7 +41,7 @@ function tick() {
     // non-visible (functional)
     updateMovementKeys();
     playerPhysics();
-    player.health += (player.regenRate/60 / (tickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}
+    if (player.regenAllowed) {player.health += (player.regenRate/60 / (tickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}};
     if (player.health > player.maxHealth) {
         player.health = player.maxHealth;
     }
