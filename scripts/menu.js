@@ -201,7 +201,10 @@ overflow: auto;
         let input = document.createElement('input');
         if (localStorage.getItem(settingId) !== null) {
             let storedValue = localStorage.getItem(settingId);
+            console.log(settingId);
+            console.log(storedValue);
             value = storedValue !== null ? storedValue / mult : value;
+            console.log(value);
             if (isNaN(value)) {
                 value = storedValue;
             }
@@ -245,7 +248,7 @@ overflow: auto;
             accent-color: #3800d3;`
             input.style.flex = '1';
             input.addEventListener('input', () => {
-                let valueToStore = input.value * mult;
+                let valueToStore = (input.value * mult).toFixed(rounding);
                 if (isNaN(valueToStore)) {
                     valueToStore = input.value;
                 }
