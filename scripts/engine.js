@@ -5,6 +5,8 @@ const world = {
 }
 const env = {
     global: {
+        // skybox example: [['rgb(1,2,3)',1000]] where its [color, y]
+        skybox: [['rgb(0,0,0)', 800],['rgb(28,24,56)', 400],['rgb(25,76,151)', 192],['rgb(138,183,209)', 128],['rgb(57,134,206)', 96],['rgb(36,125,207)', 0], ['rgb(0,0,0)', -200]],
         paused: false,
         targetRate: 60,
         baseGravity: -0.6,
@@ -392,9 +394,14 @@ function updateTime() {
     const waterImages = ['watertop_render1', 'watertop_render2', 'watertop_render3', 'watertop_render4'];
     waterimg = waterImages[Math.floor((Date.now() % 500) / 125)];
 
-    // sky color changes, up is space and down is void or caves idk which one
-    document.body.style.background = `linear-gradient(to bottom, rgb(0, 0, 0) ${player.y - 2500}%, rgb(28, 24, 56) ${player.y - 800}%, rgb(25, 76, 151) ${player.y - 400}%, rgb(36, 125, 207) ${player.y}%, rgb(0,0,0) ${player.y + 200}%)`;
-    document.body.style.height = '1000vh';
+    // Calculate the sky color based on player's y position
+    let gradientStops = env.global.skybox.map(([color, y]) => {
+        let position = ((player.y - y)) * 10 * camera.scale + 50;
+        return `${color} ${position}%`;
+    }).join(', ');
+
+    document.body.style.background = `linear-gradient(to bottom, ${gradientStops})`;
+    document.body.style.height = '100vh';
     document.body.style.margin = '0';
 
     // update gravity for space
