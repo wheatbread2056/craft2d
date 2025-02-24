@@ -99,6 +99,29 @@ const initialBlockList = [
     ['cobblestone2', 'Dark Cobblestone', true, true],
     ['cobblestone3', 'Very Dark Cobblestone', true, true],
 
+    // ores (very big)
+    ['ore_coal1', 'Coal Ore', true, true],
+    ['ore_coal2', 'Dark Coal Ore', true, true],
+    ['ore_coal3', 'Very Dark Coal Ore', true, true],
+    ['ore_iron1', 'Iron Ore', true, true],
+    ['ore_iron2', 'Dark Iron Ore', true, true],
+    ['ore_iron3', 'Very Dark Iron Ore', true, true],
+    ['ore_gold1', 'Gold Ore', true, true],
+    ['ore_gold2', 'Dark Gold Ore', true, true],
+    ['ore_gold3', 'Very Dark Gold Ore', true, true],
+    ['ore_diamond1', 'Diamond Ore', true, true],
+    ['ore_diamond2', 'Dark Diamond Ore', true, true],
+    ['ore_diamond3', 'Very Dark Diamond Ore', true, true],
+    ['ore_emerald1', 'Emerald Ore', true, true],
+    ['ore_emerald2', 'Dark Emerald Ore', true, true],
+    ['ore_emerald3', 'Very Dark Emerald Ore', true, true],
+    ['ore_ruby1', 'Ruby Ore', true, true],
+    ['ore_ruby2', 'Dark Ruby Ore', true, true],
+    ['ore_ruby3', 'Very Dark Ruby Ore', true, true],
+    ['ore_zyrite1', 'Zyrite Ore', true, true],
+    ['ore_zyrite2', 'Dark Zyrite Ore', true, true],
+    ['ore_zyrite3', 'Very Dark Zyrite Ore', true, true],
+
     //
     ///// Category: Colorful blocks
     //
