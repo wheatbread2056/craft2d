@@ -94,6 +94,11 @@ const initialBlockList = [
     ['stone3', 'Very Dark Stone', true, true],
     ['stone4', 'Unbreakable Stone', true, false], // unbreakable stone
 
+    // cobblestone types
+    ['cobblestone1', 'Cobblestone', true, true],
+    ['cobblestone2', 'Dark Cobblestone', true, true],
+    ['cobblestone3', 'Very Dark Cobblestone', true, true],
+
     //
     ///// Category: Colorful blocks
     //
