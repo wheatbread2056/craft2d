@@ -52,6 +52,72 @@ function worldGen(start, end) {
     let startTime = performance.now() / 1000;
     worldgen = {x:start, y:0, scale:1, treedelay:0, biome:0};
     if (env.global.worldGenType == 'normal') {
+        let ores = ['coal', 'iron', 'gold', 'diamond', 'emerald', 'ruby', 'zyrite'];
+        let oreProperties = {
+            // zyrite is the final ore
+            coal: {size: 5, rate: 0.004, minimumStoneType: 1, maxHeight: Infinity},
+            iron: {size: 4, rate: 0.003, minimumStoneType: 1, maxHeight: Infinity},
+            gold: {size: 4, rate: 0.0015, minimumStoneType: 1, maxHeight: 64},
+            diamond: {size: 3, rate: 0.0008, minimumStoneType: 1, maxHeight: 48},
+            emerald: {size: 3, rate: 0.0004, minimumStoneType: 2, maxHeight: 2},
+            ruby: {size: 3, rate: 0.00002, minimumStoneType: 2, maxHeight: -4},
+            zyrite: {size: 2, rate: 0.00001, minimumStoneType: 3, maxHeight: -16},
+        }
+
+        function generateOreVein(type, x, y) {
+            let veinSize = Math.round(oreProperties[type].size * veinSizeMultiplier);
+            let veinRate = oreProperties[type].rate;
+            let minimumStoneType = oreProperties[type].minimumStoneType;
+            let maxHeight = oreProperties[type].maxHeight;
+
+            if (Math.random() > veinRate * (1 - (y / 120))) {
+                return;
+            }
+
+            if (y > maxHeight) {
+                return;
+            }
+
+            let visited = new Set();
+            let directions = [
+                {dx: -1, dy: 0},
+                {dx: 1, dy: 0},
+                {dx: 0, dy: -1},
+                {dx: 0, dy: 1}
+            ];
+
+            function isVisited(x, y) {
+                return visited.has(`${x},${y}`);
+            }
+
+            function markVisited(x, y) {
+                visited.add(`${x},${y}`);
+            }
+
+            for (let i = 0; i < veinSize; i++) {
+                let retries = 0;
+                while (retries < 50) {
+                    const block = getBlock(x, y);
+                    // avoids generating ores in stone4 or higher, since there aren't any ore textures made for them because stone4 is meant to be unbrakable
+                    if (!isVisited(x, y) && block && block.startsWith('stone') && parseInt(block.replace('stone', '')) >= minimumStoneType && parseInt(block.replace('stone', '')) < 4) {
+                        let stoneType = getBlock(x, y).replace('stone', '');
+                        setBlock(x, y, `ore_${type}${stoneType}`);
+                        markVisited(x, y);
+                        break;
+                    } else {
+                        retries++;
+                        let direction = directions[Math.floor(Math.random() * directions.length)];
+                        x += direction.dx;
+                        y += direction.dy;
+                    }
+                }
+
+                let direction = directions[Math.floor(Math.random() * directions.length)];
+                x += direction.dx;
+                y += direction.dy;
+            }
+        }
+
         for (var z = start; z < end; z++) {
             worldgen.y = (noise1d(cells1d[0], 32768 + worldgen.x / 128) * 64); // 128 blocks per integer, 64 blocks range
             for (var noiselayer = 1; noiselayer < cells1d.length; noiselayer++) {
@@ -147,6 +213,15 @@ function worldGen(start, end) {
             }
             for (var i = -24 + layerOffset3; i > -27; i--) {
                 setBlock(worldgen.x, i, 'stone4');
+            }
+
+            // ore generation
+            // vein size multiplier = 0.5 to 1.5
+            var veinSizeMultiplier = mapgenrandom(91) + 0.5;
+            for (let ore of ores) {
+                for (let y = worldgen.y - 1; y >= -24; y--) {
+                    generateOreVein(ore, worldgen.x, y);
+                }
             }
             
             if (!underwater) {

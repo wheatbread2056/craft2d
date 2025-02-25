@@ -25,6 +25,7 @@ function command(cmd) { // take a command input for the chatbox, then return the
 /crash
 /tickrate <yellow>val</yellow>
 /putils <yellow>action</yellow>
+/seed
 /<magenta>save</magenta> <yellow>filename</yellow>
 /<magenta>load</magenta>`;
     }
@@ -132,6 +133,8 @@ player.fly set to <yellow>${player.fly}</yellow>`;
         } else {
             return `(putils) valid commands: <yellow>heal, kill, invulnerable, noclip, image, nf</yellow>`;
         }
+    } else if (args[0] == 'seed') { // get seed
+        return `<green>${seed}</green>`;
     } else if (args[0] == 'save') { // save world
         let result = saveWorld(args[1]);
         return result === undefined ? `saved as ${args[1]}.craft2d` : result;

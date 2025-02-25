@@ -111,7 +111,11 @@ function showBlock(ctx, x, y, block, darken = false) { // x and y are relative t
     if (isPlayer) {
         ctx.globalAlpha = 0.5;
     }
-    ctx.drawImage(blockimages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    try {
+        ctx.drawImage(blockimages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    } catch (e) {
+        ctx.drawImage(blockimages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    }
     if (isPlayer || darken) {
         ctx.globalAlpha = 1.0;
     }
