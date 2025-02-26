@@ -60,8 +60,8 @@ function worldGen(start, end) {
             gold: {size: 4, rate: 0.0015, minimumStoneType: 1, maxHeight: 64},
             diamond: {size: 3, rate: 0.0008, minimumStoneType: 1, maxHeight: 48},
             emerald: {size: 3, rate: 0.0004, minimumStoneType: 2, maxHeight: 2},
-            ruby: {size: 3, rate: 0.00002, minimumStoneType: 2, maxHeight: -4},
-            zyrite: {size: 2, rate: 0.00001, minimumStoneType: 3, maxHeight: -16},
+            ruby: {size: 3, rate: 0.00016, minimumStoneType: 2, maxHeight: -4},
+            zyrite: {size: 1, rate: 0.0001, minimumStoneType: 3, maxHeight: -16},
         }
 
         function generateOreVein(type, x, y) {
