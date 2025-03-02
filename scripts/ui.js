@@ -25,7 +25,7 @@ document.body.appendChild(versionText);
 // controls text
 const controlsKeybind = document.createElement('p');
 controlsKeybind.setAttribute('class', 'infotext3');
-controlsKeybind.innerHTML = 'hold <b>q</b> for controls.';
+controlsKeybind.innerHTML =  `❤️ ${player.health}/${player.maxHealth}`;
 document.body.appendChild(controlsKeybind);
 
 const controlsList = document.createElement('pre');
@@ -223,6 +223,17 @@ function renderInfoText() {
         controlsKeybind.setAttribute('style', 'opacity:0');
         controlsList.setAttribute('style', 'opacity:1');
     }
+    let healthColor;
+    if (player.health >= 0.75 * player.maxHealth) {
+        healthColor = 'white';
+    } else if (player.health > 0.5 * player.maxHealth) {
+        healthColor = 'yellow';
+    } else if (player.health > 0.25 * player.maxHealth) {
+        healthColor = 'orange';
+    } else {
+        healthColor = 'red';
+    }
+    controlsKeybind.innerHTML = `❤️ <b><${healthColor}>${player.health.toFixed(0)}/${player.maxHealth}</${healthColor}></b>`;
     if (chatboxActive) {
         let cursorVisible = Math.floor((ticknum / 60) * 2) % 2 === 0;
         let cursorText = cursorVisible ? '|' : '';
