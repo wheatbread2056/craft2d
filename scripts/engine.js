@@ -8,6 +8,7 @@ const env = {
         // skybox example: [['rgb(1,2,3)',1000]] where its [color, y]
         skybox: [['rgb(0,0,0)', 800],['rgb(28,24,56)', 400],['rgb(25,76,151)', 192],['rgb(138,183,209)', 128],['rgb(57,134,206)', 96],['rgb(36,125,207)', 0], ['rgb(0,0,0)', -200]],
         paused: false,
+        physicsQuality: 16, // amount of collisions per player tick, 16 default
         targetRate: 60,
         baseGravity: -0.6,
         gravity: 0,
@@ -312,63 +313,64 @@ function playerPhysics() {
         }
     }
     
-    // momentum & friction
-    player.x += player.mx / tickrateComputed;
-    player.y += player.my / tickrateComputed;
-    if (player.fly == false) { // normal non-flying friction
-        if (player.air || player.inWater) { // air friction
-            player.mx *= Math.pow(0.98, 60 / tickrateComputed);
-        } else if (!player.acc) { // ground friction
-            player.mx *= Math.pow(0.5, 60 / tickrateComputed);
-        }
-    } else { // flying friction
-        if (player.flyx == false) {
-            player.mx *= Math.pow(0.8, 60 / tickrateComputed);
-        }
-        if (player.flyy == false) {
-            player.my *= Math.pow(0.8, 60 / tickrateComputed);
-        }
-        
-    }
-    
-    // COLLISION
-    // rewritten in alpha 1.8 - should be much better
-    // this is actually AMAZING.
-    if (!player.noclip) {
-        playertop = player.y;
-        playerbottom = player.y - 1;
-        playerleft = player.x;
-        playerright = player.x + 1;
-        playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(player.y)));
-        playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(player.y)));
-        // player bottom collision
-        if (playerLeftTouching) {
-            player.mx = 0;
-            player.x = Math.ceil(playerleft);
-        }
-        if (playerRightTouching) {
-            player.mx = 0;
-            player.x = Math.floor(playerleft);
-        }
-        playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
-        if (playerBottomTouching) {
-            if (player.my < -21.6 && !player.invulnerable) {
-                // fall damage based on the player's vertical velocity
-                player.health -= ((player.my*2/60) * (player.my*2/60) * (player.my*2/60) * (player.my*2/60)) * 160;
-                handlePlayerHealth();
-            };
-            player.air = false;
-            player.my = 0;
-            player.y = Math.ceil(player.y);
-        } else {
-            if (!player.inWater) {
-                player.air = true;
+    for (let i = 0; i < env.global.physicsQuality; i++) {
+        // momentum & friction
+        player.x += player.mx / tickrateComputed / env.global.physicsQuality;
+        player.y += player.my / tickrateComputed / env.global.physicsQuality;
+        if (player.fly == false) { // normal non-flying friction
+            if (player.air || player.inWater) { // air friction
+                player.mx *= Math.pow(0.98, 60 / tickrateComputed / env.global.physicsQuality);
+            } else if (!player.acc) { // ground friction
+                player.mx *= Math.pow(0.5, 60 / tickrateComputed / env.global.physicsQuality);
+            }
+        } else { // flying friction
+            if (player.flyx == false) {
+                player.mx *= Math.pow(0.8, 60 / tickrateComputed / env.global.physicsQuality);
+            }
+            if (player.flyy == false) {
+                player.my *= Math.pow(0.8, 60 / tickrateComputed / env.global.physicsQuality);
             }
         }
-        playerTopTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.floor(playertop + 1)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.floor(playertop + 1)))
-        if (playerTopTouching && !playerBottomTouching) {
-            player.my = 0;
-            player.y = Math.ceil(playerbottom);
+        
+        // COLLISION
+        // rewritten in alpha 1.8 - should be much better
+        // this is actually AMAZING.
+        if (!player.noclip) {
+            playertop = player.y;
+            playerbottom = player.y - 1;
+            playerleft = player.x;
+            playerright = player.x + 1;
+            playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(player.y)));
+            playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(player.y)));
+            // player bottom collision
+            if (playerLeftTouching) {
+                player.mx = 0;
+                player.x = Math.ceil(playerleft);
+            }
+            if (playerRightTouching) {
+                player.mx = 0;
+                player.x = Math.floor(playerleft);
+            }
+            playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
+            if (playerBottomTouching) {
+                if (player.my < -21.6 && !player.invulnerable) {
+                    // fall damage based on the player's vertical velocity
+                    player.health -= ((player.my*2/60) * (player.my*2/60) * (player.my*2/60) * (player.my*2/60)) * 160;
+                    handlePlayerHealth();
+                };
+                player.air = false;
+                player.my = 0;
+                player.y = Math.ceil(player.y);
+            } else {
+                if (!player.inWater) {
+                    player.air = true;
+                }
+            }
+            playerTopTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.floor(playertop + 1)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.floor(playertop + 1)))
+            if (playerTopTouching && !playerBottomTouching) {
+                player.my = 0;
+                player.y = Math.floor(playertop);
+            }
         }
     }
     // walljumping
