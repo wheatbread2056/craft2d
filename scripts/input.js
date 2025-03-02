@@ -15,6 +15,7 @@ const keybinds = {
     'controls': ['q'],
     'chat': ['/'],
     'pause': ['p'],
+    'inventory': ['e'],
 }
 const keys = {
     // example keys
@@ -52,6 +53,9 @@ function keydownEvent(key) {
         } else 
         return;
     } else {
+        if (!isNaN(key) && key >= '1' && key <= '9') {
+            player.currentSlot = parseInt(key);
+        }
         if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
             keys.Space = true;
         }
@@ -61,16 +65,26 @@ function keydownEvent(key) {
         if (keybinds.fly.includes(key) && env.global.flyAllowed) { // fly mode toggle
             player.fly = !player.fly;
         }
+        if (keybinds.inventory.includes(key) && player.controlAllowed) { // open/close inventory
+            player.inventoryOpen = !player.inventoryOpen;
+            if (player.inventoryOpen) {
+                document.body.appendChild(inventoryGrid);
+                player.modificationAllowed = false;
+            } else {
+                document.body.removeChild(inventoryGrid);
+                player.modificationAllowed = true;
+            }
+        }
         if (keybinds.nextBlock.includes(key)) { // next block
-            currentblock++;
-            if (currentblock >= selblocks.length) {
-                currentblock = 0;
+            player.currentSlot++;
+            if (player.currentSlot > 9) {
+                player.currentSlot = 1;
             }
         }
         if (keybinds.prevBlock.includes(key)) { // previous block
-            currentblock--;
-            if (currentblock < 0) {
-                currentblock = selblocks.length - 1;
+            player.currentSlot--;
+            if (player.currentSlot < 1) {
+                player.currentSlot = 9;
             }
         }
         if (keybinds.zoomOut.includes(key)) { // zoom out

@@ -40,11 +40,32 @@ controlsList.innerHTML = `blocks are deleted and placed at the <b>mouse</b>
 <b>change zoom</b>: - / 0 / +`;
 document.body.appendChild(controlsList);
 
-// block selector (replacing soon)
-const blockSelector = document.createElement('p');
-blockSelector.setAttribute('class', 'blockselector');
-blockSelector.innerHTML = 'Block (1/99)';
-document.body.appendChild(blockSelector);
+// block selector v2!
+const inventoryBar = document.createElement('div');
+inventoryBar.style = `
+position: absolute;
+bottom: 0;`
+document.body.appendChild(inventoryBar);
+
+// inventory ui
+const inventoryGrid = document.createElement('div');
+inventoryGrid.setAttribute('class', 'inventory-grid');
+inventoryGrid.style.display = 'grid';
+inventoryGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(50px, 1fr))';
+inventoryGrid.style.gap = '10px';
+inventoryGrid.style.overflowY = 'scroll';
+inventoryGrid.style.maxHeight = '400px';
+inventoryGrid.style.border = '1px solid #ccc';
+inventoryGrid.style.padding = '10px';
+inventoryGrid.style.backgroundColor = '#00000088';
+inventoryGrid.style.width = '80%';
+inventoryGrid.style.maxHeight = '90%';
+inventoryGrid.style.position = 'absolute';
+inventoryGrid.style.top = '50%';
+inventoryGrid.style.left = '50%';
+inventoryGrid.style.transform = 'translate(-50%, -50%)';
+inventoryGrid.style.backdropFilter = 'blur(10px)';
+inventoryGrid.style.border = 'none';
 
 var chatboxTimeout;
 var chatboxActive = false;
@@ -100,6 +121,56 @@ function enableChatbox() {
             }, 100);
         }, 5000);
     }
+}
+
+function createInventoryUI() {
+    for (let blockId in blockimages) {
+        const blockSlot = document.createElement('div');
+        blockSlot.setAttribute('class', 'inventory-block-slot');
+        blockSlot.style.width = '50px';
+        blockSlot.style.height = '50px';
+        blockSlot.style.display = 'flex';
+        blockSlot.style.alignItems = 'center';
+        blockSlot.style.justifyContent = 'center';
+        blockSlot.style.backgroundColor = '#00000088';
+        blockSlot.style.border = '2px solid #00000000';
+
+        let blockImage = blockimages[blockId].cloneNode(true);
+        blockImage.style.width = '48px';
+        blockImage.style.height = '48px';
+        blockImage.style.imageRendering = 'pixelated';
+
+        blockSlot.appendChild(blockImage);
+        blockSlot.addEventListener('click', () => {
+            player.inventory[player.currentSlot].id = blockId;
+        });
+
+        inventoryGrid.appendChild(blockSlot);
+    }
+}
+createInventoryUI();
+
+function renderBlockSelector() {
+    inventoryBar.innerHTML = '';
+    for (let i = 1; i <= 9; i++) {
+        const slot = document.createElement('div');
+        slot.setAttribute('class', 'inventory-slot');
+        slot.style.display = 'inline-block';
+        slot.style.marginRight = '8px';
+        let image = blockimages[player.inventory[i].id].cloneNode(true);
+        image.style.width = '48px';
+        image.style.height = '48px';
+        image.style.border = '4px solid rgb(54, 54, 54)';
+        if (i == player.currentSlot) {
+            image.style.border = '4px solid rgb(119, 0, 255)';
+        }
+        image.style.backgroundColor = 'rgba(100, 100, 100, 0.5)';
+        image.style.imageRendering = 'pixelated';
+        slot.appendChild(image);
+        inventoryBar.appendChild(slot);
+    }
+    inventoryBar.style.left = '50%';
+    inventoryBar.style.transform = 'translateX(-50%)';
 }
 
 function renderInfoText() {
@@ -160,5 +231,4 @@ function renderInfoText() {
             chatbox.innerHTML = '<gray>...</gray>';
         }
     }
-    blockSelector.innerHTML = `${blocknames[selblocks[currentblock]] || selblocks[currentblock]} (${currentblock + 1}/${selblocks.length}) | hp ${Math.ceil(player.health)}/${player.maxHealth} (${Math.round(player.health/player.maxHealth*1000)/10}%)`;
 }

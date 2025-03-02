@@ -33,6 +33,18 @@ const env = {
     },
 };
 const player = {
+    inventory: {
+        1: {id: 'bricks', amount: 64},
+        2: {id: 'stonebricks', amount: 64},
+        3: {id: 'planks1', amount: 64},
+        4: {id: 'crate', amount: 64},
+        5: {id: 'glass', amount: 64},
+        6: {id: 'water', amount: 64},
+        7: {id: 'grass1', amount: 64},
+        8: {id: 'cobblestone1', amount: 64},
+        9: {id: 'cglass14', amount: 64}
+    },
+    currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
     x: 0, // player x position
     y: 0, // player y position
     mx: 0, // player x velocity per tick
@@ -49,10 +61,12 @@ const player = {
     maxHealth: env.player.defaultMaxHealth, // player's maximum health
     health: env.player.defaultMaxHealth, // player's current health
     controlAllowed: true, // if the user is allowed to control the player
+    modificationAllowed: true, // if the user is allowed to modify the world
     invulnerable: env.player.defaultInvincibility, // true = no damage & infinite regen rate
     regenRate: env.player.defaultRegenRate, // hp regenerated every second
     regenAllowed: true, // player regen toggle
     deathOverlay: false,
+    inventoryOpen: false,
 };
 const camera = {
     x: 0,
@@ -77,7 +91,6 @@ var mx = 0; // mouse x
 var my = 0; // mouse y
 var oldMx = 0;
 var oldMy = 0;
-var currentblock = 0; // current block in the block selector
 
 function setBlock(x, y, block = 'test', layer = 'fg') {
     // yeah this is going to break everything.
@@ -160,6 +173,7 @@ function handlePlayerHealth() {
     if (player.health <= 0) {
         player.health = 0;
         player.controlAllowed = false;
+        player.modificationAllowed = false;
         player.regenAllowed = false;
 
         if (!player.deathOverlay) {
@@ -183,6 +197,7 @@ function handlePlayerHealth() {
                 player.health = player.maxHealth;
                 player.controlAllowed = true;
                 player.regenAllowed = true;
+                player.modificationAllowed = true;
                 player.deathOverlay = false;
                 document.body.removeChild(overlay);
                 document.removeEventListener('keydown', theListener);
@@ -419,6 +434,7 @@ function updateTime() {
 }
 
 function blockModification() {
+    if (!player.modificationAllowed) return;
     // get the coordinates for the old and new block positions
     let oldBlockX = Math.floor(oldMx / 64 / camera.scale + camera.x);
     let oldBlockY = Math.ceil(-oldMy / 64 / camera.scale + camera.y);
@@ -447,11 +463,11 @@ function blockModification() {
 
             // place the block if it is not restricted
             if (block !== 'stone4' && !isWorldBottom && !isPlayerPosition) {
-                if (selblocks[currentblock] === 'grassbg6' || selblocks[currentblock] === 'grassbg7') {
-                    setBlock(oldBlockX, oldBlockY, selblocks[currentblock] + 'a');
-                    setBlock(oldBlockX, oldBlockY + 1, selblocks[currentblock] + 'b');
+                if (player.inventory[player.currentSlot].id === 'grassbg6' || player.inventory[player.currentSlot].id === 'grassbg7') {
+                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id+ 'a');
+                    setBlock(oldBlockX, oldBlockY + 1, player.inventory[player.currentSlot].id + 'b');
                 } else {
-                    setBlock(oldBlockX, oldBlockY, selblocks[currentblock]);
+                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id);
                 }
             }
         }

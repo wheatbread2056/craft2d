@@ -149,7 +149,7 @@ const initialBlockList = [
     //
 
     ['player', undefined, false],
-    ['test', undefined, false],
+    ['test', undefined, true],
     ['watertop_render1', undefined, false],
     ['watertop_render2', undefined, false],
     ['watertop_render3', undefined, false],

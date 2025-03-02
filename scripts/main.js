@@ -47,6 +47,7 @@ function tick() {
         player.health = player.maxHealth;
     }
     // visible
+    renderBlockSelector();
     blockModification();
     updateTime();
     moveCamera();
