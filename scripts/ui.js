@@ -28,18 +28,6 @@ controlsKeybind.setAttribute('class', 'infotext3');
 controlsKeybind.innerHTML =  `❤️ ${player.health}/${player.maxHealth}`;
 document.body.appendChild(controlsKeybind);
 
-const controlsList = document.createElement('pre');
-controlsList.setAttribute('class', 'infotext3');
-// controls list will be replaced with controls in settings menu (alpha 1.10)
-controlsList.innerHTML = `blocks are deleted and placed at the <b>mouse</b>
-<b>move</b>: WASD / arrows
-<b>delete block</b>: LeftClick / z
-<b>place block</b>: RightClick / x
-<b>toggle fly mode</b>: c
-<b>choose block</b>: n / m
-<b>change zoom</b>: - / 0 / +`;
-document.body.appendChild(controlsList);
-
 // block selector v2!
 const inventoryBar = document.createElement('div');
 inventoryBar.style = `
@@ -215,13 +203,6 @@ function renderInfoText() {
         } else {
             infoLn3.innerHTML = '';
         }
-    }
-    if (!keybinds.controls.some(key => keys[key])) {
-        controlsKeybind.setAttribute('style', 'opacity:1');
-        controlsList.setAttribute('style', 'opacity:0');
-    } else {
-        controlsKeybind.setAttribute('style', 'opacity:0');
-        controlsList.setAttribute('style', 'opacity:1');
     }
     let healthColor;
     if (player.health >= 0.75 * player.maxHealth) {
