@@ -13,6 +13,7 @@ player.jumpMult = parseInt(localStorage.getItem('gameplay.jumpMultiplier')) || e
 player.regenRate = parseInt(localStorage.getItem('gameplay.regenRate'))|| env.player.defaultRegenRate;
 player.invulnerable = localStorage.getItem('gameplay.invincibility') === 'true' || env.player.defaultInvincibility;
 player.health = player.maxHealth; // update player's health
+env.global.physicsQuality = parseInt(localStorage.getItem('gameplay.physicsQuality')) || env.global.physicsQuality;
 
 // update the keybinds
 for (const key in keybinds) {

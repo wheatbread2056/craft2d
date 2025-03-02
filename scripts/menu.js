@@ -306,6 +306,7 @@ overflow: auto;
             createSetting('gameplay.jumpMultiplier', 'Jump multiplier', 'range', 5, 20, 10, 0.1, 1);
             createSetting('gameplay.regenRate', 'Regen rate', 'range', -100, 500, 75, 0.1, 1);
             createSetting('gameplay.invincibility', 'Invincibility', 'checkbox', undefined, undefined, false);
+            createSetting('gameplay.physicsQuality', 'Collision quality', 'range', 1, 32, 16);
             break;
         case 'controls':
             // for each thing in keybinds (input.js), create a setting with text input.
