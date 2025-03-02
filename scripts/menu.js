@@ -293,7 +293,7 @@ overflow: auto;
             createCategory2("Reload to apply changes.")
             createSetting('audio.masterVolume', 'Master Volume', 'range', 0, 100, 100);
             createSetting('audio.musicVolume', 'Music Volume', 'range', 0, 100, 100);
-            // unused: createSetting('audio.sfxVolume', 'Sfx Volume', 'range', 0, 100, 100);
+            createSetting('audio.sfxVolume', 'Sfx Volume', 'range', 0, 100, 100);
             createSetting('audio.musicSpeed', 'Music Speed', 'range', 5, 20, 10, 0.1, 1);
             break;
         case 'video':

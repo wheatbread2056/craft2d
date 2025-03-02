@@ -37,6 +37,14 @@ function loopMusic(musicArray) {
     });
 }
 
+function playSound(src, volume = 1, speed = 1) {
+    let sound = new Audio(src);
+    sound.volume = volume * ((localStorage.getItem('audio.sfxVolume') || 100) / 100) * ((localStorage.getItem('audio.masterVolume') || 100) / 100);
+    sound.playbackRate = speed;
+    sound.preservesPitch = false;
+    sound.play();
+}
+
 function endLoop() {
     if (musicLoop) {
         musicLoop.pause();

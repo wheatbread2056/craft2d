@@ -298,9 +298,13 @@ function playerPhysics() {
     }
 
     // check if in water
+    let previousWater = player.inWater;
     player.inWater = getBlock(Math.round(player.x),Math.floor(player.y)) == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5)) == 'watertop';
     if (player.inWater) {
         player.air = false;
+    }
+    if (player.inWater && !previousWater) {
+        playSound('sfx/splash.wav', 0.4);
     }
 
     // disable acceleration mode when needed (prevents endless sliding)
@@ -372,6 +376,7 @@ function playerPhysics() {
                     // fall damage based on the player's vertical velocity
                     player.health -= ((player.my*2/60) * (player.my*2/60) * (player.my*2/60) * (player.my*2/60)) * 160;
                     handlePlayerHealth();
+                    playSound('sfx/hitHurt.wav');
                 };
                 player.air = false;
                 player.my = 0;
