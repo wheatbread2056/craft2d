@@ -26,8 +26,8 @@ for (const key in keybinds) {
 var tickrateComputed = 60; // avoid undefined errors in player physcis
 function tick() {
     tickrateComputed = Math.round(1000 / (performance.now() - lastTick));
-    if (tickrateComputed < 1) { // avoid divide by 0
-        tickrateComputed = 60;
+    if (tickrateComputed < 5) { // avoid divide by 0
+        tickrateComputed = 5;
     }
     if (Number.isInteger(ticknum / tickrate)) { // every 60 ticks reset low and high
         tickrateLow = tickrate; tickrateHigh = 0;
