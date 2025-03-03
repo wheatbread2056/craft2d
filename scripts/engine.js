@@ -120,7 +120,9 @@ function showBlock(ctx, x, y, block, darken = false) { // x and y are relative t
     // ctx added in alpha 1.5.5 to draw onto a canvas context
     const isPlayer = (block == 'player' && player.inWater == true && player.fly == false);
     if (darken) {
-        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        ctx.globalAlpha = 0.7;
     }
     if (isPlayer) {
         ctx.globalAlpha = 0.5;

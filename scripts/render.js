@@ -36,9 +36,9 @@ function renderWorld(camx, camy) {
             }
             else {
                 let block = getBlock(x + Math.floor(camx), -y + Math.floor(camy));
-                if (getBlock(x + Math.floor(camx), -y + Math.floor(camy), 'bg') !== null) {
+                if (transparentblocks.includes(block) || block == null) {
                     let block1 = getBlock(x + Math.floor(camx), -y + Math.floor(camy), 'bg');
-                    showBlock(globalCtx, x - camx2, -y - camy2, block1, true);
+                    if (block1 !== null) showBlock(globalCtx, x - camx2, -y - camy2, block1, true);
                 }
                 if (!(block == null)) {
                     if (block == 'watertop') { // show water animated

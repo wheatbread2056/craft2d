@@ -3,13 +3,16 @@ const allblocks = [];
 const blocknames = {}; // object.
 const nocollision = [];
 const selblocks = [];
+const transparentblocks = []; // used to optimize rendering
 
 function addBlock(block) {
-    let id = block[0];
-    let name = block[1];
-    let collision = block[2];
-    let selectable = block[3];
+    let id = block.id;
+    let name = block.name;
+    let collision = block.col;
+    let selectable = block.sel;
+    let t = block.t;
     allblocks.push(id);
+    if (t) transparentblocks.push(id);
     if (!collision) nocollision.push(id);
     if (selectable) selblocks.push(id);
     if (name) blocknames[id] = name;
@@ -21,139 +24,138 @@ const initialBlockList = [
     //
 
     // bricks
-    ['bricks', 'Bricks', true, true],
-    ['dirtbricks', 'Dirt Bricks', true, true],
-    ['goldbricks', 'Gold Bricks', true, true],
-    ['stonebricks', 'Stone Bricks', true, true],
+    { id: 'bricks', name: 'Bricks', col: true, sel: true },
+    { id: 'dirtbricks', name: 'Dirt Bricks', col: true, sel: true },
+    { id: 'goldbricks', name: 'Gold Bricks', col: true, sel: true },
+    { id: 'stonebricks', name: 'Stone Bricks', col: true, sel: true },
 
     // planks
-    ['planks1', 'Autumn Planks', true, true],
-    ['planks2', 'Meadow Planks', true, true],
-    ['planks3', 'Woods Planks', true, true],
+    { id: 'planks1', name: 'Autumn Planks', col: true, sel: true },
+    { id: 'planks2', name: 'Meadow Planks', col: true, sel: true },
+    { id: 'planks3', name: 'Woods Planks', col: true, sel: true },
 
     // other
-    ['crate', 'Wooden Crate', true, true],
-    ['glass', 'Glass', true, true],
+    { id: 'crate', name: 'Wooden Crate', col: true, sel: true },
+    { id: 'glass', name: 'Glass', col: true, sel: true, t: true },
 
     //
     ///// Category: Natural blocks
     //
 
-    ['water', 'Water', false, true],
-    ['watertop', undefined, false, true],
+    { id: 'water', name: 'Water', col: false, sel: true },
+    { id: 'watertop', name: undefined, col: false, sel: true },
 
-    ['sand', 'Sand', true, true],
-    ['dirt', 'Dirt', true, true],
-    ['cactus', 'Cactus', true, true],
+    { id: 'sand', name: 'Sand', col: true, sel: true },
+    { id: 'dirt', name: 'Dirt', col: true, sel: true },
+    { id: 'cactus', name: 'Cactus', col: true, sel: true },
 
     // flowers
-    ['flower1', 'Red Flower', false, true],
-    ['flower2', 'Orange Flower', false, true],
-    ['flower3', 'Yellow Flower', false, true],
-    ['flower4', 'Green Flower', false, true],
-    ['flower5', 'Teal Flower', false, true],
-    ['flower6', 'Blue Flower', false, true],
-    ['flower7', 'Violet Flower', false, true],
-    ['flower8', 'Pink Flower', false, true],
+    { id: 'flower1', name: 'Red Flower', col: false, sel: true, t: true },
+    { id: 'flower2', name: 'Orange Flower', col: false, sel: true, t: true },
+    { id: 'flower3', name: 'Yellow Flower', col: false, sel: true, t: true },
+    { id: 'flower4', name: 'Green Flower', col: false, sel: true, t: true },
+    { id: 'flower5', name: 'Teal Flower', col: false, sel: true, t: true },
+    { id: 'flower6', name: 'Blue Flower', col: false, sel: true, t: true },
+    { id: 'flower7', name: 'Violet Flower', col: false, sel: true, t: true },
+    { id: 'flower8', name: 'Pink Flower', col: false, sel: true, t: true },
 
     // grass (full blocks)
-    ['grass1', 'Autumn Grass', true, true],
-    ['grass2', 'Meadow Grass', true, true],
-    ['grass3', 'Woods Grass', true, true],
-    ['grass4', 'Snowy Grass', true, true],
+    { id: 'grass1', name: 'Autumn Grass', col: true, sel: true },
+    { id: 'grass2', name: 'Meadow Grass', col: true, sel: true },
+    { id: 'grass3', name: 'Woods Grass', col: true, sel: true },
+    { id: 'grass4', name: 'Snowy Grass', col: true, sel: true },
 
     // grass (backgrounds)
-    // i believe that this system is flawed, since it was meant to be quick but not good, and it was implemented back in 1.3 which is really old
-    ['grassbg1', undefined, false],
-    ['grassbg2', undefined, false],
-    ['grassbg3', undefined, false],
-    ['grassbg4', undefined, false],
-    ['grassbg5', undefined, false],
-    ['grassbg6a', undefined, false],
-    ['grassbg6b', undefined, false],
-    ['grassbg7a', undefined, false],
-    ['grassbg7b', undefined, false],
+    { id: 'grassbg1', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg2', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg3', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg4', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg5', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg6a', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg6b', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg7a', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg7b', name: undefined, col: false, sel: false, t: true },
 
     // leaves (full blocks)
-    ['leaves1', 'Yellow Autumn Leaves', true, true],
-    ['leaves2', 'Orange Autumn Leaves', true, true],
-    ['leaves3', 'Red Autumn Leaves', true, true],
-    ['leaves4', 'Bright Yellow Autumn Leaves', true, true],
-    ['leaves5', 'Green Meadow Leaves', true, true],
-    ['leaves6', 'Dark Woods Leaves', true, true],
-    ['leaves7', 'Snowy Leaves', true, true],
+    { id: 'leaves1', name: 'Yellow Autumn Leaves', col: true, sel: true },
+    { id: 'leaves2', name: 'Orange Autumn Leaves', col: true, sel: true },
+    { id: 'leaves3', name: 'Red Autumn Leaves', col: true, sel: true },
+    { id: 'leaves4', name: 'Bright Yellow Autumn Leaves', col: true, sel: true },
+    { id: 'leaves5', name: 'Green Meadow Leaves', col: true, sel: true },
+    { id: 'leaves6', name: 'Dark Woods Leaves', col: true, sel: true },
+    { id: 'leaves7', name: 'Snowy Leaves', col: true, sel: true },
 
     // logs
-    ['log1', 'Autumn Log', true, true],
-    ['log2', 'Meadow Log', true, true],
-    ['log3', 'Woods Log', true, true],
+    { id: 'log1', name: 'Autumn Log', col: true, sel: true },
+    { id: 'log2', name: 'Meadow Log', col: true, sel: true },
+    { id: 'log3', name: 'Woods Log', col: true, sel: true },
 
     // stone types
-    ['stone1', 'Stone', true, true],
-    ['stone2', 'Dark Stone', true, true],
-    ['stone3', 'Very Dark Stone', true, true],
-    ['stone4', 'Unbreakable Stone', true, false], // unbreakable stone
+    { id: 'stone1', name: 'Stone', col: true, sel: true },
+    { id: 'stone2', name: 'Dark Stone', col: true, sel: true },
+    { id: 'stone3', name: 'Very Dark Stone', col: true, sel: true },
+    { id: 'stone4', name: 'Unbreakable Stone', col: true, sel: false }, // unbreakable stone
 
     // cobblestone types
-    ['cobblestone1', 'Cobblestone', true, true],
-    ['cobblestone2', 'Dark Cobblestone', true, true],
-    ['cobblestone3', 'Very Dark Cobblestone', true, true],
+    { id: 'cobblestone1', name: 'Cobblestone', col: true, sel: true },
+    { id: 'cobblestone2', name: 'Dark Cobblestone', col: true, sel: true },
+    { id: 'cobblestone3', name: 'Very Dark Cobblestone', col: true, sel: true },
 
     // ores (very big)
-    ['ore_coal1', 'Coal Ore', true, true],
-    ['ore_coal2', 'Dark Coal Ore', true, true],
-    ['ore_coal3', 'Very Dark Coal Ore', true, true],
-    ['ore_iron1', 'Iron Ore', true, true],
-    ['ore_iron2', 'Dark Iron Ore', true, true],
-    ['ore_iron3', 'Very Dark Iron Ore', true, true],
-    ['ore_gold1', 'Gold Ore', true, true],
-    ['ore_gold2', 'Dark Gold Ore', true, true],
-    ['ore_gold3', 'Very Dark Gold Ore', true, true],
-    ['ore_diamond1', 'Diamond Ore', true, true],
-    ['ore_diamond2', 'Dark Diamond Ore', true, true],
-    ['ore_diamond3', 'Very Dark Diamond Ore', true, true],
-    ['ore_emerald1', 'Emerald Ore', true, true],
-    ['ore_emerald2', 'Dark Emerald Ore', true, true],
-    ['ore_emerald3', 'Very Dark Emerald Ore', true, true],
-    ['ore_ruby1', 'Ruby Ore', true, true],
-    ['ore_ruby2', 'Dark Ruby Ore', true, true],
-    ['ore_ruby3', 'Very Dark Ruby Ore', true, true],
-    ['ore_zyrite1', 'Zyrite Ore', true, true],
-    ['ore_zyrite2', 'Dark Zyrite Ore', true, true],
-    ['ore_zyrite3', 'Very Dark Zyrite Ore', true, true],
+    { id: 'ore_coal1', name: 'Coal Ore', col: true, sel: true },
+    { id: 'ore_coal2', name: 'Dark Coal Ore', col: true, sel: true },
+    { id: 'ore_coal3', name: 'Very Dark Coal Ore', col: true, sel: true },
+    { id: 'ore_iron1', name: 'Iron Ore', col: true, sel: true },
+    { id: 'ore_iron2', name: 'Dark Iron Ore', col: true, sel: true },
+    { id: 'ore_iron3', name: 'Very Dark Iron Ore', col: true, sel: true },
+    { id: 'ore_gold1', name: 'Gold Ore', col: true, sel: true },
+    { id: 'ore_gold2', name: 'Dark Gold Ore', col: true, sel: true },
+    { id: 'ore_gold3', name: 'Very Dark Gold Ore', col: true, sel: true },
+    { id: 'ore_diamond1', name: 'Diamond Ore', col: true, sel: true },
+    { id: 'ore_diamond2', name: 'Dark Diamond Ore', col: true, sel: true },
+    { id: 'ore_diamond3', name: 'Very Dark Diamond Ore', col: true, sel: true },
+    { id: 'ore_emerald1', name: 'Emerald Ore', col: true, sel: true },
+    { id: 'ore_emerald2', name: 'Dark Emerald Ore', col: true, sel: true },
+    { id: 'ore_emerald3', name: 'Very Dark Emerald Ore', col: true, sel: true },
+    { id: 'ore_ruby1', name: 'Ruby Ore', col: true, sel: true },
+    { id: 'ore_ruby2', name: 'Dark Ruby Ore', col: true, sel: true },
+    { id: 'ore_ruby3', name: 'Very Dark Ruby Ore', col: true, sel: true },
+    { id: 'ore_zyrite1', name: 'Zyrite Ore', col: true, sel: true },
+    { id: 'ore_zyrite2', name: 'Dark Zyrite Ore', col: true, sel: true },
+    { id: 'ore_zyrite3', name: 'Very Dark Zyrite Ore', col: true, sel: true },
 
     //
     ///// Category: Colorful blocks
     //
 
     // colored glass
-    ['cglass1', 'Red Colored Glass', true, true],
-    ['cglass2', 'Orange Colored Glass', true, true],
-    ['cglass3', 'Yellow Colored Glass', true, true],
-    ['cglass4', 'Lime Colored Glass', true, true],
-    ['cglass5', 'Green Colored Glass', true, true],
-    ['cglass6', 'Aqua Colored Glass', true, true],
-    ['cglass7', 'Cyan Colored Glass', true, true],
-    ['cglass8', 'Light Blue Colored Glass', true, true],
-    ['cglass9', 'Blue Colored Glass', true, true],
-    ['cglass10', 'Dark Purple Colored Glass', true, true],
-    ['cglass11', 'Purple Colored Glass', true, true],
-    ['cglass12', 'Pink Colored Glass', true, true],
-    ['cglass13', 'Hot Pink Colored Glass', true, true],
-    ['cglass14', 'Black Colored Glass', true, true],
-    ['cglass15', 'Brown Colored Glass', true, true],
-    ['cglass16', 'Gray Colored Glass', true, true],
+    { id: 'cglass1', name: 'Red Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass2', name: 'Orange Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass3', name: 'Yellow Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass4', name: 'Lime Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass5', name: 'Green Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass6', name: 'Aqua Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass7', name: 'Cyan Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass8', name: 'Light Blue Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass9', name: 'Blue Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass10', name: 'Dark Purple Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass11', name: 'Purple Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass12', name: 'Pink Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass13', name: 'Hot Pink Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass14', name: 'Black Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass15', name: 'Brown Colored Glass', col: true, sel: true, t: true },
+    { id: 'cglass16', name: 'Gray Colored Glass', col: true, sel: true, t: true },
 
     //
     ///// Category: testing / internal
     //
 
-    ['player', undefined, false],
-    ['test', undefined, true],
-    ['watertop_render1', undefined, false],
-    ['watertop_render2', undefined, false],
-    ['watertop_render3', undefined, false],
-    ['watertop_render4', undefined, false],
+    { id: 'player', name: undefined, col: false, sel: false, t: true },
+    { id: 'test', name: undefined, col: true, sel: false },
+    { id: 'watertop_render1', name: undefined, col: false, sel: false, t: true },
+    { id: 'watertop_render2', name: undefined, col: false, sel: false, t: true },
+    { id: 'watertop_render3', name: undefined, col: false, sel: false, t: true },
+    { id: 'watertop_render4', name: undefined, col: false, sel: false, t: true },
 ];
 for (let block of initialBlockList) {
     addBlock(block);

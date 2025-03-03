@@ -155,8 +155,10 @@ function worldGen(start, end) {
                     } else {
                         setBlock(worldgen.x, worldgen.y, 'grass1');
                     }
+                    setBlock(worldgen.x, worldgen.y, 'dirt', 'bg');
                     for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
                         setBlock(worldgen.x, i, 'dirt');
+                        setBlock(worldgen.x, i, 'dirt', 'bg');
                     }
                 }
                 if (worldgen.biome == 1) { // meadows
@@ -165,16 +167,20 @@ function worldGen(start, end) {
                     } else {
                         setBlock(worldgen.x, worldgen.y, 'grass2');
                     }
+                    setBlock(worldgen.x, worldgen.y, 'dirt', 'bg');
                     for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
                         setBlock(worldgen.x, i, 'dirt');
+                        setBlock(worldgen.x, i, 'dirt', 'bg');
                     }
                 }
                 if (worldgen.biome == 2) { // desert
                     for (var i = worldgen.y; i > worldgen.y - 3 + layerOffset0; i--) {
                         setBlock(worldgen.x, i, 'sand');
+                        setBlock(worldgen.x, i, 'sand', 'bg');
                     }
                     for (var i = worldgen.y - 2; i > worldgen.y - 5 + layerOffset0; i--) {
                         setBlock(worldgen.x, i, 'dirt');
+                        setBlock(worldgen.x, i, 'dirt', 'bg');
                     }
                 }
                 if (worldgen.biome == 3) { // Woods
@@ -183,13 +189,16 @@ function worldGen(start, end) {
                     } else {
                         setBlock(worldgen.x, worldgen.y, 'grass3');
                     }
+                    setBlock(worldgen.x, worldgen.y, 'dirt', 'bg');
                     for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
                         setBlock(worldgen.x, i, 'dirt');
+                        setBlock(worldgen.x, i, 'dirt', 'bg');
                     }
                 }
             } else {
                 setBlock(worldgen.x, env.global.worldSeaLevel, 'watertop');
                 setBlock(worldgen.x, worldgen.y, 'sand');
+                setBlock(worldgen.x, worldgen.y, 'sand', 'bg');
                 for (var i = env.global.worldSeaLevel - 1; i > worldgen.y; i--) {
                     setBlock(worldgen.x, i, 'water');
                 }
@@ -201,15 +210,18 @@ function worldGen(start, end) {
             for (var i = worldgen.y - 5 + layerOffset0; i > layerOffset1; i--) {
                 if (i < worldgen.y - 4 + layerOffset0) {
                     setBlock(worldgen.x, i, 'stone1');
+                    setBlock(worldgen.x, i, 'stone1', 'bg');
                 }
             }
             for (var i = 0 + layerOffset1; i > -12 + layerOffset2; i--) {
                 if (i < worldgen.y - 4 + layerOffset0) {
                     setBlock(worldgen.x, i, 'stone2');
+                    setBlock(worldgen.x, i, 'stone2', 'bg');
                 }
             }
             for (var i = -12 + layerOffset2; i > -24 + layerOffset3; i--) {
                 setBlock(worldgen.x, i, 'stone3');
+                setBlock(worldgen.x, i, 'stone3', 'bg');
             }
             for (var i = -24 + layerOffset3; i > -27; i--) {
                 setBlock(worldgen.x, i, 'stone4');
