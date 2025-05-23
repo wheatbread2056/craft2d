@@ -1,9 +1,16 @@
 // generate block images
-for (const i in allblocks) {
-    blk = allblocks[i];
-    const imagekey = blk;
+function initializeImage(src) {
+    let imagekey = src.split('/').pop().split('.')[0];
     blockimages[imagekey] = new Image();
-    blockimages[imagekey].src = `images/blocks/${blk}.png`;
+    blockimages[imagekey].src = src
+}
+for (const i in allblocks) {
+    let blk = allblocks[i];
+    initializeImage(`images/blocks/${blk}.png`);
+}
+for (const i in tools) {
+    let tool = tools[i].id;
+    initializeImage(`images/tools/${tool}.png`);
 }
 
 // canvas + ctx

@@ -5,6 +5,20 @@ const nocollision = [];
 const selblocks = [];
 const transparentblocks = []; // used to optimize rendering
 
+const toolTiers = { // wooden, stone, coal, iron, gold, diamond, emerald, ruby, zyrite, developer (special)
+    0: { durability: Infinity, efficiency: 0.2, damage: 1 }, // hands (no tool)
+    1: { durability: 32, efficiency: 0.5, damage: 3 },
+    2: { durability: 64, efficiency: 0.8, damage: 4 },
+    3: { durability: 128, efficiency: 0.5, damage: 5 }, // special, pickaxe autosmelts ores & sword burns mobs
+    4: { durability: 256, efficiency: 1.2, damage: 7 },
+    5: { durability: 512, efficiency: 1.5, damage: 9 },
+    6: { durability: 1024, efficiency: 1.8, damage: 12 },
+    7: { durability: 2048, efficiency: 2.5, damage: 18 },
+    8: { durability: 4096, efficiency: 3.6, damage: 27 },
+    9: { durability: 8192, efficiency: 5.0, damage: 48 },
+    10: { durability: Infinity, efficiency: Infinity, damage: Infinity },
+}
+
 function addBlock(block) {
     let id = block.id;
     let name = block.name;
@@ -156,6 +170,19 @@ const initialBlockList = [
     { id: 'watertop_render2', name: undefined, col: false, sel: false, t: true },
     { id: 'watertop_render3', name: undefined, col: false, sel: false, t: true },
     { id: 'watertop_render4', name: undefined, col: false, sel: false, t: true },
+];
+const tools = [ // 
+    // wooden, stone, coal, iron, gold, diamond, emerald, ruby, zyrite
+    // only pickaxes for now.
+    { id: 'pickaxe1', name: 'Wooden Pickaxe', tier: 1 },
+    { id: 'pickaxe2', name: 'Stone Pickaxe', tier: 2 },
+    { id: 'pickaxe3', name: 'Coal Pickaxe', tier: 3 },
+    { id: 'pickaxe4', name: 'Iron Pickaxe', tier: 4 },
+    { id: 'pickaxe5', name: 'Gold Pickaxe', tier: 5 },
+    { id: 'pickaxe6', name: 'Diamond Pickaxe', tier: 6 },
+    { id: 'pickaxe7', name: 'Emerald Pickaxe', tier: 7 },
+    { id: 'pickaxe8', name: 'Ruby Pickaxe', tier: 8 },
+    { id: 'pickaxe9', name: 'Zyrite Pickaxe', tier: 9 },
 ];
 for (let block of initialBlockList) {
     addBlock(block);
