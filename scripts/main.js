@@ -26,8 +26,8 @@ for (const key in keybinds) {
 
 function gameTick() { // block physics and other things go here, but player physics, building, rendering, etc. ANYTHING that needs to be smooth, goes in renderTick()
     gameTickrateComputed = Math.round(1000 / (performance.now() - lastGameTick));
-    if (gameTickrateComputed < 1) { // avoid divide by 0
-        gameTickrateComputed = 1;
+    if (gameTickrateComputed < 5) { // avoid divide by 0
+        gameTickrateComputed = 5;
     }
     lastGameTick = performance.now();
     updateTime();
@@ -35,8 +35,8 @@ function gameTick() { // block physics and other things go here, but player phys
 }
 function renderTick() {
     renderTickrateComputed = Math.round(1000 / (performance.now() - lastRenderTick));
-    if (renderTickrateComputed < 1) { // avoid divide by 0
-        renderTickrateComputed = 1;
+    if (renderTickrateComputed < 5) { // avoid divide by 0
+        renderTickrateComputed = 5;
     }
     lastRenderTick = performance.now();
     // non-visible (functional)
