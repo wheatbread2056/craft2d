@@ -42,7 +42,7 @@ const player = {
         6: {id: 'water', amount: 64},
         7: {id: 'grass1', amount: 64},
         8: {id: 'cobblestone1', amount: 64},
-        9: {id: 'cglass14', amount: 64}
+        9: {id: 'cglass14', amount: 64},
     },
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
     x: 0, // player x position
@@ -306,7 +306,8 @@ function playerPhysics() {
         player.air = false;
     }
     if (player.inWater && !previousWater) {
-        playSound('sfx/splash.wav', 0.4);
+        // this is very loud.
+        // playSound('sfx/splash.wav', 0.4);
     }
 
     // disable acceleration mode when needed (prevents endless sliding)

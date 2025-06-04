@@ -2,7 +2,7 @@ const loadTime = (performance.now() / 1000).toFixed(3);
 console.log(`loader.js loaded @ ${loadTime}s`);
 
 // this is the only thing that needs to be manually changed
-const versionID = "a1.10-dev37";
+const versionID = document.querySelector('meta[name="versionID"]').content;
 
 // automatic stuff
 const awerothiaergbyvze = { // version naming stuff
@@ -15,8 +15,8 @@ const versionName = `${awerothiaergbyvze[versionID[0]]} ${versionID.slice(1)}`; 
 document.title = `craft2D - ${versionName}`; // make the version title
 
 // put the game script(s) in
-const scripts1 = ['engine','data','files','mobile','input','music','menu']; // stage1 (before game)
-const scripts2 = ['cmd','render','worldgen','ui','main']; // stage 2 (ingame)
+const scripts1 = ['engine', 'data', 'files', 'mobile', 'input', 'music', 'menu']; // stage1 (before game)
+const scripts2 = ['cmd', 'render', 'worldgen', 'ui', 'main']; // stage 2 (ingame)
 
 // wait until the document body is loaded
 // uses a different loadScript
@@ -50,7 +50,7 @@ function loadScript(src, version) {
     script.src = `${src}?v=${version}`;
     script.onload = () => {
         const loadTime = (performance.now() / 1000);
-        console.log(`${src} loaded in ${(loadTime-initTime).toFixed(3)}s`);
+        console.log(`${src} loaded in ${(loadTime - initTime).toFixed(3)}s`);
     };
     script.onerror = (e) => {
         console.warn(`custom script failed (${src}) @ ${(performance.now() / 1000).toFixed(3)}s`);
