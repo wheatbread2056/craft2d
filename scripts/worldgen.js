@@ -204,6 +204,7 @@ function worldGen(start, end) {
                 }
                 for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
                     setBlock(worldgen.x, i, 'dirt');
+                    setBlock(worldgen.x, i, 'dirt', 'bg');
                 }
             }
             
