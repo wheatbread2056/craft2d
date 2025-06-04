@@ -36,7 +36,7 @@ const movementKeys = {
 
 // key events . part 1
 function keydownEvent(key) {
-    if (chatboxActive) {
+    /* if (chatboxActive) {
         keys[key] = true;
         if (key == 'v' && keys.Control) {
             navigator.clipboard.readText().then(text => {
@@ -51,7 +51,9 @@ function keydownEvent(key) {
         } else if (key == 'Backspace') {
             chatboxText = chatboxText.slice(0, -1);
         } else 
-        return;
+        return; */
+    if (1 == 2) {
+        1 + 1; // this is a placeholder to prevent the code from being empty
     } else {
         if (!isNaN(key) && key >= '1' && key <= '9') {
             player.currentSlot = parseInt(key);

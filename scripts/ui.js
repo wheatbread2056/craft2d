@@ -55,62 +55,6 @@ inventoryGrid.style.transform = 'translate(-50%, -50%)';
 inventoryGrid.style.backdropFilter = 'blur(10px)';
 inventoryGrid.style.border = 'none';
 
-var chatboxTimeout;
-var chatboxActive = false;
-var chatboxText = '';
-const chatbox = document.createElement('p');
-chatbox.setAttribute('class', 'chatbox');
-chatbox.setAttribute('style', 'opacity:0.8');
-chatbox.innerHTML = '<i>/help or /?</i>';
-document.body.appendChild(chatbox);
-
-const chathistory = document.createElement('div');
-chathistory.setAttribute('class', 'chathistory');
-chathistory.style.opacity = 0;
-chathistory.style.whiteSpace = 'pre-wrap'; // supports newlines but not text wrapping
-chathistory.style.whiteSpace = 'normal'; // supports text wrapping but not newlines
-document.body.appendChild(chathistory);
-
-function enableChatbox() {
-    chatboxActive = !chatboxActive;
-    player.controlAllowed = !chatboxActive;
-    if (chatboxActive) {
-        clearTimeout(chatboxTimeout);
-        chatbox.setAttribute('style', 'opacity:1');
-        chatboxText = '';
-        chatbox.innerHTML = '';
-        if (chathistory.innerHTML.length > 0) {
-            chathistory.style.opacity = 1;
-        }
-    } else {
-        chathistory.style.opacity = 1;
-        chatbox.setAttribute('style', 'opacity:0.8');
-        chatbox.innerHTML = '<i>/help or /?</i>';
-        chathistory.innerHTML = command(chatboxText);
-        
-        // Check if the command output contains newlines
-        if (chathistory.innerHTML.includes('\n')) {
-            chathistory.style.whiteSpace = 'pre-wrap';
-        } else {
-            chathistory.style.whiteSpace = 'normal';
-        }
-
-        clearTimeout(chatboxTimeout);
-        chatboxTimeout = setTimeout(() => {
-            let opacity = 1;
-            const fadeOut = setInterval(() => {
-                if (opacity <= 0) {
-                    clearInterval(fadeOut);
-                    chathistory.style.opacity = 0;
-                } else {
-                    opacity -= 0.1;
-                    chathistory.style.opacity = opacity;
-                }
-            }, 100);
-        }, 5000);
-    }
-}
-
 function createInventoryUI() {
     for (let blockId in blockimages) {
         const blockSlot = document.createElement('div');
@@ -164,16 +108,16 @@ function renderBlockSelector() {
 function renderInfoText() {
     if (debug == true) {
         // let didn't work for this
-        if (tickrateLow >= 60) {
+        if (renderTickrateComputed >= 60) {
             var performanceGrade = 'a';
             var performanceColor = 'purple';
-        } else if (tickrateLow >= 45) {
+        } else if (renderTickrateComputed >= 45) {
             var performanceGrade = 'b';
             var performanceColor = 'cyan';
-        } else if (tickrateLow >= 30) {
+        } else if (renderTickrateComputed >= 30) {
             var performanceGrade = 'c';
             var performanceColor = 'green';
-        } else if (tickrateLow >= 15) {
+        } else if (renderTickrateComputed >= 15) {
             var performanceGrade = 'd';
             var performanceColor = 'orange';
         } else {
@@ -192,7 +136,7 @@ function renderInfoText() {
         }
         infoLn1.innerHTML = `<b>player</b>: (<red>${player.x.toFixed(2)}</red>, <cyan>${player.y.toFixed(2)}</cyan>) | velocity (<yellow>${player.mx.toFixed(2)}</yellow>, <yellow>${player.my.toFixed(2)}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
         infoLn2.innerHTML = `<b>world</b>: <yellow>${blocksRendered}</yellow> blocks rendered, <yellow>${world.fg.size + world.bg.size}</yellow> (<${worldSizeColor}>${((world.fg.size + world.bg.size) / (2**24*2) * 200).toFixed(2)}%</${worldSizeColor}>) blocks stored, <yellow>${mapxsize}</yellow> map x size, <yellow>${camera.scale}</yellow> camera scale`;
-        infoLn3.innerHTML = `<b>time</b>: tick <yellow>${ticknum}</yellow> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${tickrateComputed}</magenta>, max <green>${tickrateHigh}</green>, min <red>${tickrateLow}</red> | grade <${performanceColor}>${performanceGrade}</${performanceColor}>`;
+        infoLn3.innerHTML = `<b>time</b>: rt <yellow>${renderTickNum}</yellow>, gt <blue>${gameTickNum}</blue> | target rate <cyan>${tickrate}</cyan>, actual rate <magenta>${gameTickrateComputed}</magenta>, fps <green>${renderTickrateComputed}</green> | grade <${performanceColor}>${performanceGrade}</${performanceColor}>`;
     } else {
         infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
@@ -215,12 +159,4 @@ function renderInfoText() {
         healthColor = 'red';
     }
     controlsKeybind.innerHTML = `❤️ <b><${healthColor}>${player.health.toFixed(0)}/${player.maxHealth}</${healthColor}></b>`;
-    if (chatboxActive) {
-        let cursorVisible = Math.floor((ticknum / 60) * 2) % 2 === 0;
-        let cursorText = cursorVisible ? '|' : '';
-        chatbox.innerHTML = chatboxText + cursorText;
-        if (chatboxText.length <= 0) {
-            chatbox.innerHTML = '<gray>...</gray>';
-        }
-    }
 }

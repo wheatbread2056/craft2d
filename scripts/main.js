@@ -23,39 +23,40 @@ for (const key in keybinds) {
         keybinds[key] = storedKey.split(',').map(k => k.trim());
     }
 }
-var tickrateComputed = 60; // avoid undefined errors in player physcis
-function tick() {
-    tickrateComputed = Math.round(1000 / (performance.now() - lastTick));
-    if (tickrateComputed < 5) { // avoid divide by 0
-        tickrateComputed = 5;
+
+function gameTick() { // block physics and other things go here, but player physics, building, rendering, etc. ANYTHING that needs to be smooth, goes in renderTick()
+    gameTickrateComputed = Math.round(1000 / (performance.now() - lastGameTick));
+    if (gameTickrateComputed < 1) { // avoid divide by 0
+        gameTickrateComputed = 1;
     }
-    if (Number.isInteger(ticknum / tickrate)) { // every 60 ticks reset low and high
-        tickrateLow = tickrate; tickrateHigh = 0;
+    lastGameTick = performance.now();
+    updateTime();
+    gameTickNum++;
+}
+function renderTick() {
+    renderTickrateComputed = Math.round(1000 / (performance.now() - lastRenderTick));
+    if (renderTickrateComputed < 1) { // avoid divide by 0
+        renderTickrateComputed = 1;
     }
-    if (tickrateComputed < tickrateLow) {
-        tickrateLow = tickrateComputed;
-    }
-    if (tickrateComputed > tickrateHigh) {
-        tickrateHigh = tickrateComputed;
-    }
-    lastTick = performance.now();
+    lastRenderTick = performance.now();
     // non-visible (functional)
     updateMovementKeys();
-    playerPhysics();
-    if (player.regenAllowed) {player.health += (player.regenRate/60 / (tickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}};
+    
+    if (player.regenAllowed) {player.health += (player.regenRate/60 / (gameTickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}};
     if (player.health > player.maxHealth) {
         player.health = player.maxHealth;
     }
     // visible
-    renderBlockSelector();
+    playerPhysics();
     blockModification();
-    updateTime();
-    moveCamera();
     renderWorld(camera.x, camera.y);
+    renderBlockSelector();
     renderInfoText();
-    ticknum++;
+    moveCamera();
+
+    renderTickNum++;
     oldMx = mx; oldMy = my;
-    requestAnimationFrame(tick);
+    requestAnimationFrame(renderTick);
 }
 
 initialNoiseGeneration(16); // 2^16 size
@@ -63,6 +64,6 @@ worldGen(-256, 256);
 spawnPlayer(Math.round((mapstart / 2) + (mapend / 2))); // should just be 0
 document.dispatchEvent(GameLoaded);
 const finishedLoadTime = Date.now();
-tick();
+renderTick();
 
-// var clock = setInterval(tick, 1000/tickrate);
+var clock = setInterval(gameTick, 1000/tickrate);

@@ -74,11 +74,14 @@ const camera = {
     scale: 1
 };
 const blockimages = {}
-var tickrate = 60;
+var tickrate = 5;
 // var mapseed = 0;
-var ticknum = 0;
-var lastTick = Date.now();
-var tickrateComputed = 60;
+var renderTickNum = 0;
+var gameTickNum = 0;
+var lastRenderTick = Date.now();
+var lastGameTick = Date.now();
+var gameTickrateComputed = 60;
+var renderTickrateComputed = 60;
 var tickrateLow = tickrate;
 var tickrateHigh = 0;
 var blocksRendered = 0;
@@ -225,14 +228,14 @@ function playerPhysics() {
         if (player.fly == false) {
             if (!player.air && !player.inWater) {
                 if (movementKeys.left) {
-                    player.mx += -env.global.baseSpeedVelocity / 3 / (tickrateComputed / 60) * player.speedMult;
+                    player.mx += -env.global.baseSpeedVelocity / 3 / (renderTickrateComputed / 60) * player.speedMult;
                     if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
                         player.mx = -env.global.baseSpeedVelocity * player.speedMult;
                     }
                     player.acc = true;
                 }
                 if (movementKeys.right) {
-                    player.mx += env.global.baseSpeedVelocity / 3 / (tickrateComputed / 60) * player.speedMult;
+                    player.mx += env.global.baseSpeedVelocity / 3 / (renderTickrateComputed / 60) * player.speedMult;
                     if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
                         player.mx = env.global.baseSpeedVelocity * player.speedMult;
                     }
@@ -240,10 +243,10 @@ function playerPhysics() {
                 }
             } else {
                 if (movementKeys.left) {
-                    player.mx += -env.global.baseSpeedVelocity / 24 / (tickrateComputed / 60) * player.speedMult;
+                    player.mx += -env.global.baseSpeedVelocity / 24 / (renderTickrateComputed / 60) * player.speedMult;
                 }
                 if (movementKeys.right) {
-                    player.mx += env.global.baseSpeedVelocity / 24 / (tickrateComputed / 60) * player.speedMult;
+                    player.mx += env.global.baseSpeedVelocity / 24 / (renderTickrateComputed / 60) * player.speedMult;
                 }
             }
             if (!player.inWater) {
@@ -257,10 +260,10 @@ function playerPhysics() {
             }
             else { // water movement
                 if (movementKeys.up) {
-                    player.my += 0.1 / (tickrateComputed / 60) * player.jumpMult;
+                    player.my += 0.1 / (renderTickrateComputed / 60) * player.jumpMult;
                 }
                 if (movementKeys.down) {
-                    player.my -= 0.2 / (tickrateComputed / 60) * player.jumpMult;
+                    player.my -= 0.2 / (renderTickrateComputed / 60) * player.jumpMult;
                 }
             }
         }
@@ -269,28 +272,28 @@ function playerPhysics() {
 
         else if (player.fly == true) {
             if (movementKeys.left) {
-                player.mx += -7.2 / (tickrateComputed / 60) * player.speedMult;
+                player.mx += -7.2 / (renderTickrateComputed / 60) * player.speedMult;
                 if (player.mx < -24 * player.speedMult) {
                     player.mx = -24 * player.speedMult;
                 }
                 player.flyx = true;
             }
             if (movementKeys.right) {
-                player.mx += 7.2 / (tickrateComputed / 60) * player.speedMult;
+                player.mx += 7.2 / (renderTickrateComputed / 60) * player.speedMult;
                 if (player.mx > 24 * player.speedMult) {
                     player.mx = 24 * player.speedMult;
                 }
                 player.flyx = true;
             }
             if (movementKeys.up) {
-                player.my += 2.4 / (tickrateComputed / 60) * player.jumpMult;
+                player.my += 2.4 / (renderTickrateComputed / 60) * player.jumpMult;
                 if (player.my > 12 * player.jumpMult) {
                     player.my = 12 * player.jumpMult;
                 }
                 player.flyy = true;
             }
             if (movementKeys.down) {
-                player.my -= 2.4 / (tickrateComputed / 60) * player.jumpMult;
+                player.my -= 2.4 / (renderTickrateComputed / 60) * player.jumpMult;
                 if (player.my < -12 * player.jumpMult) {
                     player.my = -12 * player.jumpMult;
                 }
@@ -328,29 +331,29 @@ function playerPhysics() {
     // gravity
     if (player.fly == false) {
         if (player.inWater) { // buoyancy
-            player.my += 0.1 / (tickrateComputed / 60);
-            player.my *= Math.pow(0.98, 60 / tickrateComputed);
+            player.my += 0.1 / (renderTickrateComputed / 60);
+            player.my *= Math.pow(0.98, 60 / renderTickrateComputed);
         } else {
-            player.my += env.global.gravity * (60 / tickrateComputed);
+            player.my += env.global.gravity * (60 / renderTickrateComputed);
         }
     }
     
     for (let i = 0; i < env.global.physicsQuality; i++) {
         // momentum & friction
-        player.x += player.mx / tickrateComputed / env.global.physicsQuality;
-        player.y += player.my / tickrateComputed / env.global.physicsQuality;
+        player.x += player.mx / renderTickrateComputed / env.global.physicsQuality;
+        player.y += player.my / renderTickrateComputed / env.global.physicsQuality;
         if (player.fly == false) { // normal non-flying friction
             if (player.air || player.inWater) { // air friction
-                player.mx *= Math.pow(0.98, 60 / tickrateComputed / env.global.physicsQuality);
+                player.mx *= Math.pow(0.98, 60 / renderTickrateComputed / env.global.physicsQuality);
             } else if (!player.acc) { // ground friction
-                player.mx *= Math.pow(0.5, 60 / tickrateComputed / env.global.physicsQuality);
+                player.mx *= Math.pow(0.5, 60 / renderTickrateComputed / env.global.physicsQuality);
             }
         } else { // flying friction
             if (player.flyx == false) {
-                player.mx *= Math.pow(0.8, 60 / tickrateComputed / env.global.physicsQuality);
+                player.mx *= Math.pow(0.8, 60 / renderTickrateComputed / env.global.physicsQuality);
             }
             if (player.flyy == false) {
-                player.my *= Math.pow(0.8, 60 / tickrateComputed / env.global.physicsQuality);
+                player.my *= Math.pow(0.8, 60 / renderTickrateComputed / env.global.physicsQuality);
             }
         }
         
