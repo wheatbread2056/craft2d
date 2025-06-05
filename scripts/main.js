@@ -30,9 +30,9 @@ function gameTick() { // block physics and other things go here, but player phys
         client.gameTickrateComputed = 5;
     }
     client.lastGameTick = performance.now();
-    updateTime();
     env.global.gameTickNum++;
 }
+
 function renderTick() {
     client.renderTickrateComputed = Math.round(1000 / (performance.now() - client.lastRenderTick));
     if (client.renderTickrateComputed < 5) { // avoid divide by 0
@@ -50,6 +50,7 @@ function renderTick() {
     playerPhysics();
     blockModification();
     renderWorld(camera.x, camera.y);
+    updateTime();
     renderBlockSelector();
     renderInfoText();
     moveCamera();
