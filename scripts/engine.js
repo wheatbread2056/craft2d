@@ -195,26 +195,21 @@ function handlePlayerHealth() {
             overlay.innerHTML = '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white; text-align: center;">dead.</div>';
             document.body.appendChild(overlay);
 
-            let theListener = (e) => {
-                if (Date.now() - deathTime < 5000) return;
-                spawnPlayer(0);
-                player.health = player.maxHealth;
-                player.controlAllowed = true;
-                player.regenAllowed = true;
-                player.modificationAllowed = true;
-                player.deathOverlay = false;
-                document.body.removeChild(overlay);
-                document.removeEventListener('keydown', theListener);
-                clearInterval(updateDeathOverlayTimer);
-            };
-
-            if (env.global.respawnEnabled) {document.addEventListener('keydown', theListener)};
-            if (env.global.respawnEnabled) {
-                const updateDeathOverlayTimer = setInterval(function () {
-                    let timeLeft = Math.max(0, 5 - Math.floor((Date.now() - deathTime) / 1000));
-                    overlay.innerHTML = `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white; text-align: center;">dead (${timeLeft}s)</div>`;
-                }, 100);
-            }
+            const updateDeathOverlayTimer = setInterval(function () {
+                let timeLeft = Math.max(0, 5 - Math.floor((Date.now() - deathTime) / 1000));
+                overlay.innerHTML = `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white; text-align: center;">dead (${timeLeft}s)</div>`;
+                
+                if (timeLeft === 0) {
+                    spawnPlayer(0);
+                    player.health = player.maxHealth;
+                    player.controlAllowed = true;
+                    player.regenAllowed = true;
+                    player.modificationAllowed = true;
+                    player.deathOverlay = false;
+                    document.body.removeChild(overlay);
+                    clearInterval(updateDeathOverlayTimer);
+                }
+            }, 100);
             player.deathOverlay = true;
         }
     }
