@@ -13,6 +13,7 @@ const env = {
         baseGravity: -0.6,
         gravity: 0,
         respawnEnabled: true,
+        respawnTime: 5, // seconds
         walljumpEnabled: false,
         flyAllowed: true,
         baseSpeedVelocity: 7.2,
@@ -196,7 +197,7 @@ function handlePlayerHealth() {
             document.body.appendChild(overlay);
 
             const updateDeathOverlayTimer = setInterval(function () {
-                let timeLeft = Math.max(0, 5 - Math.floor((Date.now() - deathTime) / 1000));
+                let timeLeft = Math.max(0, env.global.respawnTime - Math.floor((Date.now() - deathTime) / 1000));
                 overlay.innerHTML = `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: white; text-align: center;">dead (${timeLeft}s)</div>`;
                 
                 if (timeLeft === 0) {
