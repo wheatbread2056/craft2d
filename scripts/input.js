@@ -106,9 +106,6 @@ function keydownEvent(key) {
         if (keybinds.resetZoom.includes(key)) { // reset zoom
             camera.scale = 1;
         }
-        if (keybinds.chat.includes(key)) { // chat
-            enableChatbox();
-        }
         if (keybinds.pause.includes(key)) {
             if (env.global.paused) {unpauseGame()} else {pauseGame()};
         }
