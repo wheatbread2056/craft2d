@@ -153,8 +153,8 @@ function spawnPlayer(spawnx) {
                     break;
                 } else {
                     spawnx -= 1;
-                    if (spawnx < mapstart + 1) {
-                        spawnx = mapend - 1;
+                    if (spawnx < env.global.mapstart + 1) {
+                        spawnx = env.global.mapend - 1;
                     }
                     asdfhjkhagdbsf();
                     break;

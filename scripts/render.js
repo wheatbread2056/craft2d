@@ -36,7 +36,7 @@ function renderWorld(camx, camy) {
     for (var y = -1; y < 17 / camera.scale * (window.innerHeight / 1080); y++) {
         for (var x = 0; x < 31 / camera.scale * (window.innerWidth / 1920); x++) {
             if (x + Math.floor(camx) < env.global.mapstart) {
-                worldGen(mapstart - 64, env.global.mapstart);
+                worldGen(env.global.mapstart - 64, env.global.mapstart);
             }
             if (x + Math.floor(camx) > env.global.mapend) {
                 worldGen(env.global.mapend, env.global.mapend + 64);
