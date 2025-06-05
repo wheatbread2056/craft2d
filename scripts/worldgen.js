@@ -467,12 +467,12 @@ function worldGen(start, end) {
             worldgen.x++;
         }
     }
-    if (start < mapstart) {
-        mapstart = start;
+    if (start < env.global.mapstart) {
+        env.global.mapstart = start;
     }
-    if (end > mapend) {
-        mapend = end;
+    if (end > env.global.mapend) {
+        env.global.mapend = end;
     }
-    mapxsize = Math.abs(mapstart) + Math.abs(mapend);
-    console.log(`Generated map region in ${(performance.now() / 1000 - startTime).toFixed(3)}s - new total size ${mapxsize} (${world.fg.size + world.bg.size} blocks)`);
+    env.global.mapxsize = Math.abs(env.global.mapstart) + Math.abs(env.global.mapend);
+    console.log(`Generated map region in ${(performance.now() / 1000 - startTime).toFixed(3)}s - new total size ${env.global.mapxsize} (${world.fg.size + world.bg.size} blocks)`);
 }

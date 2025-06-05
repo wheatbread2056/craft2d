@@ -25,24 +25,24 @@ for (const key in keybinds) {
 }
 
 function gameTick() { // block physics and other things go here, but player physics, building, rendering, etc. ANYTHING that needs to be smooth, goes in renderTick()
-    gameTickrateComputed = Math.round(1000 / (performance.now() - lastGameTick));
-    if (gameTickrateComputed < 5) { // avoid divide by 0
-        gameTickrateComputed = 5;
+    client.gameTickrateComputed = Math.round(1000 / (performance.now() - client.lastGameTick));
+    if (client.gameTickrateComputed < 5) { // avoid divide by 0
+        client.gameTickrateComputed = 5;
     }
-    lastGameTick = performance.now();
+    client.lastGameTick = performance.now();
     updateTime();
-    gameTickNum++;
+    env.global.gameTickNum++;
 }
 function renderTick() {
-    renderTickrateComputed = Math.round(1000 / (performance.now() - lastRenderTick));
-    if (renderTickrateComputed < 5) { // avoid divide by 0
-        renderTickrateComputed = 5;
+    client.renderTickrateComputed = Math.round(1000 / (performance.now() - client.lastRenderTick));
+    if (client.renderTickrateComputed < 5) { // avoid divide by 0
+        client.renderTickrateComputed = 5;
     }
-    lastRenderTick = performance.now();
+    client.lastRenderTick = performance.now();
     // non-visible (functional)
     updateMovementKeys();
     
-    if (player.regenAllowed) {player.health += (player.regenRate/60 / (renderTickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}};
+    if (player.regenAllowed) {player.health += (player.regenRate/60 / (client.renderTickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}};
     if (player.health > player.maxHealth) {
         player.health = player.maxHealth;
     }
@@ -54,16 +54,16 @@ function renderTick() {
     renderInfoText();
     moveCamera();
 
-    renderTickNum++;
-    oldMx = mx; oldMy = my;
+    env.global.renderTickNum++;
+    client.oldMx = client.mx; client.oldMy = client.my;
     requestAnimationFrame(renderTick);
 }
 
 initialNoiseGeneration(16); // 2^16 size
 worldGen(-256, 256);
-spawnPlayer(Math.round((mapstart / 2) + (mapend / 2))); // should just be 0
+spawnPlayer(0);
 document.dispatchEvent(GameLoaded);
 const finishedLoadTime = Date.now();
 renderTick();
 
-var clock = setInterval(gameTick, 1000/tickrate);
+var clock = setInterval(gameTick, 1000/env.global.tickrate);

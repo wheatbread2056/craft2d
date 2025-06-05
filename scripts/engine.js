@@ -22,6 +22,12 @@ const env = {
         worldBottomEnabled: true,
         worldBottomBlock: 'stone4',
         worldBottomImmutable: true,
+        tickrate: 5, // 5 ticks per second default
+        renderTickNum: 0,
+        gameTickNum: 0,
+        mapxsize: 0, // size of the map in blocks
+        mapstart: -256, // start of the map
+        mapend: 256, // end of the map
         seed: Math.round(Math.random() * (2147483647*2) - 2147483647),
     },
     player: {
@@ -73,27 +79,20 @@ const camera = {
     y: 0, 
     scale: 1
 };
+const client = {
+    gameTickrateComputed: 60, // computed game tickrate
+    renderTickrateComputed: 60, // computed render tickrate
+    lastGameTick: Date.now(), // last game tick time
+    lastRenderTick: Date.now(), // last render tick time
+    blocksRendered: 0, // number of blocks rendered in the last render tick
+    debug: false,
+    mx: 0, // mouse x position
+    my: 0, // mouse y position
+    oldMx: 0, // previous mouse x position
+    oldMy: 0, // previous mouse y position
+    waterimg: 'watertop_render1', // current water image
+}
 const blockimages = {}
-var tickrate = 5;
-// var mapseed = 0;
-var renderTickNum = 0;
-var gameTickNum = 0;
-var lastRenderTick = Date.now();
-var lastGameTick = Date.now();
-var gameTickrateComputed = 60;
-var renderTickrateComputed = 60;
-var tickrateLow = tickrate;
-var tickrateHigh = 0;
-var blocksRendered = 0;
-var waterimg = `watertop_render1`;
-var mapxsize = 0;
-var mapstart = null;
-var mapend = null;
-var debug = false;
-var mx = 0; // mouse x
-var my = 0; // mouse y
-var oldMx = 0;
-var oldMy = 0;
 
 function setBlock(x, y, block = 'test', layer = 'fg') {
     // yeah this is going to break everything.
@@ -228,14 +227,14 @@ function playerPhysics() {
         if (player.fly == false) {
             if (!player.air && !player.inWater) {
                 if (movementKeys.left) {
-                    player.mx += -env.global.baseSpeedVelocity / 3 / (renderTickrateComputed / 60) * player.speedMult;
+                    player.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * player.speedMult;
                     if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
                         player.mx = -env.global.baseSpeedVelocity * player.speedMult;
                     }
                     player.acc = true;
                 }
                 if (movementKeys.right) {
-                    player.mx += env.global.baseSpeedVelocity / 3 / (renderTickrateComputed / 60) * player.speedMult;
+                    player.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * player.speedMult;
                     if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
                         player.mx = env.global.baseSpeedVelocity * player.speedMult;
                     }
@@ -243,10 +242,10 @@ function playerPhysics() {
                 }
             } else {
                 if (movementKeys.left) {
-                    player.mx += -env.global.baseSpeedVelocity / 24 / (renderTickrateComputed / 60) * player.speedMult;
+                    player.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * player.speedMult;
                 }
                 if (movementKeys.right) {
-                    player.mx += env.global.baseSpeedVelocity / 24 / (renderTickrateComputed / 60) * player.speedMult;
+                    player.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * player.speedMult;
                 }
             }
             if (!player.inWater) {
@@ -260,10 +259,10 @@ function playerPhysics() {
             }
             else { // water movement
                 if (movementKeys.up) {
-                    player.my += 0.1 / (renderTickrateComputed / 60) * player.jumpMult;
+                    player.my += 0.1 / (client.renderTickrateComputed / 60) * player.jumpMult;
                 }
                 if (movementKeys.down) {
-                    player.my -= 0.2 / (renderTickrateComputed / 60) * player.jumpMult;
+                    player.my -= 0.2 / (client.renderTickrateComputed / 60) * player.jumpMult;
                 }
             }
         }
@@ -272,28 +271,28 @@ function playerPhysics() {
 
         else if (player.fly == true) {
             if (movementKeys.left) {
-                player.mx += -7.2 / (renderTickrateComputed / 60) * player.speedMult;
+                player.mx += -7.2 / (client.renderTickrateComputed / 60) * player.speedMult;
                 if (player.mx < -24 * player.speedMult) {
                     player.mx = -24 * player.speedMult;
                 }
                 player.flyx = true;
             }
             if (movementKeys.right) {
-                player.mx += 7.2 / (renderTickrateComputed / 60) * player.speedMult;
+                player.mx += 7.2 / (client.renderTickrateComputed / 60) * player.speedMult;
                 if (player.mx > 24 * player.speedMult) {
                     player.mx = 24 * player.speedMult;
                 }
                 player.flyx = true;
             }
             if (movementKeys.up) {
-                player.my += 2.4 / (renderTickrateComputed / 60) * player.jumpMult;
+                player.my += 2.4 / (client.renderTickrateComputed / 60) * player.jumpMult;
                 if (player.my > 12 * player.jumpMult) {
                     player.my = 12 * player.jumpMult;
                 }
                 player.flyy = true;
             }
             if (movementKeys.down) {
-                player.my -= 2.4 / (renderTickrateComputed / 60) * player.jumpMult;
+                player.my -= 2.4 / (client.renderTickrateComputed / 60) * player.jumpMult;
                 if (player.my < -12 * player.jumpMult) {
                     player.my = -12 * player.jumpMult;
                 }
@@ -331,29 +330,29 @@ function playerPhysics() {
     // gravity
     if (player.fly == false) {
         if (player.inWater) { // buoyancy
-            player.my += 0.1 / (renderTickrateComputed / 60);
-            player.my *= Math.pow(0.98, 60 / renderTickrateComputed);
+            player.my += 0.1 / (client.renderTickrateComputed / 60);
+            player.my *= Math.pow(0.98, 60 / client.renderTickrateComputed);
         } else {
-            player.my += env.global.gravity * (60 / renderTickrateComputed);
+            player.my += env.global.gravity * (60 / client.renderTickrateComputed);
         }
     }
     
     for (let i = 0; i < env.global.physicsQuality; i++) {
         // momentum & friction
-        player.x += player.mx / renderTickrateComputed / env.global.physicsQuality;
-        player.y += player.my / renderTickrateComputed / env.global.physicsQuality;
+        player.x += player.mx / client.renderTickrateComputed / env.global.physicsQuality;
+        player.y += player.my / client.renderTickrateComputed / env.global.physicsQuality;
         if (player.fly == false) { // normal non-flying friction
             if (player.air || player.inWater) { // air friction
-                player.mx *= Math.pow(0.98, 60 / renderTickrateComputed / env.global.physicsQuality);
+                player.mx *= Math.pow(0.98, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             } else if (!player.acc) { // ground friction
-                player.mx *= Math.pow(0.5, 60 / renderTickrateComputed / env.global.physicsQuality);
+                player.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
         } else { // flying friction
             if (player.flyx == false) {
-                player.mx *= Math.pow(0.8, 60 / renderTickrateComputed / env.global.physicsQuality);
+                player.mx *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
             if (player.flyy == false) {
-                player.my *= Math.pow(0.8, 60 / renderTickrateComputed / env.global.physicsQuality);
+                player.my *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
         }
         
@@ -447,10 +446,10 @@ function updateTime() {
 function blockModification() {
     if (!player.modificationAllowed) return;
     // get the coordinates for the old and new block positions
-    let oldBlockX = Math.floor(oldMx / 64 / camera.scale + camera.x);
-    let oldBlockY = Math.ceil(-oldMy / 64 / camera.scale + camera.y);
-    let newBlockX = Math.floor(mx / 64 / camera.scale + camera.x);
-    let newBlockY = Math.ceil(-my / 64 / camera.scale + camera.y);
+    let oldBlockX = Math.floor(client.oldMx / 64 / camera.scale + camera.x);
+    let oldBlockY = Math.ceil(-client.oldMy / 64 / camera.scale + camera.y);
+    let newBlockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
+    let newBlockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
 
     // use the burgerham algorhitm for line
     let dx = Math.abs(newBlockX - oldBlockX);

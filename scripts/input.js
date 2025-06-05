@@ -62,7 +62,7 @@ function keydownEvent(key) {
             keys.Space = true;
         }
         if (keybinds.debug.includes(key)) { // debug mode toggle
-            debug = !debug;
+            client.debug = !client.debug;
         }
         if (keybinds.fly.includes(key) && env.global.flyAllowed) { // fly mode toggle
             player.fly = !player.fly;
@@ -165,6 +165,6 @@ function updateMovementKeys() {
 
 // update mouse pos
 document.addEventListener('mousemove', (event) => {
-    mx = event.clientX;
-    my = event.clientY;
+    client.mx = event.clientX;
+    client.my = event.clientY;
 });
