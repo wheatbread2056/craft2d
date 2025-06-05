@@ -33,3 +33,5 @@ Craft2D is written in raw JavaScript, and does not use an engine or library made
 
 ## Why are there no versions before alpha 1.7 available?
 Before alpha 1.7, I was not using GitHub with this project as I believed it would go nowhere.
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wheatbread2056/craft2d)
