@@ -30,6 +30,7 @@ function gameTick() { // block physics and other things go here, but player phys
         client.gameTickrateComputed = 5;
     }
     client.lastGameTick = performance.now();
+    blockPhysics();
     env.global.gameTickNum++;
 }
 

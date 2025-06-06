@@ -57,7 +57,7 @@ const initialBlockList = [
     //
 
     { id: 'water', name: 'Water', col: false, sel: true },
-    { id: 'watertop', name: undefined, col: false, sel: true },
+    { id: 'watertop', name: undefined, col: false, sel: true, t: true },
 
     { id: 'sand', name: 'Sand', col: true, sel: true },
     { id: 'dirt', name: 'Dirt', col: true, sel: true },

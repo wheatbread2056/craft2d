@@ -37,6 +37,7 @@ const env = {
         mapxsize: 0, // size of the map in blocks
         mapstart: -256, // start of the map
         mapend: 256, // end of the map
+        simulationRadius: 2, // radius in chunks, to do game ticks
         chunksize: 32, // size of a chunk in blocks (16x16 = 256 blocks (small), 32x32 = 1024 blocks (default), 64x64 = 4096 blocks (large))
         seed: Math.round(Math.random() * (2147483647*2) - 2147483647),
     },
@@ -527,11 +528,100 @@ function blockModification() {
     }
 }
 
+function getNearChunks(radius = 1) {
+    const cx = Math.floor(player.x / env.global.chunksize);
+    const cy = Math.floor(player.y / env.global.chunksize);
+    const chunks = [];
+    for (let x = cx - radius; x <= cx + radius; x++) {
+        for (let y = cy - radius; y <= cy + radius; y++) {
+            chunks.push({cx: x, cy: y});
+        }
+    }
+    return chunks;
+}
+
+function blockPhysics() {
+    // sand falls, and water expands to any empty spaces on the left, bottom, and right.
+    const nearChunks = getNearChunks(2);
+    // Track positions that have already been updated this tick
+    const sandUpdated = new Set();
+    const watertopUpdated = new Set();
+    const waterUpdated = new Set();
+    // sand physics
+    // 1. look for sand blocks in the near chunks
+    for (const {cx, cy} of nearChunks) {
+        const chunk = getChunkMap('fg', cx, cy, false);
+        if (!chunk) continue;
+        for (const [blockKey, block] of chunk.entries()) {
+            if (block == 'sand') {
+                const [bx, by] = blockKey.split(',').map(Number);
+                const x = cx * env.global.chunksize + bx;
+                const y = cy * env.global.chunksize + by;
+                // Skip if this sand block was already updated after falling
+                if (sandUpdated.has(`${x},${y}`)) continue;
+                // check if the block below is empty
+                if (getBlockCollision(x, y - 1) == null) {
+                    deleteBlock(x, y);
+                    setBlock(x, y - 1, block);
+                    sandUpdated.add(`${x},${y-1}`);
+                }
+            }
+        }
+    }
+    // water physics
+    // first, expand watertop blocks to left and right
+    // Track positions that have already been updated this tick for water
+    for (const {cx, cy} of nearChunks) {
+        const chunk = getChunkMap('fg', cx, cy, false);
+        if (!chunk) continue;
+        for (const [blockKey, block] of chunk.entries()) {
+            if (block == 'watertop') {
+                const [bx, by] = blockKey.split(',').map(Number);
+                const x = cx * env.global.chunksize + bx;
+                const y = cy * env.global.chunksize + by;
+                if (watertopUpdated.has(`${x},${y}`)) continue;
+                if (getBlockCollision(x - 1, y) == null && getBlock(x - 1, y) !== 'watertop') setBlock(x - 1, y, 'watertop'), watertopUpdated.add(`${x-1},${y}`);
+                if (getBlockCollision(x + 1, y) == null && getBlock(x + 1, y) !== 'watertop') setBlock(x + 1, y, 'watertop'), watertopUpdated.add(`${x+1},${y}`);
+                // place water below
+                if (getBlockCollision(x, y - 1) == null && getBlock(x, y - 1) !== 'water') {
+                    setBlock(x, y - 1, 'water');
+                    waterUpdated.add(`${x},${y-1}`);
+                }
+            }
+        }
+    }
+    // then, expand water blocks downwards, left, and right
+    for (const {cx, cy} of nearChunks) {
+        const chunk = getChunkMap('fg', cx, cy, false);
+        if (!chunk) continue;
+        for (const [blockKey, block] of chunk.entries()) {
+            if (block == 'water') {
+                const [bx, by] = blockKey.split(',').map(Number);
+                const x = cx * env.global.chunksize + bx;
+                const y = cy * env.global.chunksize + by;
+                if (waterUpdated.has(`${x},${y}`)) continue;
+                if (getBlockCollision(x, y - 1) == null && getBlock(x, y - 1) !== 'water') {
+                    setBlock(x, y - 1, 'water');
+                    waterUpdated.add(`${x},${y-1}`);
+                }
+                if (getBlockCollision(x - 1, y) == null && getBlock(x - 1, y) !== 'water') {
+                    setBlock(x - 1, y, 'water');
+                    waterUpdated.add(`${x-1},${y}`);
+                }
+                if (getBlockCollision(x + 1, y) == null && getBlock(x + 1, y) !== 'water') {
+                    setBlock(x + 1, y, 'water');
+                    waterUpdated.add(`${x+1},${y}`);
+                }
+            }
+        }
+    }
+}
+
 function killClock() {
 	clearInterval(clock);
 }
 function setTickrate(rate) {
 	tickrate = rate;
 	killClock();
-	window.clock = setInterval(tick, 1000/tickrate);
+	window.clock = setInterval(gameTick, 1000/tickrate);
 }
