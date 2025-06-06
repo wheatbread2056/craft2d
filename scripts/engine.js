@@ -1,8 +1,16 @@
 // world doesn't store variables and stuff, env stores that. world stores the map
-const world = {
-    fg: new Map(),
-    bg: new Map()
+
+function chunkKey(cx, cy, layer = 'fg') {
+    return `${layer}:${cx},${cy}`;
 }
+function blockKey(bx, by) {
+    return `${bx},${by}`;
+}
+
+const world = {
+    fg: new Map(), // Map<chunkKey, Map<blockKey, block>>
+    bg: new Map()
+};
 const env = {
     global: {
         // skybox example: [['rgb(1,2,3)',1000]] where its [color, y]
@@ -13,7 +21,7 @@ const env = {
         baseGravity: -0.6,
         gravity: 0,
         respawnEnabled: true,
-        respawnTime: 5, // seconds
+        respawnTime: 2, // seconds
         walljumpEnabled: false,
         flyAllowed: true,
         baseSpeedVelocity: 7.2,
@@ -29,6 +37,7 @@ const env = {
         mapxsize: 0, // size of the map in blocks
         mapstart: -256, // start of the map
         mapend: 256, // end of the map
+        chunksize: 32, // size of a chunk in blocks (16x16 = 256 blocks (small), 32x32 = 1024 blocks (default), 64x64 = 4096 blocks (large))
         seed: Math.round(Math.random() * (2147483647*2) - 2147483647),
     },
     player: {
@@ -95,24 +104,50 @@ const client = {
 }
 const blockimages = {}
 
+function getChunkAndBlock(x, y) {
+    const cx = Math.floor(x / env.global.chunksize);
+    const cy = Math.floor(y / env.global.chunksize);
+    const bx = ((x % env.global.chunksize) + env.global.chunksize) % env.global.chunksize;
+    const by = ((y % env.global.chunksize) + env.global.chunksize) % env.global.chunksize;
+    return { cx, cy, bx, by };
+}
+
+function getChunkMap(layer, cx, cy, create = false) {
+    const w = world[layer];
+    const key = chunkKey(cx, cy, layer);
+    let chunk = w.get(key);
+    if (!chunk && create) {
+        chunk = new Map();
+        w.set(key, chunk);
+    }
+    return chunk;
+}
+
 function setBlock(x, y, block = 'test', layer = 'fg') {
-    // yeah this is going to break everything.
-    world[layer].set(`${x},${y}`, block);
+    const { cx, cy, bx, by } = getChunkAndBlock(x, y);
+    const chunk = getChunkMap(layer, cx, cy, true);
+    chunk.set(blockKey(bx, by), block);
 }
 function getBlock(x, y, layer = 'fg') {
-    let block = world[layer].get(`${x},${y}`) || null
+    const { cx, cy, bx, by } = getChunkAndBlock(x, y);
+    const chunk = getChunkMap(layer, cx, cy, false);
+    let block = chunk ? chunk.get(blockKey(bx, by)) : null;
     if (y <= -27 && env.global.worldBottomEnabled && block == null) { // for world bottom
         return env.global.worldBottomBlock;
     } else {
-        return block;
+        return block || null;
     }
 }
 function deleteBlock(x, y, layer = 'fg') {
-    world[layer].delete(`${x},${y}`);
+    const { cx, cy, bx, by } = getChunkAndBlock(x, y);
+    const chunk = getChunkMap(layer, cx, cy, false);
+    if (chunk) {
+        chunk.delete(blockKey(bx, by));
+    }
 }
 // no layer for this one because background blocks will never have collision
 function getBlockCollision(x, y) {
-    let block = getBlock(x,y);
+    let block = getBlock(x, y);
     if (nocollision.includes(block) || block == null) {
         return null;
     } else {
