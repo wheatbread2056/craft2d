@@ -60,7 +60,6 @@ function renderTick() {
     requestAnimationFrame(renderTick);
 }
 
-initialNoiseGeneration(16); // 2^16 size
 worldGen(-256, 256);
 spawnPlayer(0);
 document.dispatchEvent(GameLoaded);
