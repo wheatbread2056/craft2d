@@ -51,9 +51,9 @@ const env = {
 };
 const player = {
     inventory: {
-        1: {id: 'bricks', amount: 64},
-        2: {id: 'stonebricks', amount: 64},
-        3: {id: 'planks1', amount: 64},
+        1: {id: 'pickaxe1', amount: 64},
+        2: {id: 'axe1', amount: 64},
+        3: {id: 'shovel1', amount: 64},
         4: {id: 'crate', amount: 64},
         5: {id: 'glass', amount: 64},
         6: {id: 'water', amount: 64},
@@ -69,7 +69,9 @@ const player = {
     blockDamage: 0, // current damage dealt to intreacting block
     currentBlockHardness: 0,
     breakingBlock: false, // if the player is breaking a block
+    blockToolType: 'none',
     currentBreakRate: 0, // current break rate of the block
+    currentToolType: 'none', // current tool type that the player is holding.
     mx: 0, // player x velocity per tick
     my: 0, // player y velocity per tick
     air: false, // if in midair
@@ -516,8 +518,11 @@ function blockModification() {
         player.blockX = newBlockX, player.blockY = newBlockY;
         let block = getBlock(player.blockX, player.blockY, layer);
         if (block !== null) {
+            player.blockToolType = tooltypes[block] || 'none';
             player.currentBlockHardness = hardness[block];
-            player.blockDamage += player.currentBreakRate / (client.renderTickrateComputed / 60);
+            if (player.currentToolType == player.blockToolType || player.blockToolType == 'none') {
+                player.blockDamage += player.currentBreakRate / (client.renderTickrateComputed / 60);
+            }
             if (player.blockDamage >= player.currentBlockHardness) {
                 // play sound
                 // delete the block
