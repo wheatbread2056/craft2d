@@ -31,6 +31,7 @@ const env = {
         worldBottomEnabled: true,
         worldBottomBlock: 'stone4',
         worldBottomImmutable: true,
+        maxStackSize: 99, // max stack size for everything, but some items might have overrides
         tickrate: 5, // 5 ticks per second default
         renderTickNum: 0,
         gameTickNum: 0,
@@ -64,6 +65,7 @@ const player = {
     },
     gamemode: env.player.defaultGamemode,
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
+    currentItem: null,
     x: 0, // player x position
     y: 0, // player y position
     blockX: 0, // x pos of interacting block
@@ -501,18 +503,9 @@ function blockModification() {
     if (!player.modificationAllowed) return;
     let layer = player.interactionLayer;
 
-    // get the coordinates for the old and new block positions
-    let oldBlockX = Math.floor(client.oldMx / 64 / camera.scale + camera.x);
-    let oldBlockY = Math.ceil(-client.oldMy / 64 / camera.scale + camera.y);
-    let newBlockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
-    let newBlockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
-
-    // use the burgerham algorhitm for line
-    let dx = Math.abs(newBlockX - oldBlockX);
-    let dy = Math.abs(newBlockY - oldBlockY);
-    let sx = (oldBlockX < newBlockX) ? 1 : -1;
-    let sy = (oldBlockY < newBlockY) ? 1 : -1;
-    let err = dx - dy;
+    // get the coordinates for the block position under the mouse
+    let blockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
+    let blockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
 
     // block breaking
     if (keybinds.delete.some(key => keys[key]) && player.breakingBlock == false) {
@@ -522,11 +515,12 @@ function blockModification() {
         player.breakingBlock = false;
     }
     if (player.breakingBlock) {
-        if (newBlockX !== player.blockX || newBlockY !== player.blockY) {
+        if (blockX !== player.blockX || blockY !== player.blockY) {
             // reset block damage if breaking new block
             player.blockDamage = 0;
         }
-        player.blockX = newBlockX, player.blockY = newBlockY;
+        player.blockX = blockX;
+        player.blockY = blockY;
         let block = getBlock(player.blockX, player.blockY, layer);
         if (block !== null) {
             player.blockToolType = tooltypes[block] || 'none';
@@ -539,39 +533,47 @@ function blockModification() {
                 // delete the block
                 deleteBlock(player.blockX, player.blockY, layer);
                 player.blockDamage = 0;
+                // add block to player inventory
+                // first, look at EVERY inventory slot until theres a slot containing the block. but if its already a full stack, keep looking
+                // then, if theres either no slots with the blocks, or all the slots with the block are full stacks, add to first empty slot.
+                let added = false;
+                for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
+                    let invSlot = player.inventory[slot];
+                    if (invSlot.id === block && invSlot.amount < env.global.maxStackSize) {
+                        invSlot.amount++;
+                        added = true;
+                        break;
+                    }
+                }
+                if (!added) {
+                    for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
+                        let invSlot = player.inventory[slot];
+                        if (invSlot.id === null || invSlot.amount === 0) {
+                            invSlot.id = block;
+                            invSlot.amount = 1;
+                            break;
+                        }
+                    }
+                }
+                createInventoryUI();
             }
         }
     }
 
-    while (true) {
-        // destroying doesn't use the line algorhitm, because you're supposed to destroy 1 block slowly at a time.
-        // check if the place key is pressed to place a block
-        if (keybinds.place.some(key => keys[key])) {
-            let block = getBlock(oldBlockX, oldBlockY, layer);
-            let isWorldBottom = oldBlockY < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable;
-            let isPlayerPosition = Math.round(player.x) === oldBlockX && Math.round(player.y) === oldBlockY;
+    // placing blocks
+    if (keybinds.place.some(key => keys[key])) {
+        let block = getBlock(blockX, blockY, layer);
+        let isWorldBottom = blockY < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable;
+        let isPlayerPosition = Math.round(player.x) === blockX && Math.round(player.y) === blockY;
 
-            // place the block if it is not restricted
-            if (block !== 'stone4' && !isWorldBottom && !isPlayerPosition) {
-                if (player.inventory[player.currentSlot].id === 'grassbg6' || player.inventory[player.currentSlot].id === 'grassbg7') {
-                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id+ 'a', layer);
-                    setBlock(oldBlockX, oldBlockY + 1, player.inventory[player.currentSlot].id + 'b', layer);
-                } else {
-                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id, layer);
-                }
+        // place the block if it is not restricted
+        if (block !== 'stone4' && block == null && allblocks.includes(player.currentItem)) {
+            setBlock(blockX, blockY, player.inventory[player.currentSlot].id, layer);
+            player.inventory[player.currentSlot].amount--;
+            if (player.inventory[player.currentSlot].amount <= 0) {
+                player.inventory[player.currentSlot].id = null; // remove the block from the inventory if amount is 0
             }
-        }
-
-        // break the loop if the end of the line is reached
-        if (oldBlockX === newBlockX && oldBlockY === newBlockY) break;
-        let e2 = 2 * err;
-        if (e2 > -dy) {
-            err -= dy;
-            oldBlockX += sx;
-        }
-        if (e2 < dx) {
-            err += dx;
-            oldBlockY += sy;
+            createInventoryUI();
         }
     }
 }

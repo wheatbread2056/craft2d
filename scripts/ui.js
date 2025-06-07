@@ -70,6 +70,7 @@ inventoryGrid.addEventListener('dragstart', function(e) {
 });
 
 function createInventoryUI() {
+    inventoryGrid.innerHTML = ''; // clear grid... or else
     function newBlockSlot(id = 'baby keem') {
         let blockSlot = document.createElement('div');
         blockSlot.setAttribute('class', 'inventory-block-slot');
@@ -80,6 +81,7 @@ function createInventoryUI() {
         blockSlot.style.justifyContent = 'center';
         blockSlot.style.backgroundColor = '#00000088';
         blockSlot.style.border = '2px solid #00000000';
+        blockSlot.style.position = 'relative'; // Ensure absolute children are positioned relative to this slot
         if (id <= 9) {
             blockSlot.style.border = '2px solid rgba(75, 0, 160, 0.5)';
             blockSlot.style.backgroundColor = 'rgba(37, 0, 78, 0.5)';
@@ -115,6 +117,19 @@ function createInventoryUI() {
                 blockImage.style.height = '48px';
                 blockImage.style.imageRendering = 'pixelated';
                 blockSlot.appendChild(blockImage);
+                // add text thats the amount stored
+                if (player.inventory[slotId].amount > 1) {
+                    const amountText = document.createElement('span');
+                    amountText.style.position = 'absolute';
+                    amountText.style.bottom = '2px';
+                    amountText.style.right = '2px';
+                    amountText.style.color = '#fff';
+                    amountText.style.fontSize = '16px';
+                    amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                    amountText.style.pointerEvents = 'none'; // Allow clicks to pass through
+                    amountText.textContent = player.inventory[slotId].amount;
+                    blockSlot.appendChild(amountText);
+                }
             }
             blockSlot.addEventListener('click', () => {
                 if (client.inventorySelectedSlot == null) {
@@ -167,6 +182,18 @@ function renderBlockSelector() {
         image.style.backgroundColor = 'rgba(100, 100, 100, 0.5)';
         image.style.imageRendering = 'pixelated';
         slot.appendChild(image);
+        if (player.inventory[i].amount > 1) {
+            const amountText = document.createElement('span');
+            amountText.style.position = 'absolute';
+            amountText.style.bottom = '8px';
+            amountText.style.right = '4px';
+            amountText.style.color = '#fff';
+            amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            amountText.style.fontSize = '16px';
+            amountText.textContent = player.inventory[i].amount;
+            slot.style.position = 'relative'; // Ensure parent is relative for absolute child
+            slot.appendChild(amountText);
+        }
         inventoryBar.appendChild(slot);
     }
     inventoryBar.style.left = '50%';
