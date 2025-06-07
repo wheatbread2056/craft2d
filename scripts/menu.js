@@ -1,6 +1,6 @@
 document.body.style.height = '100vh';
 document.body.style.margin = '0';
-document.body.style.backgroundImage = 'linear-gradient(to bottom right, purple, darkblue)';
+document.body.style.backgroundImage = 'linear-gradient(to bottom right, MidnightBlue, indigo)';
 document.body.style.backgroundSize = 'cover';
 loopMusic([{src:'music/craft2d-maintheme-v1.10.mp3',speed:1}]);
 
@@ -33,6 +33,7 @@ function showWorldSelector() {
             "(:",
             "the ai allegations are NOT true",
             "no bugs since 2038!",
+            "what version is it?",
         ]
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
@@ -394,9 +395,13 @@ menuTitle2.style = 'font-size: 24px; text-align: center; margin-top: 0; position
 document.body.appendChild(menuTitle);
 document.body.appendChild(menuTitle2);
 
-const playButton = new MenuButton({text: 'Start craft2D', class: 'playButton', onclick: () => {
+const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', onclick: () => {
     document.body.removeChild(menuDiv);
     showWorldSelector();
+}});
+
+const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
+    alert('multiplayer does NOT exist yet');
 }});
 
 const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', onclick: () => {
@@ -405,6 +410,7 @@ const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', on
 }});
 
 playButton.appendTo(menuDiv);
+playButton2.appendTo(menuDiv);
 settingsButton.appendTo(menuDiv);
 
 document.body.appendChild(menuDiv);
