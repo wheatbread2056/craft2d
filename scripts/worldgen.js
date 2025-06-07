@@ -450,5 +450,5 @@ function worldGen(start, end) {
         env.global.mapend = end;
     }
     env.global.mapxsize = Math.abs(env.global.mapstart) + Math.abs(env.global.mapend);
-    console.log(`Generated map region in ${(performance.now() / 1000 - startTime).toFixed(3)}s - new total size ${env.global.mapxsize} (${world.fg.size + world.bg.size} blocks)`);
+    console.log(`Generated map region in ${(performance.now() / 1000 - startTime).toFixed(3)}s - new total size ${env.global.mapxsize} (${world.fg.size + world.bg.size} chunks)`);
 }
