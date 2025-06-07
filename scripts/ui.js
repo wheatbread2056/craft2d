@@ -62,7 +62,7 @@ inventoryGrid.style.backdropFilter = 'blur(10px)';
 inventoryGrid.style.border = 'none';
 
 function createInventoryUI() {
-    for (let blockId in selblocks) {
+    for (let blockId in globalImages) {
         const blockSlot = document.createElement('div');
         blockSlot.setAttribute('class', 'inventory-block-slot');
         blockSlot.style.width = '50px';
@@ -73,14 +73,14 @@ function createInventoryUI() {
         blockSlot.style.backgroundColor = '#00000088';
         blockSlot.style.border = '2px solid #00000000';
 
-        let blockImage = globalImages[selblocks[blockId]].cloneNode(true);
+        let blockImage = globalImages[blockId].cloneNode(true);
         blockImage.style.width = '48px';
         blockImage.style.height = '48px';
         blockImage.style.imageRendering = 'pixelated';
 
         blockSlot.appendChild(blockImage);
         blockSlot.addEventListener('click', () => {
-            player.inventory[player.currentSlot].id = selblocks[blockId];
+            player.inventory[player.currentSlot].id = blockId;
         });
 
         inventoryGrid.appendChild(blockSlot);

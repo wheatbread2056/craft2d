@@ -69,6 +69,7 @@ const player = {
     blockDamage: 0, // current damage dealt to intreacting block
     currentBlockHardness: 0,
     breakingBlock: false, // if the player is breaking a block
+    currentBreakRate: 0, // current break rate of the block
     mx: 0, // player x velocity per tick
     my: 0, // player y velocity per tick
     air: false, // if in midair
@@ -516,7 +517,7 @@ function blockModification() {
         let block = getBlock(player.blockX, player.blockY, layer);
         if (block !== null) {
             player.currentBlockHardness = hardness[block];
-            player.blockDamage += 0.05 / (client.renderTickrateComputed / 60);
+            player.blockDamage += player.currentBreakRate / (client.renderTickrateComputed / 60);
             if (player.blockDamage >= player.currentBlockHardness) {
                 // play sound
                 // delete the block
