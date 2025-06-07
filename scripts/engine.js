@@ -47,20 +47,22 @@ const env = {
         defaultJumpMultiplier: 1,
         defaultInvincibility: false,
         defaultRegenRate: 7.5,
+        defaultGamemode: 'survival', // survival, creative
     },
 };
 const player = {
     inventory: {
-        1: {id: 'pickaxe1', amount: 64},
-        2: {id: 'axe1', amount: 64},
-        3: {id: 'shovel1', amount: 64},
-        4: {id: 'crate', amount: 64},
-        5: {id: 'glass', amount: 64},
-        6: {id: 'water', amount: 64},
-        7: {id: 'grass1', amount: 64},
-        8: {id: 'cobblestone1', amount: 64},
-        9: {id: 'cglass14', amount: 64},
+        1: {id: 'pickaxe1', amount: 1},
+        2: {id: 'axe1', amount: 1},
+        3: {id: 'shovel1', amount: 1},
+        4: {id: null, amount: 0},
+        5: {id: null, amount: 0},
+        6: {id: null, amount: 0},
+        7: {id: null, amount: 0},
+        8: {id: null, amount: 0},
+        9: {id: null, amount: 0},
     },
+    gamemode: env.player.defaultGamemode,
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
     x: 0, // player x position
     y: 0, // player y position
@@ -111,8 +113,17 @@ const client = {
     oldMx: 0, // previous mouse x position
     oldMy: 0, // previous mouse y position
     waterimg: 'watertop_render1', // current water image
+    inventorySelectedSlot: null,
 }
 const globalImages = {}
+
+// create inventory rows
+for (let row = 2; row <= 5; row++) { // generates 4 more rows (2-5), each with 9 slots
+    for (let col = 1; col <= 9; col++) {
+        const slot = (row - 1) * 9 + col;
+        player.inventory[slot] = { id: null, amount: 0 };
+    }
+}
 
 function getChunkAndBlock(x, y) {
     const cx = Math.floor(x / env.global.chunksize);

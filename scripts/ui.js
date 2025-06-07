@@ -52,18 +52,26 @@ inventoryGrid.style.maxHeight = '400px';
 inventoryGrid.style.border = '1px solid #ccc';
 inventoryGrid.style.padding = '10px';
 inventoryGrid.style.backgroundColor = '#00000088';
+inventoryGrid.style.maxWidth = '576px';
 inventoryGrid.style.width = '80%';
-inventoryGrid.style.maxHeight = '90%';
+inventoryGrid.style.maxHeight = '60%';
 inventoryGrid.style.position = 'absolute';
 inventoryGrid.style.top = '50%';
 inventoryGrid.style.left = '50%';
 inventoryGrid.style.transform = 'translate(-50%, -50%)';
 inventoryGrid.style.backdropFilter = 'blur(10px)';
 inventoryGrid.style.border = 'none';
+inventoryGrid.style.userSelect = 'none';
+// Prevent images from being draggable in the inventory grid
+inventoryGrid.addEventListener('dragstart', function(e) {
+    if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+    }
+});
 
 function createInventoryUI() {
-    for (let blockId in globalImages) {
-        const blockSlot = document.createElement('div');
+    function newBlockSlot(id = 'baby keem') {
+        let blockSlot = document.createElement('div');
         blockSlot.setAttribute('class', 'inventory-block-slot');
         blockSlot.style.width = '50px';
         blockSlot.style.height = '50px';
@@ -72,18 +80,65 @@ function createInventoryUI() {
         blockSlot.style.justifyContent = 'center';
         blockSlot.style.backgroundColor = '#00000088';
         blockSlot.style.border = '2px solid #00000000';
+        if (id <= 9) {
+            blockSlot.style.border = '2px solid rgba(75, 0, 160, 0.5)';
+            blockSlot.style.backgroundColor = 'rgba(37, 0, 78, 0.5)';
+        }
+        if (client.inventorySelectedSlot == id) {
+            blockSlot.style.border = '2px solid rgb(119, 0, 255)';
+            blockSlot.style.backgroundColor = 'rgba(119, 0, 255, 0.5)';
+        }
+        return blockSlot;
+    }
+    if (player.gamemode == 'creative') {
+        for (let blockId in globalImages) {
+            const blockSlot = newBlockSlot();
 
-        let blockImage = globalImages[blockId].cloneNode(true);
-        blockImage.style.width = '48px';
-        blockImage.style.height = '48px';
-        blockImage.style.imageRendering = 'pixelated';
+            let blockImage = globalImages[blockId].cloneNode(true);
+            blockImage.style.width = '48px';
+            blockImage.style.height = '48px';
+            blockImage.style.imageRendering = 'pixelated';
 
-        blockSlot.appendChild(blockImage);
-        blockSlot.addEventListener('click', () => {
-            player.inventory[player.currentSlot].id = blockId;
-        });
+            blockSlot.appendChild(blockImage);
+            blockSlot.addEventListener('click', () => {
+                player.inventory[player.currentSlot].id = blockId;
+            });
 
-        inventoryGrid.appendChild(blockSlot);
+            inventoryGrid.appendChild(blockSlot);
+        }
+    } else {
+        for (let slotId in player.inventory) {
+            const blockSlot = newBlockSlot(slotId);
+            if (player.inventory[slotId].id !== null) {
+                let blockImage = globalImages[player.inventory[slotId].id].cloneNode(true);
+                blockImage.style.width = '48px';
+                blockImage.style.height = '48px';
+                blockImage.style.imageRendering = 'pixelated';
+                blockSlot.appendChild(blockImage);
+            }
+            blockSlot.addEventListener('click', () => {
+                if (client.inventorySelectedSlot == null) {
+                    // No slot selected yet, select this one
+                    client.inventorySelectedSlot = slotId;
+                    inventoryGrid.innerHTML = ''; // Clear the grid
+                    createInventoryUI();
+                } else {
+                    // Slot already selected, swap with this one
+                    if (client.inventorySelectedSlot !== slotId) {
+                        // Swap the two slots
+                        const temp = { ...player.inventory[client.inventorySelectedSlot] };
+                        player.inventory[client.inventorySelectedSlot] = { ...player.inventory[slotId] };
+                        player.inventory[slotId] = temp;
+                    }
+                    // Deselect after swap (or if same slot clicked)
+                    client.inventorySelectedSlot = null;
+                    // Optionally, re-render the UI to reflect changes
+                    inventoryGrid.innerHTML = '';
+                    createInventoryUI();
+                }
+            });
+            inventoryGrid.appendChild(blockSlot);
+        }
     }
 }
 createInventoryUI();
@@ -95,7 +150,14 @@ function renderBlockSelector() {
         slot.setAttribute('class', 'inventory-slot');
         slot.style.display = 'inline-block';
         slot.style.marginRight = '8px';
-        let image = globalImages[player.inventory[i].id].cloneNode(true);
+        let image;
+        if (player.inventory[i] && globalImages[player.inventory[i].id]) {
+            image = globalImages[player.inventory[i].id].cloneNode(true);
+        } else {
+            image = document.createElement('img');
+            // WHAT does this do.
+            image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAFUlEQVR4nO3BMQEAAAgDoJvc6F9hAAAgwA8A9Qw2pQAAAABJRU5ErkJggg==';
+        }
         image.style.width = '48px';
         image.style.height = '48px';
         image.style.border = '4px solid rgb(54, 54, 54)';
