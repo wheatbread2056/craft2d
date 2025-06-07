@@ -17,7 +17,7 @@ const env = {
         skybox: [['rgb(0,0,0)', 800],['rgb(28,24,56)', 400],['rgb(25,76,151)', 192],['rgb(138,183,209)', 128],['rgb(57,134,206)', 96],['rgb(36,125,207)', 0], ['rgb(0,0,0)', -200]],
         paused: false,
         physicsQuality: 16, // amount of collisions per player tick, 16 default
-        targetRate: 60,
+        targetRate: 5,
         baseGravity: -0.6,
         gravity: 0,
         respawnEnabled: true,
