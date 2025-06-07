@@ -16,6 +16,7 @@ const keybinds = {
     'chat': ['/'],
     'pause': ['p'],
     'inventory': ['e'],
+    'layerToggle': ['l'],
 }
 const keys = {
     // example keys
@@ -109,6 +110,14 @@ function keydownEvent(key) {
         if (keybinds.pause.includes(key)) {
             if (env.global.paused) {unpauseGame()} else {pauseGame()};
         }
+        if (keybinds.layerToggle.includes(key)) {
+            if (player.interactionLayer == 'fg') {
+                player.interactionLayer = 'bg';
+            } else {
+                player.interactionLayer = 'fg';
+            }
+        }
+
         // fixes for capslock / shift
         if (key == 'CapsLock' || key == 'Shift') { // when capslock or shift is pressed
             for (let possiblyLowerKey in keys) { // check all the keys in the object

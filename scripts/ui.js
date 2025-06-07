@@ -16,6 +16,12 @@ infoLn3.setAttribute('style', 'top:48px');
 infoLn3.innerHTML = 'Camera scale: 1.23x';
 document.body.appendChild(infoLn3);
 
+const layerIndicator = document.createElement('p');
+layerIndicator.setAttribute('class', 'infotext2');
+layerIndicator.setAttribute('style', 'top:24px');
+layerIndicator.innerHTML = 'Layer: Foreground';
+document.body.appendChild(layerIndicator);
+
 // version text
 const versionText = document.createElement('p');
 versionText.setAttribute('class', 'infotext2');
@@ -74,7 +80,7 @@ function createInventoryUI() {
 
         blockSlot.appendChild(blockImage);
         blockSlot.addEventListener('click', () => {
-            player.inventory[player.currentSlot].id = blockId;
+            player.inventory[player.currentSlot].id = selblocks[blockId];
         });
 
         inventoryGrid.appendChild(blockSlot);
@@ -159,4 +165,13 @@ function renderInfoText() {
         healthColor = 'red';
     }
     controlsKeybind.innerHTML = `❤️ <b><${healthColor}>${player.health.toFixed(0)}/${player.maxHealth}</${healthColor}></b>`;
+    let interactionText = '';
+    if (player.interactionLayer === 'fg') {
+        interactionText = 'Foreground';
+    } else if (player.interactionLayer === 'bg') {
+        interactionText = 'Background';
+    } else {
+        interactionText = player.interactionLayer;
+    }
+    layerIndicator.innerHTML = `Layer: <b>${interactionText}</b>`;
 }

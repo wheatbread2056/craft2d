@@ -84,6 +84,7 @@ const player = {
     regenAllowed: true, // player regen toggle
     deathOverlay: false,
     inventoryOpen: false,
+    interactionLayer: 'fg', // layer to interact with (foreground or background)
 };
 const camera = {
     x: 0,
@@ -159,8 +160,10 @@ function showBlock(ctx, x, y, block, darken = false) { // x and y are relative t
     // ctx added in alpha 1.5.5 to draw onto a canvas context
     const isPlayer = (block == 'player' && player.inWater == true && player.fly == false);
     if (darken) {
-        ctx.fillStyle = 'black';
-        ctx.fillRect(Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        if (!transparentblocks.includes(block)) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        }
         ctx.globalAlpha = 0.7;
     }
     if (isPlayer) {
@@ -477,6 +480,7 @@ function updateTime() {
 
 function blockModification() {
     if (!player.modificationAllowed) return;
+    let layer = player.interactionLayer;
     // get the coordinates for the old and new block positions
     let oldBlockX = Math.floor(client.oldMx / 64 / camera.scale + camera.x);
     let oldBlockY = Math.ceil(-client.oldMy / 64 / camera.scale + camera.y);
@@ -494,22 +498,22 @@ function blockModification() {
         // check if the delete key is pressed to destroy the block
         if (keybinds.delete.some(key => keys[key])) {
             if (getBlock(oldBlockX, oldBlockY) !== 'stone4') {
-                deleteBlock(oldBlockX, oldBlockY);
+                deleteBlock(oldBlockX, oldBlockY, layer);
             }
         }
         // check if the place key is pressed to place a block
         if (keybinds.place.some(key => keys[key])) {
-            let block = getBlock(oldBlockX, oldBlockY);
+            let block = getBlock(oldBlockX, oldBlockY, layer);
             let isWorldBottom = oldBlockY < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable;
             let isPlayerPosition = Math.round(player.x) === oldBlockX && Math.round(player.y) === oldBlockY;
 
             // place the block if it is not restricted
             if (block !== 'stone4' && !isWorldBottom && !isPlayerPosition) {
                 if (player.inventory[player.currentSlot].id === 'grassbg6' || player.inventory[player.currentSlot].id === 'grassbg7') {
-                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id+ 'a');
-                    setBlock(oldBlockX, oldBlockY + 1, player.inventory[player.currentSlot].id + 'b');
+                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id+ 'a', layer);
+                    setBlock(oldBlockX, oldBlockY + 1, player.inventory[player.currentSlot].id + 'b', layer);
                 } else {
-                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id);
+                    setBlock(oldBlockX, oldBlockY, player.inventory[player.currentSlot].id, layer);
                 }
             }
         }
