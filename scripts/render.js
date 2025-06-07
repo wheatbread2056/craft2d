@@ -1,8 +1,8 @@
 // generate block images
 function initializeImage(src) {
     let imagekey = src.split('/').pop().split('.')[0];
-    blockimages[imagekey] = new Image();
-    blockimages[imagekey].src = src
+    globalImages[imagekey] = new Image();
+    globalImages[imagekey].src = src;
 }
 for (const i in allblocks) {
     let blk = allblocks[i];
@@ -11,6 +11,10 @@ for (const i in allblocks) {
 for (const i in tools) {
     let tool = tools[i].id;
     initializeImage(`images/tools/${tool}.png`);
+}
+for (const i in overlays) {
+    let overlay = overlays[i];
+    initializeImage(`images/overlay/${overlay}.png`);
 }
 
 // canvas + ctx
@@ -63,6 +67,27 @@ function renderWorld(camx, camy) {
 
 function renderPlayer(ctx, camx, camy) {
     showBlock(ctx, player.x - camx, player.y - camy, 'player');
+}
+
+function renderOverlay(ctx, camx, camy) {
+    // block breaking overlay
+    if (!(!player.blockDamage || player.blockDamage <= 0)) {
+        let progress = player.blockDamage / player.currentBlockHardness;
+        let breakOverlay = 0;
+        if (progress > 0.2) breakOverlay = Math.ceil((progress - 0.2) / 0.2);
+        if (breakOverlay == 0) ctx.globalAlpha = 0;
+        else ctx.globalAlpha = 0.5;
+        showBlock(ctx, player.blockX - camx, player.blockY - camy, `breaking${breakOverlay}`);
+        ctx.globalAlpha = 1;
+    }
+
+    // block selection overlay
+    if (getBlock(client.blockMx, client.blockMy, player.interactionLayer) !== null) {
+        if (!player.breakingBlock) ctx.globalAlpha = 0.5;
+        else ctx.globalAlpha = 0.8;
+        showBlock(ctx, client.blockMx - camx, client.blockMy - camy, `blockselect`);
+        ctx.globalAlpha = 1;
+    }
 }
 
 function moveCamera() {

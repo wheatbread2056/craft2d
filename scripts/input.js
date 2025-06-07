@@ -177,3 +177,8 @@ document.addEventListener('mousemove', (event) => {
     client.mx = event.clientX;
     client.my = event.clientY;
 });
+
+function updateCommonValues() {
+    client.blockMx = Math.floor(client.mx / 64 / camera.scale + camera.x);
+    client.blockMy = Math.ceil(-client.my / 64 / camera.scale + camera.y);
+}

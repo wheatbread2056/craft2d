@@ -73,7 +73,7 @@ function createInventoryUI() {
         blockSlot.style.backgroundColor = '#00000088';
         blockSlot.style.border = '2px solid #00000000';
 
-        let blockImage = blockimages[selblocks[blockId]].cloneNode(true);
+        let blockImage = globalImages[selblocks[blockId]].cloneNode(true);
         blockImage.style.width = '48px';
         blockImage.style.height = '48px';
         blockImage.style.imageRendering = 'pixelated';
@@ -95,7 +95,7 @@ function renderBlockSelector() {
         slot.setAttribute('class', 'inventory-slot');
         slot.style.display = 'inline-block';
         slot.style.marginRight = '8px';
-        let image = blockimages[player.inventory[i].id].cloneNode(true);
+        let image = globalImages[player.inventory[i].id].cloneNode(true);
         image.style.width = '48px';
         image.style.height = '48px';
         image.style.border = '4px solid rgb(54, 54, 54)';

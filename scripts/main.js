@@ -48,9 +48,11 @@ function renderTick() {
         player.health = player.maxHealth;
     }
     // visible
+    updateCommonValues();
     playerPhysics();
     blockModification();
     renderWorld(camera.x, camera.y);
+    renderOverlay(globalCtx, camera.x, camera.y);
     updateTime();
     renderBlockSelector();
     renderInfoText();

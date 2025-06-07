@@ -64,6 +64,11 @@ const player = {
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
     x: 0, // player x position
     y: 0, // player y position
+    blockX: 0, // x pos of interacting block
+    blockY: 0, // y pos of interacting block
+    blockDamage: 0, // current damage dealt to intreacting block
+    currentBlockHardness: 0,
+    breakingBlock: false, // if the player is breaking a block
     mx: 0, // player x velocity per tick
     my: 0, // player y velocity per tick
     air: false, // if in midair
@@ -104,7 +109,7 @@ const client = {
     oldMy: 0, // previous mouse y position
     waterimg: 'watertop_render1', // current water image
 }
-const blockimages = {}
+const globalImages = {}
 
 function getChunkAndBlock(x, y) {
     const cx = Math.floor(x / env.global.chunksize);
@@ -170,9 +175,9 @@ function showBlock(ctx, x, y, block, darken = false) { // x and y are relative t
         ctx.globalAlpha = 0.5;
     }
     try {
-        ctx.drawImage(blockimages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        ctx.drawImage(globalImages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     } catch (e) {
-        ctx.drawImage(blockimages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     }
     if (isPlayer || darken) {
         ctx.globalAlpha = 1.0;
@@ -481,6 +486,7 @@ function updateTime() {
 function blockModification() {
     if (!player.modificationAllowed) return;
     let layer = player.interactionLayer;
+
     // get the coordinates for the old and new block positions
     let oldBlockX = Math.floor(client.oldMx / 64 / camera.scale + camera.x);
     let oldBlockY = Math.ceil(-client.oldMy / 64 / camera.scale + camera.y);
@@ -494,13 +500,34 @@ function blockModification() {
     let sy = (oldBlockY < newBlockY) ? 1 : -1;
     let err = dx - dy;
 
-    while (true) {
-        // check if the delete key is pressed to destroy the block
-        if (keybinds.delete.some(key => keys[key])) {
-            if (getBlock(oldBlockX, oldBlockY) !== 'stone4') {
-                deleteBlock(oldBlockX, oldBlockY, layer);
+    // block breaking
+    if (keybinds.delete.some(key => keys[key]) && player.breakingBlock == false) {
+        player.breakingBlock = true;
+    }
+    if (!keybinds.delete.some(key => keys[key]) && player.breakingBlock == true) {
+        player.breakingBlock = false;
+    }
+    if (player.breakingBlock) {
+        if (newBlockX !== player.blockX || newBlockY !== player.blockY) {
+            // reset block damage if breaking new block
+            player.blockDamage = 0;
+        }
+        player.blockX = newBlockX, player.blockY = newBlockY;
+        let block = getBlock(player.blockX, player.blockY, layer);
+        if (block !== null) {
+            player.currentBlockHardness = hardness[block];
+            player.blockDamage += 0.05 / (client.renderTickrateComputed / 60);
+            if (player.blockDamage >= player.currentBlockHardness) {
+                // play sound
+                // delete the block
+                deleteBlock(player.blockX, player.blockY, layer);
+                player.blockDamage = 0;
             }
         }
+    }
+
+    while (true) {
+        // destroying doesn't use the line algorhitm, because you're supposed to destroy 1 block slowly at a time.
         // check if the place key is pressed to place a block
         if (keybinds.place.some(key => keys[key])) {
             let block = getBlock(oldBlockX, oldBlockY, layer);
