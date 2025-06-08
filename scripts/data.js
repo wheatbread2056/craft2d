@@ -301,7 +301,7 @@ const recipes = {
     // brick recipes
     'bricks': { output: 4, ingredients: { '#stone': 4, '#coal': 1 } }, // smelt stone into bricks
     'stonebricks': { output: 4, ingredients: { '#stone': 4, '#coal': 1 } }, // smelt stone into stone bricks
-    'dirtbricks': { output: 4, ingredients: { '#dirt': 4, '#coal': 1 } }, // smelt dirt into dirt bricks
+    'dirtbricks': { output: 4, ingredients: { 'dirt': 4, '#coal': 1 } }, // smelt dirt into dirt bricks
     'goldbricks': { output: 8, ingredients: { 'gold_bar': 4 } }, // use gold ingots to make gold bricks.
 
     // utility recipes
