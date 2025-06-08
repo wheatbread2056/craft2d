@@ -293,8 +293,21 @@ const recipes = {
     'ruby_bar': { output: 1, ingredients: { '#ruby': 1, '#coal': 6 } },
     'zyrite_bar': { output: 1, ingredients: { '#zyrite': 1, '#coal': 8 } },
 
+    // craft cobblestone back into stone via smelting
+    'stone1': { output: 4, ingredients: { '#cobblestone': 4, '#coal': 1 } }, // smelt cobblestone into stone
+    'stone2': { output: 4, ingredients: { '#cobblestone2': 4, '#coal': 1 } }, // smelt dark cobblestone into stone
+    'stone3': { output: 4, ingredients: { '#cobblestone3': 4, '#coal': 1 } }, // smelt very dark cobblestone into stone
+
+    // brick recipes
+    'bricks': { output: 4, ingredients: { '#stone': 4, '#coal': 1 } }, // smelt stone into bricks
+    'stonebricks': { output: 4, ingredients: { '#stone': 4, '#coal': 1 } }, // smelt stone into stone bricks
+    'dirtbricks': { output: 4, ingredients: { '#dirt': 4, '#coal': 1 } }, // smelt dirt into dirt bricks
+    'goldbricks': { output: 8, ingredients: { 'gold_ingot': 4 } }, // use gold ingots to make gold bricks.
+
     // utility recipes
-    'crafter': { output: 1, ingredients: { '#planks': 8, '#allstone': 4 } }, // crafting table recipe
+    'crafter': { output: 1, ingredients: { '#planks': 8, '#allstone': 4 } }, // crafting table recipe (very important)
+    'crate': { output: 1, ingredients: { '#planks': 8 } }, // crate is gonna be like a chest in the future when block data exists
+    'glass': { output: 4, ingredients: { '#sand': 4, '#coal': 1 } },
 
     // tool recipes: starts at 4 sticks, max out at 8, increase by 2 per tier.
     // pickaxe recipes. use 5 of primary resource.
@@ -356,4 +369,42 @@ for (let item of items) {
     if (typeof stacksizes[item.id] === 'undefined') {
         stacksizes[item.id] = env.global.maxStackSize;
     }
+}
+
+// used to make the uhhhhhhhhhhhhhhhhhhhhhh recipes.
+function getAllGameObjectsList() {
+    let output = '';
+    // Blocks
+    output += '=== Blocks ===\n';
+    for (let block of allblocks) {
+        let name = blocknames[block] || '(unnamed)';
+        let hasRecipe = recipes.hasOwnProperty(block);
+        output += `- ${name} [${block}]${!hasRecipe ? ' •' : ''}\n`;
+    }
+    output += '\n=== Tools ===\n';
+    for (let tool of tools) {
+        let name = tool.name || '(unnamed)';
+        let hasRecipe = recipes.hasOwnProperty(tool.id);
+        output += `- ${name} [${tool.id}]${!hasRecipe ? ' •' : ''}\n`;
+    }
+    output += '\n=== Items ===\n';
+    for (let item of items) {
+        let name = item.name || '(unnamed)';
+        let hasRecipe = recipes.hasOwnProperty(item.id);
+        output += `- ${name} [${item.id}]${!hasRecipe ? ' •' : ''}\n`;
+    }
+    return output;
+}
+
+function downloadGameObjectsList() {
+    const text = getAllGameObjectsList();
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'game_objects_list.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
