@@ -53,9 +53,9 @@ const env = {
 };
 const player = {
     inventory: {
-        1: {id: 'pickaxe9', amount: 1},
-        2: {id: 'axe9', amount: 1},
-        3: {id: 'shovel9', amount: 1},
+        1: {id: 'pickaxe1', amount: 1},
+        2: {id: 'axe1', amount: 1},
+        3: {id: 'shovel1', amount: 1},
         4: {id: 'crafter', amount: 1},
         5: {id: null, amount: 0},
         6: {id: null, amount: 0},
@@ -542,9 +542,10 @@ function blockModification() {
                 // first, look at EVERY inventory slot until theres a slot containing the block. but if its already a full stack, keep looking
                 // then, if theres either no slots with the blocks, or all the slots with the block are full stacks, add to first empty slot.
                 let added = false;
+                let drop = blockdrops[block] || null;
                 for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
                     let invSlot = player.inventory[slot];
-                    if (invSlot.id === block && invSlot.amount < env.global.maxStackSize) {
+                    if (invSlot.id === drop && invSlot.amount < env.global.maxStackSize) {
                         invSlot.amount++;
                         added = true;
                         break;
@@ -554,7 +555,7 @@ function blockModification() {
                     for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
                         let invSlot = player.inventory[slot];
                         if (invSlot.id === null || invSlot.amount === 0) {
-                            invSlot.id = block;
+                            invSlot.id = drop;
                             invSlot.amount = 1;
                             break;
                         }

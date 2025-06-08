@@ -7,6 +7,7 @@ const transparentblocks = []; // used to optimize rendering
 const hardness = [];
 const tooltypes = [];
 const blockactions = [];
+const blockdrops = [];
 
 // durability: how many interactions before breaking
 // efficiency: rate at which blocks are destroyed (hardness/sec)
@@ -35,6 +36,7 @@ function addBlock(block) {
     let hard = block.h; // how long it takes to break
     let type = block.type;
     let actions = block.actions;
+    let drops = block.drops; // what the block drops when broken, can be a string or an array of strings
     allblocks.push(id);
     if (t) transparentblocks.push(id);
     if (!collision) nocollision.push(id);
@@ -44,6 +46,11 @@ function addBlock(block) {
     else {hardness[id] = 0;} // assume the block is meant to instantly break
     if (type) tooltypes[id] = type; // type of tool needed to break the block
     if (actions) blockactions[id] = actions; // actions are onInteract, onBreak, onPlace, onTouch. more will be added in the future
+    if (drops) {
+        blockdrops[id] = drops; // what the block drops
+    } else {
+        blockdrops[id] = id; // if no drops specified, drop itself
+    }
 }
 
 const initialBlockList = [
@@ -132,9 +139,9 @@ const initialBlockList = [
     { id: 'log3', name: 'Woods Log', col: true, sel: true, h: 5, type: 'axe' },
 
     // stone types
-    { id: 'stone1', name: 'Stone', col: true, sel: true, h: 10, type: 'pickaxe'},
-    { id: 'stone2', name: 'Dark Stone', col: true, sel: true, h: 40, type: 'pickaxe' },
-    { id: 'stone3', name: 'Very Dark Stone', col: true, sel: true, h: 160, type: 'pickaxe' },
+    { id: 'stone1', name: 'Stone', col: true, sel: true, h: 10, type: 'pickaxe', drops: 'cobblestone1' },
+    { id: 'stone2', name: 'Dark Stone', col: true, sel: true, h: 40, type: 'pickaxe', drops: 'cobblestone2' },
+    { id: 'stone3', name: 'Very Dark Stone', col: true, sel: true, h: 160, type: 'pickaxe', drops: 'cobblestone3' },
     { id: 'stone4', name: 'Unbreakable Stone', col: true, sel: false }, // unbreakable stone
 
     // cobblestone types
@@ -145,9 +152,9 @@ const initialBlockList = [
     // ores (very big)
     // hardness base values: coal 12, iron 16, gold 24, diamond 48, emerald 72, ruby 96, zyrite 128
     // remember: each stone level increases the hardness by 4x, so coal ore in dark stone is 48, in very dark stone is 192, etc.
-    { id: 'ore_coal1', name: 'Coal Ore', col: true, sel: true, h: 12, type: 'pickaxe' },
-    { id: 'ore_coal2', name: 'Dark Coal Ore', col: true, sel: true, h: 48, type: 'pickaxe' },
-    { id: 'ore_coal3', name: 'Very Dark Coal Ore', col: true, sel: true, h: 192, type: 'pickaxe' },
+    { id: 'ore_coal1', name: 'Coal Ore', col: true, sel: true, h: 12, type: 'pickaxe'},
+    { id: 'ore_coal2', name: 'Dark Coal Ore', col: true, sel: true, h: 48, type: 'pickaxe'},
+    { id: 'ore_coal3', name: 'Very Dark Coal Ore', col: true, sel: true, h: 192, type: 'pickaxe'},
     { id: 'ore_iron1', name: 'Iron Ore', col: true, sel: true, h: 16, type: 'pickaxe' },
     { id: 'ore_iron2', name: 'Dark Iron Ore', col: true, sel: true, h: 64, type: 'pickaxe' },
     { id: 'ore_iron3', name: 'Very Dark Iron Ore', col: true, sel: true, h: 256, type: 'pickaxe' },
@@ -235,6 +242,17 @@ const tools = [ //
 ];
 const items = [
     { id: 'stick', name: 'Stick'},
+    { id: 'gold_stick', name: 'Gold Stick' },
+    { id: 'diamond_stick', name: 'Diamond Stick' },
+    { id: 'emerald_stick', name: 'Emerald Stick' },
+    { id: 'ruby_stick', name: 'Ruby Stick' },
+    { id: 'zyrite_stick', name: 'Zyrite Stick' },
+    { id: 'iron_bar', name: 'Iron Bar' },
+    { id: 'gold_bar', name: 'Gold Bar' },
+    { id: 'diamond_bar', name: 'Diamond Bar' },
+    { id: 'emerald_bar', name: 'Emerald Bar' },
+    { id: 'ruby_bar', name: 'Ruby Bar' },
+    { id: 'zyrite_bar', name: 'Zyrite Bar' },
 ]
 const groups = { // used for crafting
     'logs': { name: 'Logs', items: ['log1', 'log2', 'log3'] },
@@ -242,26 +260,72 @@ const groups = { // used for crafting
     'stone': { name: 'Stone', items: ['stone1', 'stone2', 'stone3'] },
     'cobblestone': { name: 'Cobblestone', items: ['cobblestone1', 'cobblestone2', 'cobblestone3'] },
     'allstone': { name: 'Stone', items: ['stone1', 'stone2', 'stone3', 'cobblestone1', 'cobblestone2', 'cobblestone3'] },
+    'coal': { name: 'Coal Ore', items: ['ore_coal1', 'ore_coal2', 'ore_coal3'] },
+    'iron': { name: 'Iron Ore', items: ['ore_iron1', 'ore_iron2', 'ore_iron3'] },
+    'gold': { name: 'Gold Ore', items: ['ore_gold1', 'ore_gold2', 'ore_gold3'] },
+    'diamond': { name: 'Diamond Ore', items: ['ore_diamond1', 'ore_diamond2', 'ore_diamond3'] },
+    'emerald': { name: 'Emerald Ore', items: ['ore_emerald1', 'ore_emerald2', 'ore_emerald3'] },
+    'ruby': { name: 'Ruby Ore', items: ['ore_ruby1', 'ore_ruby2', 'ore_ruby3'] },
+    'zyrite': { name: 'Zyrite Ore', items: ['ore_zyrite1', 'ore_zyrite2', 'ore_zyrite3'] },
 }
 const recipes = {
     // crafting recipes, for blocks, items, and tools
     // plank recipes (1 log = 4 planks)
+    'planks1': { output: 2, ingredients: { 'cactus': 1 } }, // alternate recipe that uses cactus, so player isnt doomed in desert biomes
     'planks1': { output: 4, ingredients: { 'log1': 1 } },
     'planks2': { output: 4, ingredients: { 'log2': 1 } },
     'planks3': { output: 4, ingredients: { 'log3': 1 } },
+
+    // stick recipes
     'stick': {output: 2, ingredients: { '#planks': 1 } }, // 2 sticks from 1 plank
+    'gold_stick': {output: 2, ingredients: { 'stick': 1, 'gold_bar': 1 } },
+    'diamond_stick': {output: 2, ingredients: { 'stick': 1, 'diamond_bar': 2 } },
+    'emerald_stick': {output: 2, ingredients: { 'stick': 1, 'emerald_bar': 3 } },
+    'ruby_stick': {output: 2, ingredients: { 'stick': 1, 'ruby_bar': 4 } },
+    'zyrite_stick': {output: 2, ingredients: { 'stick': 1, 'zyrite_bar': 5 } },
+
+    // ingot recipes (smelting?)
+    'iron_bar': { output: 1, ingredients: { '#iron': 1, '#coal': 1 } },
+    'gold_bar': { output: 1, ingredients: { '#gold': 1, '#coal': 2 } },
+    'diamond_bar': { output: 1, ingredients: { '#diamond': 1, '#coal': 3 } },
+    'emerald_bar': { output: 1, ingredients: { '#emerald': 1, '#coal': 4 } },
+    'ruby_bar': { output: 1, ingredients: { '#ruby': 1, '#coal': 6 } },
+    'zyrite_bar': { output: 1, ingredients: { '#zyrite': 1, '#coal': 8 } },
+
+    // utility recipes
     'crafter': { output: 1, ingredients: { '#planks': 8, '#allstone': 4 } }, // crafting table recipe
 
-    // pickaxe recipes (starts at 4 sticks, increases by 2 per tier.)
+    // tool recipes: starts at 4 sticks, max out at 8, increase by 2 per tier.
+    // pickaxe recipes. use 5 of primary resource.
     'pickaxe1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
     'pickaxe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } },
-    // later tiers will be added when ingots exist for crafting.
-    // axe recipes
-    'axe1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
-    'axe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } },
-    // shovel recipes
-    'shovel1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
-    'shovel2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } }, 
+    'pickaxe3': { output: 1, ingredients: { 'stick': 8, '#coal': 5 } },
+    'pickaxe4': { output: 1, ingredients: { 'stick': 8, 'iron_bar': 5 } },
+    'pickaxe5': { output: 1, ingredients: { 'gold_stick': 8, 'gold_bar': 5 } },
+    'pickaxe6': { output: 1, ingredients: { 'diamond_stick': 8, 'diamond_bar': 5 } },
+    'pickaxe7': { output: 1, ingredients: { 'emerald_stick': 8, 'emerald_bar': 5 } },
+    'pickaxe8': { output: 1, ingredients: { 'ruby_stick': 8, 'ruby_bar': 5 } },
+    'pickaxe9': { output: 1, ingredients: { 'zyrite_stick': 8, 'zyrite_bar': 5 } },
+    // axe recipes, use 4 of primary resource.
+    'axe1': { output: 1, ingredients: { 'stick': 4, '#planks': 4 } },
+    'axe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 4 } },
+    'axe3': { output: 1, ingredients: { 'stick': 8, '#coal': 4 } },
+    'axe4': { output: 1, ingredients: { 'stick': 8, 'iron_bar': 4 } },
+    'axe5': { output: 1, ingredients: { 'gold_stick': 8, 'gold_bar': 4 } },
+    'axe6': { output: 1, ingredients: { 'diamond_stick': 8, 'diamond_bar': 4 } },
+    'axe7': { output: 1, ingredients: { 'emerald_stick': 8, 'emerald_bar': 4 } },
+    'axe8': { output: 1, ingredients: { 'ruby_stick': 8, 'ruby_bar': 4 } },
+    'axe9': { output: 1, ingredients: { 'zyrite_stick': 8, 'zyrite_bar': 4 } },
+    // shovel recipes, use 3 of primary resource.
+    'shovel1': { output: 1, ingredients: { 'stick': 4, '#planks': 3 } },
+    'shovel2': { output: 1, ingredients: { 'stick': 6, '#allstone': 3 } },
+    'shovel3': { output: 1, ingredients: { 'stick': 8, '#coal': 3 } },
+    'shovel4': { output: 1, ingredients: { 'stick': 8, 'iron_bar': 3 } },
+    'shovel5': { output: 1, ingredients: { 'gold_stick': 8, 'gold_bar': 3 } },
+    'shovel6': { output: 1, ingredients: { 'diamond_stick': 8, 'diamond_bar': 3 } },
+    'shovel7': { output: 1, ingredients: { 'emerald_stick': 8, 'emerald_bar': 3 } },
+    'shovel8': { output: 1, ingredients: { 'ruby_stick': 8, 'ruby_bar': 3 } },
+    'shovel9': { output: 1, ingredients: { 'zyrite_stick': 8, 'zyrite_bar': 3 } }, 
 
 }
 const overlays = ['breaking1', 'breaking2', 'breaking3', 'breaking4','blockselect'];
