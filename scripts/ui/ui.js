@@ -274,15 +274,16 @@ function createInventoryUI() {
                         // Try to add to an existing stack first
                         for (let slot of Object.values(player.inventory)) {
                             if (slot.id === resultId) {
-                                // Assume maxStackSize is defined for each item, fallback to 64 if not
-                                if (slot.amount >= env.global.maxStackSize) continue;
-                                const spaceLeft = env.global.maxStackSize - slot.amount;
+                                // Use stack size from stacksizes[resultId] if defined, else fallback to env.global.maxStackSize, else 64
+                                const maxStackSize = (typeof stacksizes === 'object' && stacksizes[resultId]) ? stacksizes[resultId] : (env.global.maxStackSize || 64);
+                                if (slot.amount >= maxStackSize) continue;
+                                const spaceLeft = maxStackSize - slot.amount;
                                 if (resultAmount <= spaceLeft) {
                                     slot.amount += resultAmount;
                                     foundSlot = true;
                                     break;
                                 } else {
-                                    slot.amount = env.global.maxStackSize;
+                                    slot.amount = maxStackSize;
                                     resultAmount -= spaceLeft;
                                     // Continue to try to add the rest to another stack or empty slot
                                 }
