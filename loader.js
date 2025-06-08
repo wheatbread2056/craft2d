@@ -15,8 +15,8 @@ const versionName = `${awerothiaergbyvze[versionID[0]]} ${versionID.slice(1)}`; 
 document.title = `craft2D - ${versionName}`; // make the version title
 
 // put the game script(s) in
-const scripts1 = ['engine', 'data', 'files', 'mobile', 'input', 'music', 'menu']; // stage1 (before game)
-const scripts2 = ['cmd', 'render', 'worldgen', 'ui', 'main']; // stage 2 (ingame)
+const scripts1 = ['core/engine', 'data/crafting', 'core/data', 'core/files', 'game/mobile', 'core/input', 'game/music', 'ui/menu']; // stage1 (before game)
+const scripts2 = ['game/cmd', 'core/render', 'core/worldgen', 'ui/ui', 'main']; // stage 2 (ingame)
 
 // wait until the document body is loaded
 // uses a different loadScript

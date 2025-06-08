@@ -175,7 +175,7 @@ function createInventoryUI() {
             const craftingResultText = document.createElement('p');
             craftingResultText.innerHTML = 'Crafting Result:';
             // then the result which is the image, as a Block slot
-            const craftingResultImage = globalImages[player.currentRecipe || 'player'].cloneNode(true);
+            const craftingResultImage = globalImages[player.currentRecipe || 'unknown'].cloneNode(true);
             craftingResultImage.style.width = '48px';
             craftingResultImage.style.height = '48px';
             craftingResultImage.style.imageRendering = 'pixelated';
