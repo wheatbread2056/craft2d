@@ -22,6 +22,20 @@ layerIndicator.setAttribute('style', 'top:24px');
 layerIndicator.innerHTML = 'Layer: Foreground';
 document.body.appendChild(layerIndicator);
 
+const itemTooltip = document.createElement('p');
+itemTooltip.innerHTML = '';
+itemTooltip.setAttribute('class', 'infotext3');
+itemTooltip.style.position = 'absolute';
+itemTooltip.style.left = '50%';
+itemTooltip.style.bottom = '72px';
+itemTooltip.style.transform = 'translateX(-50%)';
+itemTooltip.style.textAlign = 'center';
+itemTooltip.style.pointerEvents = 'none';
+itemTooltip.style.width = 'max-content';
+itemTooltip.style.maxWidth = '90vw';
+itemTooltip.style.margin = '0';
+document.body.appendChild(itemTooltip);
+
 // version text
 const versionText = document.createElement('p');
 versionText.setAttribute('class', 'infotext2');
@@ -198,6 +212,25 @@ function renderBlockSelector() {
     }
     inventoryBar.style.left = '50%';
     inventoryBar.style.transform = 'translateX(-50%)';
+}
+
+function updateItemTooltip() {
+    // if holding item, show name. if not, show nothing. fade out after 2s.
+    if (player.currentItem) {
+        if (blocknames[player.currentItem]) {itemTooltip.innerHTML = blocknames[player.currentItem]}
+        else {itemTooltip.innerHTML = player.currentItem || ''};
+        document.body.removeChild(itemTooltip);
+        document.body.appendChild(itemTooltip);
+        itemTooltip.style.opacity = '1';
+        clearTimeout(client.tooltipTimeout);
+        itemTooltip.style.animation = 'fade-out 0.5s 1s forwards';
+        client.tooltipTimeout = setTimeout(() => {
+            itemTooltip.style.opacity = '0';
+            itemTooltip.style.animation = '';
+        }, 1500);
+    } else {
+        itemTooltip.style.opacity = '0';
+    }
 }
 
 function renderInfoText() {

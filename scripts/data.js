@@ -230,3 +230,6 @@ const overlays = ['breaking1', 'breaking2', 'breaking3', 'breaking4','blockselec
 for (let block of initialBlockList) {
     addBlock(block);
 }
+for (let tool of tools) {
+    blocknames[tool.id] = tool.name;
+}

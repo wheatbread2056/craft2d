@@ -58,6 +58,7 @@ function keydownEvent(key) {
     } else {
         if (!isNaN(key) && key >= '1' && key <= '9') {
             player.currentSlot = parseInt(key);
+            setTimeout(updateItemTooltip, 100);
         }
         if (key == ' ') { // bind ' ' (can't access) to 'Space' in keys object
             keys.Space = true;
