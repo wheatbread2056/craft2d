@@ -96,6 +96,7 @@ const player = {
     regenAllowed: true, // player regen toggle
     deathOverlay: false,
     inventoryOpen: false,
+    craftingOpen: false,
     interactionLayer: 'fg', // layer to interact with (foreground or background)
 };
 const camera = {

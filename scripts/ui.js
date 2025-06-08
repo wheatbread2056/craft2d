@@ -66,7 +66,8 @@ inventoryGrid.style.maxHeight = '400px';
 inventoryGrid.style.border = '1px solid #ccc';
 inventoryGrid.style.padding = '10px';
 inventoryGrid.style.backgroundColor = '#00000088';
-inventoryGrid.style.maxWidth = '576px';
+inventoryGrid.style.minWidth = '584px';
+inventoryGrid.style.maxWidth = '584px';
 inventoryGrid.style.width = '80%';
 inventoryGrid.style.maxHeight = '60%';
 inventoryGrid.style.position = 'absolute';
@@ -123,51 +124,144 @@ function createInventoryUI() {
             inventoryGrid.appendChild(blockSlot);
         }
     } else {
-        for (let slotId in player.inventory) {
-            const blockSlot = newBlockSlot(slotId);
-            if (player.inventory[slotId].id !== null) {
-                let blockImage = globalImages[player.inventory[slotId].id].cloneNode(true);
-                blockImage.style.width = '48px';
-                blockImage.style.height = '48px';
-                blockImage.style.imageRendering = 'pixelated';
-                blockSlot.appendChild(blockImage);
-                // add text thats the amount stored
-                if (player.inventory[slotId].amount > 1) {
-                    const amountText = document.createElement('span');
-                    amountText.style.position = 'absolute';
-                    amountText.style.bottom = '2px';
-                    amountText.style.right = '2px';
-                    amountText.style.color = '#fff';
-                    amountText.style.fontSize = '16px';
-                    amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-                    amountText.style.pointerEvents = 'none'; // Allow clicks to pass through
-                    amountText.textContent = player.inventory[slotId].amount;
-                    blockSlot.appendChild(amountText);
-                }
+        if (player.craftingOpen) {
+            // since no crafting system currently exists, this is just the layout, non-functional crafting gui
+            // I HATE CSS.
+            const craftingContainer = document.createElement('div');
+            craftingContainer.style.display = 'flex';
+            craftingContainer.style.flexDirection = 'column';
+            craftingContainer.style.width = '576px';
+
+            const topSection = document.createElement('div');
+            topSection.style.height = '156px';
+            topSection.style.width = '100%';
+            topSection.style.backgroundColor = '#00000088';
+
+            const LeftCraftingText = document.createElement('div');
+            LeftCraftingText.style.position = 'absolute';
+            LeftCraftingText.style.left = '16px';
+            LeftCraftingText.style.top = '0px';
+
+            // top left of topSection: text saying "Recipe Cost"
+            const recipeCostText = document.createElement('p');
+            recipeCostText.innerHTML = 'Recipe: Placeholder';
+
+            // then the cost of it, multiline (in 1 element)
+            const recipeCost = document.createElement('pre');
+            recipeCost.innerHTML = `<img src="${globalImages['grass2'].src}" style="width:24px;height:24px;vertical-align:middle;"> x10 Grass
+<img src="${globalImages['grass2'].src}" style="width:24px;height:24px;vertical-align:middle;"> x10 Grass
+<img src="${globalImages['grass2'].src}" style="width:24px;height:24px;vertical-align:middle;"> x10 Grass`; // Example multiline content
+
+            LeftCraftingText.appendChild(recipeCostText);
+            LeftCraftingText.appendChild(recipeCost);
+            topSection.appendChild(LeftCraftingText);
+
+            const RightCraftingText = document.createElement('div');
+            RightCraftingText.style.position = 'absolute';
+            RightCraftingText.style.right = '16px';
+            RightCraftingText.style.top = '0px';
+            // top right of topSection: text saying "Crafting Result"
+            const craftingResultText = document.createElement('p');
+            craftingResultText.innerHTML = 'Crafting Result:';
+            // then the result which is the image, as a Block slot
+            const craftingResultImage = globalImages['grass2'].cloneNode(true);
+            craftingResultImage.style.width = '48px';
+            craftingResultImage.style.height = '48px';
+            craftingResultImage.style.imageRendering = 'pixelated';
+            const craftingResultAmount = document.createElement('span');
+            craftingResultAmount.style.position = 'absolute';
+            craftingResultAmount.style.bottom = '2px';
+            craftingResultAmount.style.left = '-138px';
+            craftingResultAmount.style.fontSize = '32px';
+            craftingResultAmount.innerHTML = 'x444';
+            
+            const craftingResultSlot = newBlockSlot();
+            craftingResultSlot.style.position = 'absolute';
+            craftingResultSlot.style.right = '8px';
+
+            const craftButton = document.createElement('button');
+            craftButton.style.height = '32px';
+            craftButton.style.width = '192px';
+            craftButton.style.backgroundColor = '#000000ff';
+            craftButton.style.border = '2px solid #ffffff';
+            craftButton.style.position = 'absolute';
+            craftButton.style.right = '8px';
+            craftButton.style.top = '126px';
+            craftButton.innerHTML = 'Craft';
+
+            craftingResultSlot.appendChild(craftingResultImage);
+            craftingResultSlot.appendChild(craftingResultAmount);
+            RightCraftingText.appendChild(craftingResultText);
+            RightCraftingText.appendChild(craftingResultSlot);
+            RightCraftingText.appendChild(craftButton);
+            topSection.appendChild(RightCraftingText);
+
+
+            const recipeGrid = document.createElement('div');
+            recipeGrid.style.marginTop = '8px';
+            recipeGrid.style.display = 'grid';
+            recipeGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(50px, 1fr))';
+            recipeGrid.style.gap = '10px';
+            recipeGrid.style.minWidth = '576px';
+
+            for (i = 0; i < 100; i++) {
+                const blockSlot = newBlockSlot();
+                recipeGrid.appendChild(blockSlot);
             }
-            blockSlot.addEventListener('click', () => {
-                if (client.inventorySelectedSlot == null) {
-                    // No slot selected yet, select this one
-                    client.inventorySelectedSlot = slotId;
-                    inventoryGrid.innerHTML = ''; // Clear the grid
-                    createInventoryUI();
-                } else {
-                    // Slot already selected, swap with this one
-                    if (client.inventorySelectedSlot !== slotId) {
-                        // Swap the two slots
-                        const temp = { ...player.inventory[client.inventorySelectedSlot] };
-                        player.inventory[client.inventorySelectedSlot] = { ...player.inventory[slotId] };
-                        player.inventory[slotId] = temp;
+
+            craftingContainer.appendChild(topSection);
+            craftingContainer.appendChild(recipeGrid);
+            inventoryGrid.appendChild(craftingContainer);
+            
+
+        } else {
+
+            for (let slotId in player.inventory) {
+                const blockSlot = newBlockSlot(slotId);
+                if (player.inventory[slotId].id !== null) {
+                    let blockImage = globalImages[player.inventory[slotId].id].cloneNode(true);
+                    blockImage.style.width = '48px';
+                    blockImage.style.height = '48px';
+                    blockImage.style.imageRendering = 'pixelated';
+                    blockSlot.appendChild(blockImage);
+                    // add text thats the amount stored
+                    if (player.inventory[slotId].amount > 1) {
+                        const amountText = document.createElement('span');
+                        amountText.style.position = 'absolute';
+                        amountText.style.bottom = '2px';
+                        amountText.style.right = '2px';
+                        amountText.style.color = '#fff';
+                        amountText.style.fontSize = '16px';
+                        amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                        amountText.style.pointerEvents = 'none'; // Allow clicks to pass through
+                        amountText.textContent = player.inventory[slotId].amount;
+                        blockSlot.appendChild(amountText);
                     }
-                    // Deselect after swap (or if same slot clicked)
-                    client.inventorySelectedSlot = null;
-                    // Optionally, re-render the UI to reflect changes
-                    inventoryGrid.innerHTML = '';
-                    createInventoryUI();
                 }
-            });
-            inventoryGrid.appendChild(blockSlot);
-        }
+                blockSlot.addEventListener('click', () => {
+                    if (client.inventorySelectedSlot == null) {
+                        // No slot selected yet, select this one
+                        client.inventorySelectedSlot = slotId;
+                        inventoryGrid.innerHTML = ''; // Clear the grid
+                        createInventoryUI();
+                    } else {
+                        // Slot already selected, swap with this one
+                        if (client.inventorySelectedSlot !== slotId) {
+                            // Swap the two slots
+                            const temp = { ...player.inventory[client.inventorySelectedSlot] };
+                            player.inventory[client.inventorySelectedSlot] = { ...player.inventory[slotId] };
+                            player.inventory[slotId] = temp;
+                        }
+                        // Deselect after swap (or if same slot clicked)
+                        client.inventorySelectedSlot = null;
+                        // Optionally, re-render the UI to reflect changes
+                        inventoryGrid.innerHTML = '';
+                        createInventoryUI();
+                    }
+                });
+                inventoryGrid.appendChild(blockSlot);
+            }
+    }
     }
 }
 createInventoryUI();
