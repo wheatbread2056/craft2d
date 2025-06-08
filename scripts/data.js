@@ -52,6 +52,13 @@ const initialBlockList = [
     // block types: pickaxe, axe, shovel, none
     // none = break with any tool including hand, others are self explanatory.
     // blocks with no type = automatically default to none
+
+    //
+    ///// Category: Utility blocks
+    //
+    
+    // crafting table aka the crafter
+    { id: 'crafter', name: 'Crafter', col: true, sel: true, h: 5, actions: {onInteract: () => {openCraftingGUI();}}},
     
     //
     ///// Category: Construction blocks
@@ -226,10 +233,44 @@ const tools = [ //
     { id: 'shovel8', name: 'Ruby Shovel', tier: 8, type: 'shovel' },
     { id: 'shovel9', name: 'Zyrite Shovel', tier: 9, type: 'shovel' },
 ];
+const items = [
+    { id: 'stick', name: 'Stick'},
+]
+const groups = { // used for crafting
+    'logs': { name: 'Logs', items: ['log1', 'log2', 'log3'] },
+    'planks': { name: 'Planks', items: ['planks1', 'planks2', 'planks3'] },
+    'stone': { name: 'Stone', items: ['stone1', 'stone2', 'stone3'] },
+    'cobblestone': { name: 'Cobblestone', items: ['cobblestone1', 'cobblestone2', 'cobblestone3'] },
+    'allstone': { name: 'Stone', items: ['stone1', 'stone2', 'stone3', 'cobblestone1', 'cobblestone2', 'cobblestone3'] },
+}
+const recipes = {
+    // crafting recipes, for blocks, items, and tools
+    // plank recipes (1 log = 4 planks)
+    'planks1': { output: 4, ingredients: { 'log1': 1 } },
+    'planks2': { output: 4, ingredients: { 'log2': 1 } },
+    'planks3': { output: 4, ingredients: { 'log3': 1 } },
+    'stick': {output: 2, ingredients: { '#planks': 1 } }, // 2 sticks from 1 plank
+    'crafter': { output: 1, ingredients: { '#planks': 8, '#allstone': 4 } }, // crafting table recipe
+
+    // pickaxe recipes (starts at 4 sticks, increases by 2 per tier.)
+    'pickaxe1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
+    'pickaxe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } },
+    // later tiers will be added when ingots exist for crafting.
+    // axe recipes
+    'axe1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
+    'axe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } },
+    // shovel recipes
+    'shovel1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
+    'shovel2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } }, 
+
+}
 const overlays = ['breaking1', 'breaking2', 'breaking3', 'breaking4','blockselect'];
 for (let block of initialBlockList) {
     addBlock(block);
 }
 for (let tool of tools) {
     blocknames[tool.id] = tool.name;
+}
+for (let item of items) {
+    blocknames[item.id] = item.name;
 }

@@ -72,10 +72,13 @@ function keydownEvent(key) {
         if (keybinds.inventory.includes(key) && player.controlAllowed) { // open/close inventory
             player.inventoryOpen = !player.inventoryOpen;
             if (player.inventoryOpen) {
+                createInventoryUI();
                 document.body.appendChild(inventoryGrid);
                 player.modificationAllowed = false;
             } else {
                 document.body.removeChild(inventoryGrid);
+                player.craftingOpen = false;
+                createInventoryUI();
                 player.modificationAllowed = true;
             }
         }

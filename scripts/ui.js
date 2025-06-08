@@ -144,13 +144,24 @@ function createInventoryUI() {
 
             // top left of topSection: text saying "Recipe Cost"
             const recipeCostText = document.createElement('p');
-            recipeCostText.innerHTML = 'Recipe: Placeholder';
+            recipeCostText.innerHTML = `Recipe: ${blocknames[player.currentRecipe] !== undefined ? blocknames[player.currentRecipe] : player.currentRecipe || 'None'}`;
 
             // then the cost of it, multiline (in 1 element)
             const recipeCost = document.createElement('pre');
-            recipeCost.innerHTML = `<img src="${globalImages['grass2'].src}" style="width:24px;height:24px;vertical-align:middle;"> x10 Grass
-<img src="${globalImages['grass2'].src}" style="width:24px;height:24px;vertical-align:middle;"> x10 Grass
-<img src="${globalImages['grass2'].src}" style="width:24px;height:24px;vertical-align:middle;"> x10 Grass`; // Example multiline content
+            if (recipes[player.currentRecipe]) {
+                // List each ingredient and its amount, one per line
+                recipeCost.innerHTML = Object.entries(recipes[player.currentRecipe].ingredients)
+                    .map(([ingredient, amount]) => {
+                        if (ingredient.startsWith('#')) {
+                            const groupId = ingredient.slice(1);
+                            const groupName = groups[groupId]?.name || ingredient;
+                            return `${groupName}: x${amount}`;
+                        } else {
+                            return `${blocknames[ingredient] || ingredient}: x${amount}`;
+                        }
+                    })
+                    .join('\n');
+            } else recipeCost.innerHTML = 'No recipe selected';
 
             LeftCraftingText.appendChild(recipeCostText);
             LeftCraftingText.appendChild(recipeCost);
@@ -164,7 +175,7 @@ function createInventoryUI() {
             const craftingResultText = document.createElement('p');
             craftingResultText.innerHTML = 'Crafting Result:';
             // then the result which is the image, as a Block slot
-            const craftingResultImage = globalImages['grass2'].cloneNode(true);
+            const craftingResultImage = globalImages[player.currentRecipe || 'player'].cloneNode(true);
             craftingResultImage.style.width = '48px';
             craftingResultImage.style.height = '48px';
             craftingResultImage.style.imageRendering = 'pixelated';
@@ -173,7 +184,7 @@ function createInventoryUI() {
             craftingResultAmount.style.bottom = '2px';
             craftingResultAmount.style.left = '-138px';
             craftingResultAmount.style.fontSize = '32px';
-            craftingResultAmount.innerHTML = 'x444';
+            craftingResultAmount.innerHTML = `x${recipes[player.currentRecipe]?.output || 0}`; // default to 1 if no recipe selected
             
             const craftingResultSlot = newBlockSlot();
             craftingResultSlot.style.position = 'absolute';
@@ -188,6 +199,114 @@ function createInventoryUI() {
             craftButton.style.right = '8px';
             craftButton.style.top = '126px';
             craftButton.innerHTML = 'Craft';
+            craftButton.onclick = () => {
+                if (recipes[player.currentRecipe]) {
+                    const recipe = recipes[player.currentRecipe];
+                    // Check if player has enough ingredients (supporting item groups)
+                    let canCraft = true;
+                    const usedSlots = {}; // Track which slots are used for each ingredient
+
+                    for (const [ingredient, amount] of Object.entries(recipe.ingredients)) {
+                        let required = amount;
+                        let groupItems = [];
+                        if (ingredient.startsWith('#')) {
+                            // Item group: collect all matching items from groups
+                            const groupName = ingredient.slice(1);
+                            const group = groups[groupName];
+                            groupItems = group ? group.items : [];
+                            console.log(groupItems);
+                        }
+                        let totalAvailable = 0;
+                        for (let slot of Object.values(player.inventory)) {
+                            if (
+                                (ingredient.startsWith('#') && groupItems.includes(slot.id)) ||
+                                (!ingredient.startsWith('#') && slot.id === ingredient)
+                            ) {
+                                totalAvailable += slot.amount;
+                            }
+                        }
+                        if (totalAvailable < required) {
+                            canCraft = false;
+                            break;
+                        }
+                    }
+
+                    if (canCraft) {
+                        // Deduct ingredients from inventory (supporting item groups)
+                        for (const [ingredient, amount] of Object.entries(recipe.ingredients)) {
+                            let required = amount;
+                            if (ingredient.startsWith('#')) {
+                                const groupName = ingredient.slice(1);
+                                const groupItems = groups[groupName] ? groups[groupName].items : [];
+                                // Go through group items in order
+                                for (const groupItem of groupItems) {
+                                    for (let slot of Object.values(player.inventory)) {
+                                        if (slot.id === groupItem && required > 0) {
+                                            let deduct = Math.min(slot.amount, required);
+                                            slot.amount -= deduct;
+                                            required -= deduct;
+                                            if (slot.amount <= 0) {
+                                                slot.id = null;
+                                            }
+                                            if (required <= 0) break;
+                                        }
+                                    }
+                                    if (required <= 0) break;
+                                }
+                            } else {
+                                for (let slot of Object.values(player.inventory)) {
+                                    if (slot.id === ingredient && required > 0) {
+                                        let deduct = Math.min(slot.amount, required);
+                                        slot.amount -= deduct;
+                                        required -= deduct;
+                                        if (slot.amount <= 0) {
+                                            slot.id = null;
+                                        }
+                                        if (required <= 0) break;
+                                    }
+                                }
+                            }
+                        }
+                        // Add result to inventory
+                        const resultId = player.currentRecipe; // Use the correct item ID for the result
+                        const resultAmount = recipe.output || 1; // Use the output amount (default to 1)
+                        let foundSlot = false;
+                        // Try to add to an existing stack first
+                        for (let slot of Object.values(player.inventory)) {
+                            if (slot.id === resultId) {
+                                // Assume maxStackSize is defined for each item, fallback to 64 if not
+                                if (slot.amount >= env.global.maxStackSize) continue;
+                                const spaceLeft = env.global.maxStackSize - slot.amount;
+                                if (resultAmount <= spaceLeft) {
+                                    slot.amount += resultAmount;
+                                    foundSlot = true;
+                                    break;
+                                } else {
+                                    slot.amount = env.global.maxStackSize;
+                                    resultAmount -= spaceLeft;
+                                    // Continue to try to add the rest to another stack or empty slot
+                                }
+                            }
+                        }
+                        // If no stack found, add to an empty slot
+                        if (!foundSlot) {
+                            for (let slot of Object.values(player.inventory)) {
+                                if (slot.id === null) {
+                                    slot.id = resultId;
+                                    slot.amount = resultAmount;
+                                    foundSlot = true;
+                                    break;
+                                }
+                            }
+                            if (!foundSlot) {
+                                console.warn('No space in inventory to craft the item');
+                            }
+                        }
+                    } else {
+                        console.warn('Not enough ingredients to craft the item');
+                    }
+                }
+            }
 
             craftingResultSlot.appendChild(craftingResultImage);
             craftingResultSlot.appendChild(craftingResultAmount);
@@ -204,9 +323,18 @@ function createInventoryUI() {
             recipeGrid.style.gap = '10px';
             recipeGrid.style.minWidth = '576px';
 
-            for (i = 0; i < 100; i++) {
-                const blockSlot = newBlockSlot();
-                recipeGrid.appendChild(blockSlot);
+            for (let recipe in recipes) {
+                const recipeSlot = newBlockSlot();
+                let blockImage = globalImages[recipe].cloneNode(true);
+                blockImage.style.width = '48px';
+                blockImage.style.height = '48px';
+                blockImage.style.imageRendering = 'pixelated';
+                recipeSlot.appendChild(blockImage);
+                recipeSlot.addEventListener('click', () => {
+                    player.currentRecipe = recipe;
+                    createInventoryUI();
+                });
+                recipeGrid.appendChild(recipeSlot);
             }
 
             craftingContainer.appendChild(topSection);

@@ -12,6 +12,10 @@ for (const i in tools) {
     let tool = tools[i].id;
     initializeImage(`images/tools/${tool}.png`);
 }
+for (const i in items) {
+    let item = items[i].id;
+    initializeImage(`images/items/${item}.png`);
+}
 for (const i in overlays) {
     let overlay = overlays[i];
     initializeImage(`images/overlay/${overlay}.png`);

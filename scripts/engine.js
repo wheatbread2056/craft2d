@@ -53,10 +53,10 @@ const env = {
 };
 const player = {
     inventory: {
-        1: {id: 'pickaxe1', amount: 1},
-        2: {id: 'axe1', amount: 1},
-        3: {id: 'shovel1', amount: 1},
-        4: {id: null, amount: 0},
+        1: {id: 'pickaxe9', amount: 1},
+        2: {id: 'axe9', amount: 1},
+        3: {id: 'shovel9', amount: 1},
+        4: {id: 'crafter', amount: 1},
         5: {id: null, amount: 0},
         6: {id: null, amount: 0},
         7: {id: null, amount: 0},
@@ -97,6 +97,7 @@ const player = {
     deathOverlay: false,
     inventoryOpen: false,
     craftingOpen: false,
+    currentRecipe: null, // current recipe being crafted
     interactionLayer: 'fg', // layer to interact with (foreground or background)
 };
 const camera = {
@@ -698,6 +699,20 @@ function explosion(x, y, radius = 3, fg = true, bg = false) {
                 }
             }
         }
+    }
+}
+function openCraftingGUI() {
+    // set crafting mode
+    player.craftingOpen = true;
+    createInventoryUI(); // reload inventory UI
+    // make the inventory open
+    player.inventoryOpen = true;
+    if (player.inventoryOpen) {
+        document.body.appendChild(inventoryGrid);
+        player.modificationAllowed = false;
+    } else {
+        document.body.removeChild(inventoryGrid);
+        player.modificationAllowed = true;
     }
 }
 
