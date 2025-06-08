@@ -566,6 +566,10 @@ function blockModification() {
         let isWorldBottom = blockY < -26 && env.global.worldBottomEnabled && env.global.worldBottomImmutable;
         let isPlayerPosition = Math.round(player.x) === blockX && Math.round(player.y) === blockY;
 
+        if (layer === 'fg' && isPlayerPosition) {
+            return;
+        }
+
         // place the block if it is not restricted
         if (block !== 'stone4' && block == null && allblocks.includes(player.currentItem)) {
             setBlock(blockX, blockY, player.inventory[player.currentSlot].id, layer);

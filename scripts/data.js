@@ -6,6 +6,7 @@ const selblocks = [];
 const transparentblocks = []; // used to optimize rendering
 const hardness = [];
 const tooltypes = [];
+const blockactions = [];
 
 // durability: how many interactions before breaking
 // efficiency: rate at which blocks are destroyed (hardness/sec)
@@ -33,6 +34,7 @@ function addBlock(block) {
     let t = block.t;
     let hard = block.h; // how long it takes to break
     let type = block.type;
+    let actions = block.actions;
     allblocks.push(id);
     if (t) transparentblocks.push(id);
     if (!collision) nocollision.push(id);
@@ -41,6 +43,7 @@ function addBlock(block) {
     if (hard) {hardness[id] = hard;}
     else {hardness[id] = 0;} // assume the block is meant to instantly break
     if (type) tooltypes[id] = type; // type of tool needed to break the block
+    if (actions) blockactions[id] = actions; // actions are onInteract, onBreak, onPlace. more will be added in the future
 }
 
 const initialBlockList = [
