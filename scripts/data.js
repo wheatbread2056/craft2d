@@ -43,7 +43,7 @@ function addBlock(block) {
     if (hard) {hardness[id] = hard;}
     else {hardness[id] = 0;} // assume the block is meant to instantly break
     if (type) tooltypes[id] = type; // type of tool needed to break the block
-    if (actions) blockactions[id] = actions; // actions are onInteract, onBreak, onPlace. more will be added in the future
+    if (actions) blockactions[id] = actions; // actions are onInteract, onBreak, onPlace, onTouch. more will be added in the future
 }
 
 const initialBlockList = [
@@ -187,7 +187,7 @@ const initialBlockList = [
     //
 
     { id: 'player', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'test', name: undefined, col: true, sel: false, h: 1 },
+    { id: 'test', name: undefined, col: true, sel: false, h: 5, actions: { onPlace() {console.log('placed test block');}, onBreak() {console.log('broke test block');}, onInteract(x,y) {console.log('interacted with test block');}, onTouch() {console.log('touched test block');} } }, // test block, used for testing purposes
     { id: 'watertop_render1', name: undefined, col: false, sel: false, t: true, h: Infinity },
     { id: 'watertop_render2', name: undefined, col: false, sel: false, t: true, h: Infinity },
     { id: 'watertop_render3', name: undefined, col: false, sel: false, t: true, h: Infinity },

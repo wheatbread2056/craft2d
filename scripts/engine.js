@@ -61,7 +61,7 @@ const player = {
         6: {id: null, amount: 0},
         7: {id: null, amount: 0},
         8: {id: null, amount: 0},
-        9: {id: null, amount: 0},
+        9: {id: 'test', amount: Infinity},
     },
     gamemode: env.player.defaultGamemode,
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
@@ -467,6 +467,9 @@ function playerPhysics() {
             player.air = true;
         }
     }
+    // get every player-touched block (up to 6, i think?) and run its onTouch action if it exists
+
+    
 }
 
 // not currently used - but might be useful later
@@ -556,6 +559,9 @@ function blockModification() {
                     }
                 }
                 createInventoryUI();
+                if (blockactions[block] && blockactions[block].onBreak) {
+                    blockactions[block].onBreak(player.blockX, player.blockY, layer);
+                }
             }
         }
     }
@@ -570,14 +576,19 @@ function blockModification() {
             return;
         }
 
-        // place the block if it is not restricted
-        if (block !== 'stone4' && block == null && allblocks.includes(player.currentItem)) {
-            setBlock(blockX, blockY, player.inventory[player.currentSlot].id, layer);
+        // place the block if there's empty space and the held item is a block.
+        if (block == null && allblocks.includes(player.currentItem)) {
+            setBlock(blockX, blockY, player.currentItem, layer);
             player.inventory[player.currentSlot].amount--;
             if (player.inventory[player.currentSlot].amount <= 0) {
                 player.inventory[player.currentSlot].id = null; // remove the block from the inventory if amount is 0
             }
             createInventoryUI();
+            if (blockactions[player.currentItem] && blockactions[player.currentItem].onPlace) {
+                blockactions[player.currentItem].onPlace(blockX, blockY, layer);
+            }
+        } else { // assume placing without those conditions = interact
+            if (blockactions[block] && blockactions[block].onInteract) blockactions[block].onInteract(blockX, blockY, layer);
         }
     }
 }
@@ -665,6 +676,24 @@ function blockPhysics() {
                 if (getBlockCollision(x + 1, y) == null && getBlock(x + 1, y) !== 'water') {
                     setBlock(x + 1, y, 'water');
                     waterUpdated.add(`${x+1},${y}`);
+                }
+            }
+        }
+    }
+}
+
+// explosion for tnt
+function explosion(x, y, radius = 3, fg = true, bg = false) {
+    for (let i = -radius; i <= radius; i++) {
+        for (let j = -radius; j <= radius; j++) {
+            const bx = x + i;
+            const by = y + j;
+            if (Math.sqrt(i * i + j * j) <= radius) {
+                if (fg) {
+                    deleteBlock(bx, by, 'fg');
+                }
+                if (bg) {
+                    deleteBlock(bx, by, 'bg');
                 }
             }
         }
