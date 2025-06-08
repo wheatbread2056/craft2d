@@ -8,6 +8,7 @@ const hardness = [];
 const tooltypes = [];
 const blockactions = [];
 const blockdrops = [];
+const stacksizes = [];
 
 // durability: how many interactions before breaking
 // efficiency: rate at which blocks are destroyed (hardness/sec)
@@ -210,35 +211,35 @@ const initialBlockList = [
 const tools = [ // 
     // wooden, stone, coal, iron, gold, diamond, emerald, ruby, zyrite
     // pickaxes
-    { id: 'pickaxe1', name: 'Wooden Pickaxe', tier: 1, type: 'pickaxe' },
-    { id: 'pickaxe2', name: 'Stone Pickaxe', tier: 2, type: 'pickaxe' },
-    { id: 'pickaxe3', name: 'Coal Pickaxe', tier: 3, type: 'pickaxe' },
-    { id: 'pickaxe4', name: 'Iron Pickaxe', tier: 4, type: 'pickaxe' },
-    { id: 'pickaxe5', name: 'Gold Pickaxe', tier: 5, type: 'pickaxe' },
-    { id: 'pickaxe6', name: 'Diamond Pickaxe', tier: 6, type: 'pickaxe' },
-    { id: 'pickaxe7', name: 'Emerald Pickaxe', tier: 7, type: 'pickaxe' },
-    { id: 'pickaxe8', name: 'Ruby Pickaxe', tier: 8, type: 'pickaxe' },
-    { id: 'pickaxe9', name: 'Zyrite Pickaxe', tier: 9, type: 'pickaxe' },
+    { id: 'pickaxe1', name: 'Wooden Pickaxe', tier: 1, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe2', name: 'Stone Pickaxe', tier: 2, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe3', name: 'Coal Pickaxe', tier: 3, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe4', name: 'Iron Pickaxe', tier: 4, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe5', name: 'Gold Pickaxe', tier: 5, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe6', name: 'Diamond Pickaxe', tier: 6, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe7', name: 'Emerald Pickaxe', tier: 7, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe8', name: 'Ruby Pickaxe', tier: 8, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe9', name: 'Zyrite Pickaxe', tier: 9, type: 'pickaxe', stack: 1 },
     // axes
-    { id: 'axe1', name: 'Wooden Axe', tier: 1, type: 'axe' },
-    { id: 'axe2', name: 'Stone Axe', tier: 2, type: 'axe' },
-    { id: 'axe3', name: 'Coal Axe', tier: 3, type: 'axe' },
-    { id: 'axe4', name: 'Iron Axe', tier: 4, type: 'axe' },
-    { id: 'axe5', name: 'Gold Axe', tier: 5, type: 'axe' },
-    { id: 'axe6', name: 'Diamond Axe', tier: 6, type: 'axe' },
-    { id: 'axe7', name: 'Emerald Axe', tier: 7, type: 'axe' },
-    { id: 'axe8', name: 'Ruby Axe', tier: 8, type: 'axe' },
-    { id: 'axe9', name: 'Zyrite Axe', tier: 9, type: 'axe' },
+    { id: 'axe1', name: 'Wooden Axe', tier: 1, type: 'axe', stack: 1 },
+    { id: 'axe2', name: 'Stone Axe', tier: 2, type: 'axe', stack: 1 },
+    { id: 'axe3', name: 'Coal Axe', tier: 3, type: 'axe', stack: 1 },
+    { id: 'axe4', name: 'Iron Axe', tier: 4, type: 'axe', stack: 1 },
+    { id: 'axe5', name: 'Gold Axe', tier: 5, type: 'axe', stack: 1 },
+    { id: 'axe6', name: 'Diamond Axe', tier: 6, type: 'axe', stack: 1 },
+    { id: 'axe7', name: 'Emerald Axe', tier: 7, type: 'axe', stack: 1 },
+    { id: 'axe8', name: 'Ruby Axe', tier: 8, type: 'axe', stack: 1 },
+    { id: 'axe9', name: 'Zyrite Axe', tier: 9, type: 'axe', stack: 1 },
     // shovels
-    { id: 'shovel1', name: 'Wooden Shovel', tier: 1, type: 'shovel' },
-    { id: 'shovel2', name: 'Stone Shovel', tier: 2, type: 'shovel' },
-    { id: 'shovel3', name: 'Coal Shovel', tier: 3, type: 'shovel' },
-    { id: 'shovel4', name: 'Iron Shovel', tier: 4, type: 'shovel' },
-    { id: 'shovel5', name: 'Gold Shovel', tier: 5, type: 'shovel' },
-    { id: 'shovel6', name: 'Diamond Shovel', tier: 6, type: 'shovel' },
-    { id: 'shovel7', name: 'Emerald Shovel', tier: 7, type: 'shovel' },
-    { id: 'shovel8', name: 'Ruby Shovel', tier: 8, type: 'shovel' },
-    { id: 'shovel9', name: 'Zyrite Shovel', tier: 9, type: 'shovel' },
+    { id: 'shovel1', name: 'Wooden Shovel', tier: 1, type: 'shovel', stack: 1 },
+    { id: 'shovel2', name: 'Stone Shovel', tier: 2, type: 'shovel', stack: 1 },
+    { id: 'shovel3', name: 'Coal Shovel', tier: 3, type: 'shovel', stack: 1 },
+    { id: 'shovel4', name: 'Iron Shovel', tier: 4, type: 'shovel', stack: 1 },
+    { id: 'shovel5', name: 'Gold Shovel', tier: 5, type: 'shovel', stack: 1 },
+    { id: 'shovel6', name: 'Diamond Shovel', tier: 6, type: 'shovel', stack: 1 },
+    { id: 'shovel7', name: 'Emerald Shovel', tier: 7, type: 'shovel', stack: 1 },
+    { id: 'shovel8', name: 'Ruby Shovel', tier: 8, type: 'shovel', stack: 1 },
+    { id: 'shovel9', name: 'Zyrite Shovel', tier: 9, type: 'shovel', stack: 1 },
 ];
 const items = [
     { id: 'stick', name: 'Stick'},
@@ -337,4 +338,22 @@ for (let tool of tools) {
 }
 for (let item of items) {
     blocknames[item.id] = item.name;
+}
+// for all items (blocks, tools, and items), set the stack size. if it doesnt exist set it to env.global.maxStackSize
+for (let block of allblocks) {
+    if (typeof stacksizes[block] === 'undefined') {
+        stacksizes[block] = env.global.maxStackSize;
+    }
+}
+// set the stack size for tools if not already set
+for (let tool of tools) {
+    if (typeof stacksizes[tool.id] === 'undefined') {
+        stacksizes[tool.id] = tool.stack;
+    }
+}
+// set the stack size for items if not already set
+for (let item of items) {
+    if (typeof stacksizes[item.id] === 'undefined') {
+        stacksizes[item.id] = env.global.maxStackSize;
+    }
 }
