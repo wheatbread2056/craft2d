@@ -294,9 +294,9 @@ const recipes = {
     'zyrite_bar': { output: 1, ingredients: { '#zyrite': 1, '#coal': 8 } },
 
     // craft cobblestone back into stone via smelting
-    'stone1': { output: 4, ingredients: { '#cobblestone': 4, '#coal': 1 } }, // smelt cobblestone into stone
-    'stone2': { output: 4, ingredients: { '#cobblestone2': 4, '#coal': 1 } }, // smelt dark cobblestone into stone
-    'stone3': { output: 4, ingredients: { '#cobblestone3': 4, '#coal': 1 } }, // smelt very dark cobblestone into stone
+    'stone1': { output: 4, ingredients: { 'cobblestone1': 4, '#coal': 1 } }, // smelt cobblestone into stone
+    'stone2': { output: 4, ingredients: { 'cobblestone2': 4, '#coal': 1 } }, // smelt dark cobblestone into stone
+    'stone3': { output: 4, ingredients: { 'cobblestone3': 4, '#coal': 1 } }, // smelt very dark cobblestone into stone
 
     // brick recipes
     'bricks': { output: 4, ingredients: { '#stone': 4, '#coal': 1 } }, // smelt stone into bricks
@@ -305,9 +305,9 @@ const recipes = {
     'goldbricks': { output: 8, ingredients: { 'gold_bar': 4 } }, // use gold ingots to make gold bricks.
 
     // utility recipes
-    'crafter': { output: 1, ingredients: { '#planks': 8, '#allstone': 4 } }, // crafting table recipe (very important)
+    'crafter': { output: 1, ingredients: { '#planks': 8, 'pickaxe2': 1, 'axe2': 1} }, // crafting table recipe (very important)
     'crate': { output: 1, ingredients: { '#planks': 8 } }, // crate is gonna be like a chest in the future when block data exists
-    'glass': { output: 4, ingredients: { '#sand': 4, '#coal': 1 } },
+    'glass': { output: 4, ingredients: { 'sand': 4, '#coal': 1 } },
 
     // tool recipes: starts at 4 sticks, max out at 8, increase by 2 per tier.
     // pickaxe recipes. use 5 of primary resource.
