@@ -5,7 +5,8 @@ const nocollision = [];
 const selblocks = [];
 const transparentblocks = []; // used to optimize rendering
 const hardness = [];
-const tooltypes = [];
+const blocktypes = [];
+const blocklevels = [];
 const blockactions = [];
 const blockdrops = [];
 const stacksizes = [];
@@ -14,7 +15,7 @@ const stacksizes = [];
 // efficiency: rate at which blocks are destroyed (hardness/sec)
 // damage: how much damage the tool does to mobs
 // level: what types of blocks the tool can break depend on the level, like a wooden (level 1) tool can't break stone2, but a level 7 zyrite breaks everything
-const toolTiers = { // wooden, stone, coal, iron, gold, diamond, emerald, ruby, zyrite, developer (special)
+const toolTiers = { // wooden, stone, copper, iron, gold, diamond, emerald, ruby, zyrite, developer (special)
     0: { durability: Infinity, efficiency: 0, damage: 1, level: 0 }, // hands (no tool). can only break 0 hardness blocks
     1: { durability: 32, efficiency: 0.05, damage: 3, level: 1 },
     2: { durability: 64, efficiency: 0.1, damage: 4, level: 2 },
@@ -39,6 +40,7 @@ function addBlock(block) {
     let type = block.type;
     let actions = block.actions;
     let drops = block.drops; // what the block drops when broken, can be a string or an array of strings
+    let level = block.level;
     allblocks.push(id);
     if (t) transparentblocks.push(id);
     if (!collision) nocollision.push(id);
@@ -46,12 +48,17 @@ function addBlock(block) {
     if (name) blocknames[id] = name;
     if (hard) {hardness[id] = hard;}
     else {hardness[id] = 0;} // assume the block is meant to instantly break
-    if (type) tooltypes[id] = type; // type of tool needed to break the block
+    if (type) blocktypes[id] = type; // type of tool needed to break the block
     if (actions) blockactions[id] = actions; // actions are onInteract, onBreak, onPlace, onTouch. more will be added in the future
     if (drops) {
         blockdrops[id] = drops; // what the block drops
     } else {
         blockdrops[id] = id; // if no drops specified, drop itself
+    }
+    if (level) {
+        blocklevels[id] = level;
+    } else {
+        blocklevels[id] = 0; // break from anything including the hand.
     }
 }
 
@@ -74,15 +81,15 @@ const initialBlockList = [
     //
 
     // bricks
-    { id: 'bricks', name: 'Bricks', col: true, sel: true, h: 20, type: 'pickaxe' },
-    { id: 'dirtbricks', name: 'Dirt Bricks', col: true, sel: true, h: 8, type: 'pickaxe' },
-    { id: 'goldbricks', name: 'Gold Bricks', col: true, sel: true, h: 444, type: 'pickaxe' }, // good for defense, due to its high hardness.
-    { id: 'stonebricks', name: 'Stone Bricks', col: true, sel: true, h: 25, type: 'pickaxe' },
+    { id: 'bricks', name: 'Bricks', col: true, sel: true, h: 20, type: 'pickaxe', level: 3 },
+    { id: 'dirtbricks', name: 'Dirt Bricks', col: true, sel: true, h: 8, type: 'pickaxe', level: 1 },
+    { id: 'goldbricks', name: 'Gold Bricks', col: true, sel: true, h: 444, type: 'pickaxe', level: 8 }, // good for defense, due to its high hardness.
+    { id: 'stonebricks', name: 'Stone Bricks', col: true, sel: true, h: 25, type: 'pickaxe', level: 3 },
 
     // planks
-    { id: 'planks1', name: 'Autumn Planks', col: true, sel: true, h: 5, type: 'axe' },
-    { id: 'planks2', name: 'Meadow Planks', col: true, sel: true, h: 5, type: 'axe' },
-    { id: 'planks3', name: 'Woods Planks', col: true, sel: true, h: 5, type: 'axe' },
+    { id: 'planks1', name: 'Autumn Planks', col: true, sel: true, h: 5, type: 'axe', level: 1 },
+    { id: 'planks2', name: 'Meadow Planks', col: true, sel: true, h: 5, type: 'axe', level: 1 },
+    { id: 'planks3', name: 'Woods Planks', col: true, sel: true, h: 5, type: 'axe', level: 1},
 
     // other
     { id: 'crate', name: 'Wooden Crate', col: true, sel: true, h: 8 },
@@ -95,8 +102,8 @@ const initialBlockList = [
     { id: 'water', name: 'Water', col: false, sel: true, h: Infinity },
     { id: 'watertop', name: undefined, col: false, sel: true, t: true, h: Infinity },
 
-    { id: 'sand', name: 'Sand', col: true, sel: true, h: 1, type: 'shovel' },
-    { id: 'dirt', name: 'Dirt', col: true, sel: true, h: 1, type: 'shovel' },
+    { id: 'sand', name: 'Sand', col: true, sel: true, h: 1, type: 'shovel', level: 1 },
+    { id: 'dirt', name: 'Dirt', col: true, sel: true, h: 1, type: 'shovel', level: 1 },
     { id: 'cactus', name: 'Cactus', col: true, sel: true, h: 0.5 },
 
     // flowers
@@ -110,10 +117,10 @@ const initialBlockList = [
     { id: 'flower8', name: 'Pink Flower', col: false, sel: true, t: true },
 
     // grass (full blocks)
-    { id: 'grass1', name: 'Autumn Grass', col: true, sel: true, h: 1.5, type: 'shovel' },
-    { id: 'grass2', name: 'Meadow Grass', col: true, sel: true, h: 1.5, type: 'shovel' },
-    { id: 'grass3', name: 'Woods Grass', col: true, sel: true, h: 1.5, type: 'shovel' },
-    { id: 'grass4', name: 'Snowy Grass', col: true, sel: true, h: 1.8, type: 'shovel' },
+    { id: 'grass1', name: 'Autumn Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 2 },
+    { id: 'grass2', name: 'Meadow Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 2 },
+    { id: 'grass3', name: 'Woods Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 2 },
+    { id: 'grass4', name: 'Snowy Grass', col: true, sel: true, h: 1.8, type: 'shovel', level: 3 },
 
     // grass (backgrounds)
     { id: 'grassbg1', name: undefined, col: false, sel: false, t: true },
@@ -136,48 +143,48 @@ const initialBlockList = [
     { id: 'leaves7', name: 'Snowy Leaves', col: true, sel: true, h: 0.5 },
 
     // logs
-    { id: 'log1', name: 'Autumn Log', col: true, sel: true, h: 5, type: 'axe' },
-    { id: 'log2', name: 'Meadow Log', col: true, sel: true, h: 5, type: 'axe' },
-    { id: 'log3', name: 'Woods Log', col: true, sel: true, h: 5, type: 'axe' },
+    { id: 'log1', name: 'Autumn Log', col: true, sel: true, h: 5, type: 'axe', level: 1 },
+    { id: 'log2', name: 'Meadow Log', col: true, sel: true, h: 5, type: 'axe', level: 1 },
+    { id: 'log3', name: 'Woods Log', col: true, sel: true, h: 5, type: 'axe', level: 1 },
 
     // stone types
-    { id: 'stone1', name: 'Stone', col: true, sel: true, h: 10, type: 'pickaxe', drops: 'cobblestone1' },
-    { id: 'stone2', name: 'Dark Stone', col: true, sel: true, h: 40, type: 'pickaxe', drops: 'cobblestone2' },
-    { id: 'stone3', name: 'Very Dark Stone', col: true, sel: true, h: 160, type: 'pickaxe', drops: 'cobblestone3' },
-    { id: 'stone4', name: 'Unbreakable Stone', col: true, sel: false }, // unbreakable stone
+    { id: 'stone1', name: 'Stone', col: true, sel: true, h: 10, type: 'pickaxe', drops: 'cobblestone1', level: 1 },
+    { id: 'stone2', name: 'Dark Stone', col: true, sel: true, h: 40, type: 'pickaxe', drops: 'cobblestone2', level: 4 },
+    { id: 'stone3', name: 'Very Dark Stone', col: true, sel: true, h: 160, type: 'pickaxe', drops: 'cobblestone3', level: 7 },
+    { id: 'stone4', name: 'Unbreakable Stone', col: true, sel: false, h: Infinity }, // unbreakable stone
 
     // cobblestone types
-    { id: 'cobblestone1', name: 'Cobblestone', col: true, sel: true, h: 15, type: 'pickaxe' },
-    { id: 'cobblestone2', name: 'Dark Cobblestone', col: true, sel: true, h: 60, type: 'pickaxe' },
-    { id: 'cobblestone3', name: 'Very Dark Cobblestone', col: true, sel: true, h: 200, type: 'pickaxe' },
+    { id: 'cobblestone1', name: 'Cobblestone', col: true, sel: true, h: 15, type: 'pickaxe', level: 1 },
+    { id: 'cobblestone2', name: 'Dark Cobblestone', col: true, sel: true, h: 60, type: 'pickaxe', level: 4 },
+    { id: 'cobblestone3', name: 'Very Dark Cobblestone', col: true, sel: true, h: 200, type: 'pickaxe', level: 7 },
 
     // ores (very big)
     // hardness base values: coal 12, iron 16, gold 24, diamond 48, emerald 72, ruby 96, zyrite 128
     // remember: each stone level increases the hardness by 4x, so coal ore in dark stone is 48, in very dark stone is 192, etc.
-    { id: 'ore_coal1', name: 'Coal Ore', col: true, sel: true, h: 12, type: 'pickaxe'},
-    { id: 'ore_coal2', name: 'Dark Coal Ore', col: true, sel: true, h: 48, type: 'pickaxe'},
-    { id: 'ore_coal3', name: 'Very Dark Coal Ore', col: true, sel: true, h: 192, type: 'pickaxe'},
-    { id: 'ore_copper1', name: 'Copper Ore', col: true, sel: true, h: 14, type: 'pickaxe' },
-    { id: 'ore_copper2', name: 'Dark Copper Ore', col: true, sel: true, h: 56, type: 'pickaxe' },
-    { id: 'ore_copper3', name: 'Very Dark Copper Ore', col: true, sel: true, h: 224, type: 'pickaxe' },
-    { id: 'ore_iron1', name: 'Iron Ore', col: true, sel: true, h: 16, type: 'pickaxe' },
-    { id: 'ore_iron2', name: 'Dark Iron Ore', col: true, sel: true, h: 64, type: 'pickaxe' },
-    { id: 'ore_iron3', name: 'Very Dark Iron Ore', col: true, sel: true, h: 256, type: 'pickaxe' },
-    { id: 'ore_gold1', name: 'Gold Ore', col: true, sel: true, h: 24, type: 'pickaxe' },
-    { id: 'ore_gold2', name: 'Dark Gold Ore', col: true, sel: true, h: 96, type: 'pickaxe' },
-    { id: 'ore_gold3', name: 'Very Dark Gold Ore', col: true, sel: true, h: 384, type: 'pickaxe' },
-    { id: 'ore_diamond1', name: 'Diamond Ore', col: true, sel: true, h: 48, type: 'pickaxe' },
-    { id: 'ore_diamond2', name: 'Dark Diamond Ore', col: true, sel: true, h: 192, type: 'pickaxe' },
-    { id: 'ore_diamond3', name: 'Very Dark Diamond Ore', col: true, sel: true, h: 768, type: 'pickaxe' },
-    { id: 'ore_emerald1', name: 'Emerald Ore', col: true, sel: true, h: 72, type: 'pickaxe' },
-    { id: 'ore_emerald2', name: 'Dark Emerald Ore', col: true, sel: true, h: 288, type: 'pickaxe' },
-    { id: 'ore_emerald3', name: 'Very Dark Emerald Ore', col: true, sel: true, h: 1152, type: 'pickaxe' },
-    { id: 'ore_ruby1', name: 'Ruby Ore', col: true, sel: true, h: 96, type: 'pickaxe' },
-    { id: 'ore_ruby2', name: 'Dark Ruby Ore', col: true, sel: true, h: 384, type: 'pickaxe' },
-    { id: 'ore_ruby3', name: 'Very Dark Ruby Ore', col: true, sel: true, h: 1536, type: 'pickaxe' },
-    { id: 'ore_zyrite1', name: 'Zyrite Ore', col: true, sel: true, h: 128, type: 'pickaxe' },
-    { id: 'ore_zyrite2', name: 'Dark Zyrite Ore', col: true, sel: true, h: 512, type: 'pickaxe' },
-    { id: 'ore_zyrite3', name: 'Very Dark Zyrite Ore', col: true, sel: true, h: 2048, type: 'pickaxe' },
+    { id: 'ore_coal1', name: 'Coal Ore', col: true, sel: true, h: 12, type: 'pickaxe', level: 1 },
+    { id: 'ore_coal2', name: 'Dark Coal Ore', col: true, sel: true, h: 48, type: 'pickaxe', level: 4 },
+    { id: 'ore_coal3', name: 'Very Dark Coal Ore', col: true, sel: true, h: 192, type: 'pickaxe', level: 7 },
+    { id: 'ore_copper1', name: 'Copper Ore', col: true, sel: true, h: 14, type: 'pickaxe', level: 2 },
+    { id: 'ore_copper2', name: 'Dark Copper Ore', col: true, sel: true, h: 56, type: 'pickaxe', level: 4 },
+    { id: 'ore_copper3', name: 'Very Dark Copper Ore', col: true, sel: true, h: 224, type: 'pickaxe', level: 7 },
+    { id: 'ore_iron1', name: 'Iron Ore', col: true, sel: true, h: 16, type: 'pickaxe', level: 3 },
+    { id: 'ore_iron2', name: 'Dark Iron Ore', col: true, sel: true, h: 64, type: 'pickaxe', level: 4 },
+    { id: 'ore_iron3', name: 'Very Dark Iron Ore', col: true, sel: true, h: 256, type: 'pickaxe', level: 7 },
+    { id: 'ore_gold1', name: 'Gold Ore', col: true, sel: true, h: 24, type: 'pickaxe', level: 4 },
+    { id: 'ore_gold2', name: 'Dark Gold Ore', col: true, sel: true, h: 96, type: 'pickaxe', level: 4 },
+    { id: 'ore_gold3', name: 'Very Dark Gold Ore', col: true, sel: true, h: 384, type: 'pickaxe', level: 7 },
+    { id: 'ore_diamond1', name: 'Diamond Ore', col: true, sel: true, h: 48, type: 'pickaxe', level: 5 },
+    { id: 'ore_diamond2', name: 'Dark Diamond Ore', col: true, sel: true, h: 192, type: 'pickaxe', level: 5 },
+    { id: 'ore_diamond3', name: 'Very Dark Diamond Ore', col: true, sel: true, h: 768, type: 'pickaxe', level: 7 },
+    { id: 'ore_emerald1', name: 'Emerald Ore', col: true, sel: true, h: 72, type: 'pickaxe', level: 6 },
+    { id: 'ore_emerald2', name: 'Dark Emerald Ore', col: true, sel: true, h: 288, type: 'pickaxe', level: 6 },
+    { id: 'ore_emerald3', name: 'Very Dark Emerald Ore', col: true, sel: true, h: 1152, type: 'pickaxe', level: 7 },
+    { id: 'ore_ruby1', name: 'Ruby Ore', col: true, sel: true, h: 96, type: 'pickaxe', level: 7 },
+    { id: 'ore_ruby2', name: 'Dark Ruby Ore', col: true, sel: true, h: 384, type: 'pickaxe', level: 7 },
+    { id: 'ore_ruby3', name: 'Very Dark Ruby Ore', col: true, sel: true, h: 1536, type: 'pickaxe', level: 7 },
+    { id: 'ore_zyrite1', name: 'Zyrite Ore', col: true, sel: true, h: 128, type: 'pickaxe', level: 8 },
+    { id: 'ore_zyrite2', name: 'Dark Zyrite Ore', col: true, sel: true, h: 512, type: 'pickaxe', level: 8 },
+    { id: 'ore_zyrite3', name: 'Very Dark Zyrite Ore', col: true, sel: true, h: 2048, type: 'pickaxe', level: 8 },
 
     //
     ///// Category: Colorful blocks

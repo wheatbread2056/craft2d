@@ -528,9 +528,10 @@ function blockModification() {
         player.blockY = blockY;
         let block = getBlock(player.blockX, player.blockY, layer);
         if (block !== null) {
-            player.blockToolType = tooltypes[block] || 'none';
+            player.blockToolType = blocktypes[block] || 'none';
+            player.blockToolLevel = blocklevels[block] || 0;
             player.currentBlockHardness = hardness[block];
-            if (player.currentToolType == player.blockToolType || player.blockToolType == 'none') {
+            if (player.currentToolType == player.blockToolType && player.blockToolLevel <= player.currentToolLevel || player.blockToolType == 'none') {
                 player.blockDamage += player.currentBreakRate / (client.renderTickrateComputed / 60);
             }
             if (player.blockDamage >= player.currentBlockHardness) {

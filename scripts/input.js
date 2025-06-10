@@ -189,4 +189,5 @@ function updateCommonValues() {
     let currentTool = Object.values(tools).find(tool => tool.id === player.currentItem);
     player.currentBreakRate = toolTiers[currentTool?.tier]?.efficiency ?? 0.05;
     player.currentToolType = currentTool?.type || 'none';
+    player.currentToolLevel = toolTiers[currentTool?.tier]?.level || 0;
 }
