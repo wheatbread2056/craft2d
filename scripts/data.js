@@ -248,12 +248,30 @@ const items = [
     { id: 'emerald_stick', name: 'Emerald Stick' },
     { id: 'ruby_stick', name: 'Ruby Stick' },
     { id: 'zyrite_stick', name: 'Zyrite Stick' },
+
     { id: 'iron_bar', name: 'Iron Bar' },
     { id: 'gold_bar', name: 'Gold Bar' },
     { id: 'diamond_bar', name: 'Diamond Bar' },
     { id: 'emerald_bar', name: 'Emerald Bar' },
     { id: 'ruby_bar', name: 'Ruby Bar' },
     { id: 'zyrite_bar', name: 'Zyrite Bar' },
+
+    { id: 'dye1', name: 'Red Dye' },
+    { id: 'dye2', name: 'Orange Dye' },
+    { id: 'dye3', name: 'Yellow Dye' },
+    { id: 'dye4', name: 'Lime Dye' },
+    { id: 'dye5', name: 'Green Dye' },
+    { id: 'dye6', name: 'Aqua Dye' },
+    { id: 'dye7', name: 'Cyan Dye' },
+    { id: 'dye8', name: 'Light Blue Dye' },
+    { id: 'dye9', name: 'Blue Dye' },
+    { id: 'dye10', name: 'Dark Purple Dye' },
+    { id: 'dye11', name: 'Purple Dye' },
+    { id: 'dye12', name: 'Pink Dye' },
+    { id: 'dye13', name: 'Hot Pink Dye' },
+    { id: 'dye14', name: 'Black Dye' },
+    { id: 'dye15', name: 'Brown Dye' },
+    { id: 'dye16', name: 'Gray Dye' },
 ]
 const groups = { // used for crafting
     'logs': { name: 'Logs', items: ['log1', 'log2', 'log3'] },
@@ -341,6 +359,41 @@ const recipes = {
     'shovel8': { output: 1, ingredients: { 'ruby_stick': 8, 'ruby_bar': 3 } },
     'shovel9': { output: 1, ingredients: { 'zyrite_stick': 8, 'zyrite_bar': 3 } }, 
 
+    // dye recipes
+    'dye1': { output: 1, ingredients: { 'flower1': 1 } }, // Red Dye
+    'dye2': { output: 1, ingredients: { 'flower2': 1 } }, // Orange Dye
+    'dye3': { output: 1, ingredients: { 'flower3': 1 } }, // Yellow Dye
+    'dye4': { output: 1, ingredients: { 'flower4': 1 } }, // Lime Dye (Green Flower)
+    'dye5': { output: 2, ingredients: { 'dye4': 1, 'dye6': 1 } }, // Green Dye (Lime + Aqua)
+    'dye6': { output: 1, ingredients: { 'flower5': 1 } }, // Aqua Dye (Teal Flower)
+    'dye7': { output: 2, ingredients: { 'dye6': 1, 'dye9': 1 } }, // Cyan Dye (Aqua + Blue)
+    'dye8': { output: 2, ingredients: { 'dye9': 1, 'dye3': 1 } }, // Light Blue Dye (Blue + Yellow)
+    'dye9': { output: 1, ingredients: { 'flower6': 1 } }, // Blue Dye
+    'dye10': { output: 2, ingredients: { 'dye9': 1, 'dye11': 1 } }, // Dark Purple Dye (Blue + Purple)
+    'dye11': { output: 1, ingredients: { 'flower7': 1 } }, // Purple Dye (Violet Flower)
+    'dye12': { output: 1, ingredients: { 'flower8': 1 } }, // Pink Dye
+    'dye13': { output: 2, ingredients: { 'dye12': 1, 'dye1': 1 } }, // Hot Pink Dye (Pink + Red)
+    'dye14': { output: 3, ingredients: { 'dye1': 1, 'dye9': 1, 'dye11': 1 } }, // Black Dye (Red + Blue + Purple)
+    'dye15': { output: 3, ingredients: { 'dye1': 1, 'dye2': 1, 'dye3': 1 } }, // Brown Dye (Red + Orange + Yellow)
+    'dye16': { output: 3, ingredients: { 'dye3': 1, 'dye4': 1, 'dye9': 1 } }, // Gray Dye (Yellow + Lime + Blue)
+
+    // colored glass recipes (4 glass + 1 dye = 4 colored glass)
+    'cglass1': { output: 4, ingredients: { 'glass': 4, 'dye1': 1 } },
+    'cglass2': { output: 4, ingredients: { 'glass': 4, 'dye2': 1 } },
+    'cglass3': { output: 4, ingredients: { 'glass': 4, 'dye3': 1 } },
+    'cglass4': { output: 4, ingredients: { 'glass': 4, 'dye4': 1 } },
+    'cglass5': { output: 4, ingredients: { 'glass': 4, 'dye5': 1 } },
+    'cglass6': { output: 4, ingredients: { 'glass': 4, 'dye6': 1 } },
+    'cglass7': { output: 4, ingredients: { 'glass': 4, 'dye7': 1 } },
+    'cglass8': { output: 4, ingredients: { 'glass': 4, 'dye8': 1 } },
+    'cglass9': { output: 4, ingredients: { 'glass': 4, 'dye9': 1 } },
+    'cglass10': { output: 4, ingredients: { 'glass': 4, 'dye10': 1 } },
+    'cglass11': { output: 4, ingredients: { 'glass': 4, 'dye11': 1 } },
+    'cglass12': { output: 4, ingredients: { 'glass': 4, 'dye12': 1 } },
+    'cglass13': { output: 4, ingredients: { 'glass': 4, 'dye13': 1 } },
+    'cglass14': { output: 4, ingredients: { 'glass': 4, 'dye14': 1 } },
+    'cglass15': { output: 4, ingredients: { 'glass': 4, 'dye15': 1 } },
+    'cglass16': { output: 4, ingredients: { 'glass': 4, 'dye16': 1 } },
 }
 const overlays = ['breaking1', 'breaking2', 'breaking3', 'breaking4','blockselect'];
 for (let block of initialBlockList) {
