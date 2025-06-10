@@ -349,7 +349,7 @@ const recipes = {
     // pickaxe recipes. use 5 of primary resource.
     'pickaxe1': { output: 1, ingredients: { 'stick': 4, '#planks': 5 } },
     'pickaxe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 5 } },
-    'pickaxe3': { output: 1, ingredients: { 'stick': 8, '#coal': 5 } },
+    'pickaxe3': { output: 1, ingredients: { 'stick': 8, 'copper_bar': 5 } },
     'pickaxe4': { output: 1, ingredients: { 'stick': 8, 'iron_bar': 5 } },
     'pickaxe5': { output: 1, ingredients: { 'gold_stick': 8, 'gold_bar': 5 } },
     'pickaxe6': { output: 1, ingredients: { 'diamond_stick': 8, 'diamond_bar': 5 } },
@@ -359,7 +359,7 @@ const recipes = {
     // axe recipes, use 4 of primary resource.
     'axe1': { output: 1, ingredients: { 'stick': 4, '#planks': 4 } },
     'axe2': { output: 1, ingredients: { 'stick': 6, '#allstone': 4 } },
-    'axe3': { output: 1, ingredients: { 'stick': 8, '#coal': 4 } },
+    'axe3': { output: 1, ingredients: { 'stick': 8, 'copper_bar': 4 } },
     'axe4': { output: 1, ingredients: { 'stick': 8, 'iron_bar': 4 } },
     'axe5': { output: 1, ingredients: { 'gold_stick': 8, 'gold_bar': 4 } },
     'axe6': { output: 1, ingredients: { 'diamond_stick': 8, 'diamond_bar': 4 } },
@@ -369,7 +369,7 @@ const recipes = {
     // shovel recipes, use 3 of primary resource.
     'shovel1': { output: 1, ingredients: { 'stick': 4, '#planks': 3 } },
     'shovel2': { output: 1, ingredients: { 'stick': 6, '#allstone': 3 } },
-    'shovel3': { output: 1, ingredients: { 'stick': 8, '#coal': 3 } },
+    'shovel3': { output: 1, ingredients: { 'stick': 8, 'copper_bar': 3 } },
     'shovel4': { output: 1, ingredients: { 'stick': 8, 'iron_bar': 3 } },
     'shovel5': { output: 1, ingredients: { 'gold_stick': 8, 'gold_bar': 3 } },
     'shovel6': { output: 1, ingredients: { 'diamond_stick': 8, 'diamond_bar': 3 } },
