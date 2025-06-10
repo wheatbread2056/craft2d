@@ -18,14 +18,15 @@ const toolTiers = { // wooden, stone, coal, iron, gold, diamond, emerald, ruby, 
     0: { durability: Infinity, efficiency: 0, damage: 1, level: 0 }, // hands (no tool). can only break 0 hardness blocks
     1: { durability: 32, efficiency: 0.05, damage: 3, level: 1 },
     2: { durability: 64, efficiency: 0.1, damage: 4, level: 2 },
-    3: { durability: 128, efficiency: 0.08, damage: 5, level: 2 }, // special, pickaxe autosmelts ores & sword burns mobs
-    4: { durability: 256, efficiency: 0.25, damage: 7, level: 3 },
-    5: { durability: 512, efficiency: 0.6, damage: 9, level: 3},
-    6: { durability: 1024, efficiency: 1.0, damage: 12, level: 4 },
-    7: { durability: 2048, efficiency: 2.2, damage: 18, level: 5 },
-    8: { durability: 4096, efficiency: 3.6, damage: 27, level: 6 },
-    9: { durability: 8192, efficiency: 5.0, damage: 48, level: 7 },
-    10: { durability: Infinity, efficiency: Infinity, damage: Infinity },
+    3: { durability: 128, efficiency: 0.15, damage: 5, level: 3 }, // special, pickaxe autosmelts ores & sword burns mobs
+    4: { durability: 256, efficiency: 0.25, damage: 7, level: 4 },
+    5: { durability: 512, efficiency: 0.6, damage: 9, level: 5},
+    6: { durability: 1024, efficiency: 1.0, damage: 12, level: 6 },
+    7: { durability: 2048, efficiency: 2.2, damage: 18, level: 7 },
+    8: { durability: 4096, efficiency: 3.6, damage: 27, level: 8 },
+    9: { durability: 8192, efficiency: 5.0, damage: 48, level: 9 },
+    10: { durability: 16384, efficiency: 10.0, damage: 96, level: 10 }, // solarite (will be added in beta 1.0)
+    'dev': { durability: Infinity, efficiency: Infinity, damage: Infinity, level: Infinity },
 }
 
 function addBlock(block) {
@@ -156,6 +157,9 @@ const initialBlockList = [
     { id: 'ore_coal1', name: 'Coal Ore', col: true, sel: true, h: 12, type: 'pickaxe'},
     { id: 'ore_coal2', name: 'Dark Coal Ore', col: true, sel: true, h: 48, type: 'pickaxe'},
     { id: 'ore_coal3', name: 'Very Dark Coal Ore', col: true, sel: true, h: 192, type: 'pickaxe'},
+    { id: 'ore_copper1', name: 'Copper Ore', col: true, sel: true, h: 14, type: 'pickaxe' },
+    { id: 'ore_copper2', name: 'Dark Copper Ore', col: true, sel: true, h: 56, type: 'pickaxe' },
+    { id: 'ore_copper3', name: 'Very Dark Copper Ore', col: true, sel: true, h: 224, type: 'pickaxe' },
     { id: 'ore_iron1', name: 'Iron Ore', col: true, sel: true, h: 16, type: 'pickaxe' },
     { id: 'ore_iron2', name: 'Dark Iron Ore', col: true, sel: true, h: 64, type: 'pickaxe' },
     { id: 'ore_iron3', name: 'Very Dark Iron Ore', col: true, sel: true, h: 256, type: 'pickaxe' },
@@ -209,11 +213,16 @@ const initialBlockList = [
     { id: 'watertop_render4', name: undefined, col: false, sel: false, t: true, h: Infinity },
 ];
 const tools = [ // 
-    // wooden, stone, coal, iron, gold, diamond, emerald, ruby, zyrite
+    // wooden, stone, copper, iron, gold, diamond, emerald, ruby, zyrite
+    // dev tools (template textures)
+    { id: 'template_pickaxe', name: 'Developer Pickaxe', tier: 'dev', type: 'pickaxe', stack: 1 },
+    { id: 'template_axe', name: 'Developer Axe', tier: 'dev', type: 'axe', stack: 1 },
+    { id: 'template_shovel', name: 'Developer Shovel', tier: 'dev', type: 'shovel', stack: 1 },
+
     // pickaxes
     { id: 'pickaxe1', name: 'Wooden Pickaxe', tier: 1, type: 'pickaxe', stack: 1 },
     { id: 'pickaxe2', name: 'Stone Pickaxe', tier: 2, type: 'pickaxe', stack: 1 },
-    { id: 'pickaxe3', name: 'Coal Pickaxe', tier: 3, type: 'pickaxe', stack: 1 },
+    { id: 'pickaxe3', name: 'Copper Pickaxe', tier: 3, type: 'pickaxe', stack: 1 },
     { id: 'pickaxe4', name: 'Iron Pickaxe', tier: 4, type: 'pickaxe', stack: 1 },
     { id: 'pickaxe5', name: 'Gold Pickaxe', tier: 5, type: 'pickaxe', stack: 1 },
     { id: 'pickaxe6', name: 'Diamond Pickaxe', tier: 6, type: 'pickaxe', stack: 1 },
@@ -223,7 +232,7 @@ const tools = [ //
     // axes
     { id: 'axe1', name: 'Wooden Axe', tier: 1, type: 'axe', stack: 1 },
     { id: 'axe2', name: 'Stone Axe', tier: 2, type: 'axe', stack: 1 },
-    { id: 'axe3', name: 'Coal Axe', tier: 3, type: 'axe', stack: 1 },
+    { id: 'axe3', name: 'Copper Axe', tier: 3, type: 'axe', stack: 1 },
     { id: 'axe4', name: 'Iron Axe', tier: 4, type: 'axe', stack: 1 },
     { id: 'axe5', name: 'Gold Axe', tier: 5, type: 'axe', stack: 1 },
     { id: 'axe6', name: 'Diamond Axe', tier: 6, type: 'axe', stack: 1 },
@@ -233,7 +242,7 @@ const tools = [ //
     // shovels
     { id: 'shovel1', name: 'Wooden Shovel', tier: 1, type: 'shovel', stack: 1 },
     { id: 'shovel2', name: 'Stone Shovel', tier: 2, type: 'shovel', stack: 1 },
-    { id: 'shovel3', name: 'Coal Shovel', tier: 3, type: 'shovel', stack: 1 },
+    { id: 'shovel3', name: 'Copper Shovel', tier: 3, type: 'shovel', stack: 1 },
     { id: 'shovel4', name: 'Iron Shovel', tier: 4, type: 'shovel', stack: 1 },
     { id: 'shovel5', name: 'Gold Shovel', tier: 5, type: 'shovel', stack: 1 },
     { id: 'shovel6', name: 'Diamond Shovel', tier: 6, type: 'shovel', stack: 1 },
@@ -249,6 +258,7 @@ const items = [
     { id: 'ruby_stick', name: 'Ruby Stick' },
     { id: 'zyrite_stick', name: 'Zyrite Stick' },
 
+    { id: 'copper_bar', name: 'Copper Bar' },
     { id: 'iron_bar', name: 'Iron Bar' },
     { id: 'gold_bar', name: 'Gold Bar' },
     { id: 'diamond_bar', name: 'Diamond Bar' },
@@ -280,6 +290,7 @@ const groups = { // used for crafting
     'cobblestone': { name: 'Cobblestone', items: ['cobblestone1', 'cobblestone2', 'cobblestone3'] },
     'allstone': { name: 'Stone', items: ['stone1', 'stone2', 'stone3', 'cobblestone1', 'cobblestone2', 'cobblestone3'] },
     'coal': { name: 'Coal Ore', items: ['ore_coal1', 'ore_coal2', 'ore_coal3'] },
+    'copper': { name: 'Copper Ore', items: ['ore_copper1', 'ore_copper2', 'ore_copper3'] },
     'iron': { name: 'Iron Ore', items: ['ore_iron1', 'ore_iron2', 'ore_iron3'] },
     'gold': { name: 'Gold Ore', items: ['ore_gold1', 'ore_gold2', 'ore_gold3'] },
     'diamond': { name: 'Diamond Ore', items: ['ore_diamond1', 'ore_diamond2', 'ore_diamond3'] },
@@ -290,7 +301,6 @@ const groups = { // used for crafting
 const recipes = {
     // crafting recipes, for blocks, items, and tools
     // plank recipes (1 log = 4 planks)
-    'planks1': { output: 2, ingredients: { 'cactus': 1 } }, // alternate recipe that uses cactus, so player isnt doomed in desert biomes
     'planks1': { output: 4, ingredients: { 'log1': 1 } },
     'planks2': { output: 4, ingredients: { 'log2': 1 } },
     'planks3': { output: 4, ingredients: { 'log3': 1 } },
@@ -304,12 +314,13 @@ const recipes = {
     'zyrite_stick': {output: 2, ingredients: { 'stick': 1, 'zyrite_bar': 5 } },
 
     // ingot recipes (smelting?)
-    'iron_bar': { output: 1, ingredients: { '#iron': 1, '#coal': 1 } },
-    'gold_bar': { output: 1, ingredients: { '#gold': 1, '#coal': 2 } },
-    'diamond_bar': { output: 1, ingredients: { '#diamond': 1, '#coal': 3 } },
-    'emerald_bar': { output: 1, ingredients: { '#emerald': 1, '#coal': 4 } },
-    'ruby_bar': { output: 1, ingredients: { '#ruby': 1, '#coal': 6 } },
-    'zyrite_bar': { output: 1, ingredients: { '#zyrite': 1, '#coal': 8 } },
+    'copper_bar': { output: 1, ingredients: { '#copper': 1, '#coal': 1 } },
+    'iron_bar': { output: 1, ingredients: { '#iron': 1, '#coal': 2 } },
+    'gold_bar': { output: 1, ingredients: { '#gold': 1, '#coal': 3 } },
+    'diamond_bar': { output: 1, ingredients: { '#diamond': 1, '#coal': 4 } },
+    'emerald_bar': { output: 1, ingredients: { '#emerald': 1, '#coal': 6 } },
+    'ruby_bar': { output: 1, ingredients: { '#ruby': 1, '#coal': 8 } },
+    'zyrite_bar': { output: 1, ingredients: { '#zyrite': 1, '#coal': 12 } },
 
     // craft cobblestone back into stone via smelting
     'stone1': { output: 4, ingredients: { 'cobblestone1': 4, '#coal': 1 } }, // smelt cobblestone into stone

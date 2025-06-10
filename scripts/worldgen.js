@@ -39,15 +39,16 @@ function worldGen(start, end) {
     let startTime = performance.now() / 1000;
     worldgen = { x: start, y: 0, scale: 1, treedelay: 0, biome: 0 };
     if (env.global.worldGenType == 'normal') {
-        let ores = ['coal', 'iron', 'gold', 'diamond', 'emerald', 'ruby', 'zyrite'];
+        let ores = ['coal', 'copper', 'iron', 'gold', 'diamond', 'emerald', 'ruby', 'zyrite'];
         let oreProperties = {
             coal: { size: 5, rate: 0.004, minimumStoneType: 1, maxHeight: Infinity },
-            iron: { size: 4, rate: 0.003, minimumStoneType: 1, maxHeight: Infinity },
-            gold: { size: 4, rate: 0.0015, minimumStoneType: 1, maxHeight: 64 },
-            diamond: { size: 3, rate: 0.0008, minimumStoneType: 1, maxHeight: 48 },
-            emerald: { size: 3, rate: 0.0004, minimumStoneType: 2, maxHeight: 2 },
-            ruby: { size: 3, rate: 0.00016, minimumStoneType: 2, maxHeight: -4 },
-            zyrite: { size: 1, rate: 0.0001, minimumStoneType: 3, maxHeight: -16 },
+            copper: {size: 4, rate: 0.0032, minimumStoneType: 1, maxHeight: Infinity },
+            iron: { size: 4, rate: 0.0025, minimumStoneType: 1, maxHeight: Infinity },
+            gold: { size: 4, rate: 0.0015, minimumStoneType: 1, maxHeight: 32 },
+            diamond: { size: 3, rate: 0.0008, minimumStoneType: 1, maxHeight: 24 },
+            emerald: { size: 3, rate: 0.0004, minimumStoneType: 2, maxHeight: 16 },
+            ruby: { size: 3, rate: 0.00016, minimumStoneType: 2, maxHeight: 0 },
+            zyrite: { size: 1, rate: 0.0001, minimumStoneType: 3, maxHeight: -12 },
         }
 
         function generateOreVein(type, x, y) {
