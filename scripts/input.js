@@ -185,7 +185,7 @@ document.addEventListener('mousemove', (event) => {
 function updateCommonValues() {
     client.blockMx = Math.floor(client.mx / 64 / camera.scale + camera.x);
     client.blockMy = Math.ceil(-client.my / 64 / camera.scale + camera.y);
-    player.currentItem = player.inventory[player.currentSlot].id;
+    player.currentItem = player.inventory.slots[player.currentSlot].id;
     let currentTool = Object.values(tools).find(tool => tool.id === player.currentItem);
     player.currentBreakRate = toolTiers[currentTool?.tier]?.efficiency ?? 0.05;
     player.currentToolType = currentTool?.type || 'none';

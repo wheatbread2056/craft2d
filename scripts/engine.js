@@ -64,7 +64,131 @@ const env = {
     },
 };
 const player = {
-    inventory: env.player.defaultInventory,
+    inventory: { // now has functions!
+        slots: {},
+        generateSlots: function (size = env.player.defaultInventorySize) {
+            this.slots = {};
+            for (let i = 1; i <= size * 9; i++) {
+                this.slots[i] = {id: null, amount: 0}; // empty slot
+            }
+        },
+        generateDefault: function () {
+            for (let slot in env.player.defaultInventory) {
+                this.slots[slot] = {...env.player.defaultInventory[slot]};
+            }
+        },
+        nextEmptySlot: function () {
+            for (let slot of Object.values(this.slots)) {
+                if (!slot.id || slot.amount === 0) {
+                    return slot;
+                }
+            }
+            return null;
+        },
+        checkFullStack: function (slot) {
+            const maxStackSize = (typeof stacksizes === 'object' && stacksizes[slot.id]) ? stacksizes[slot.id] : env.global.maxStackSize;
+            return slot.amount >= maxStackSize;
+        },
+        firstItemSlot: function (item) {
+            for (let slot of Object.values(this.slots)) {
+                if (slot.id === item) {
+                    return slot;
+                }
+            }
+            return null;
+        },
+        totalItemCount: function (item) {
+            let count = 0;
+            for (let slot of Object.values(this.slots)) {
+                if (slot.id === item) {
+                    count += slot.amount;
+                }
+            }
+            return count;
+        },
+        addItem: function (item, amount = 1) {
+            let toAdd = amount;
+            // Fill existing stacks first
+            while (toAdd > 0) {
+                let slot = this.firstItemSlot(item);
+                if (slot && this.checkFullStack(slot)) {
+                    slot = this.nextEmptySlot();
+                }
+                if (!slot) {
+                    slot = this.nextEmptySlot();
+                }
+                if (slot == null) return false;
+                const maxStackSize = (typeof stacksizes === 'object' && stacksizes[item]) ? stacksizes[item] : env.global.maxStackSize;
+                const spaceLeft = maxStackSize - slot.amount;
+                if (spaceLeft <= 0) {
+                    // No space in this slot, try next
+                    if (slot === this.nextEmptySlot()) break;
+                    continue;
+                }
+                if (!slot.id) slot.id = item;
+                const addNow = Math.min(toAdd, spaceLeft);
+                slot.amount += addNow;
+                toAdd -= addNow;
+            }
+            return toAdd === 0;
+        },
+        removeItem: function (item, amount = 1) {
+            let toRemove = amount;
+            for (let slot of Object.values(this.slots)) {
+                if (slot.id === item) {
+                    const removeNow = Math.min(toRemove, slot.amount);
+                    slot.amount -= removeNow;
+                    toRemove -= removeNow;
+                    if (slot.amount <= 0) {
+                        slot.id = null; // empty the slot
+                    }
+                    if (toRemove <= 0) break;
+                }
+            }
+            return toRemove === 0;
+        },
+        getSlot: function (slotNumber) {
+            if (this.slots[slotNumber]) {
+                return this.slots[slotNumber];
+            } else {
+                return null; // slot does not exist
+            }
+        },
+        clearSlot: function (slotNumber) {
+            if (this.slots[slotNumber]) {
+                this.slots[slotNumber].id = null;
+                this.slots[slotNumber].amount = 0;
+            }
+        },
+        swapSlots: function (slot1, slot2) {
+            if (this.slots[slot1] && this.slots[slot2]) {
+                const temp = this.slots[slot1];
+                this.slots[slot1] = this.slots[slot2];
+                this.slots[slot2] = temp;
+            }
+        },
+        clearAll: function () {
+            for (let slot in this.slots) {
+                this.slots[slot].id = null;
+                this.slots[slot].amount = 0;
+            }
+        },
+        fixInventory: function () { // fixes: null with amount != 0, any items with amount <= 0, etc. note: overstacks are allowed.
+            for (let slot in this.slots) {
+                if (this.slots[slot].id === null && this.slots[slot].amount > 0) {
+                    this.slots[slot].amount = 0; // empty the slot
+                }
+                if (this.slots[slot].amount <= 0) {
+                    this.slots[slot].id = null; // empty the slot
+                    this.slots[slot].amount = 0;
+                }
+            }
+        },
+        fullInit: function () {
+            this.generateSlots(env.player.defaultInventorySize);
+            this.generateDefault();
+        },
+    },
     gamemode: env.player.defaultGamemode,
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
     currentItem: null,
@@ -121,23 +245,8 @@ const client = {
     waterimg: 'watertop_render1', // current water image
     inventorySelectedSlot: null,
 }
-const globalImages = {}
-
-// create inventory rows
-function generateInventory(rows) {
-    player.inventory = {};
-    for (let row = 1; row <= rows; row++) {
-        for (let col = 1; col <= 9; col++) {
-            const slot = (row - 1) * 9 + col;
-            player.inventory[slot] = { id: null, amount: 0 };
-        }
-    }
-}
-
-generateInventory(env.player.defaultInventorySize);
-for (let slot in env.player.defaultInventory) {
-    player.inventory[slot] = {...env.player.defaultInventory[slot]};
-}
+const globalImages = {};
+player.inventory.fullInit();
 
 function getChunkAndBlock(x, y) {
     const cx = Math.floor(x / env.global.chunksize);
@@ -560,24 +669,7 @@ function blockModification() {
                 let drop = blockdrops[block] || null;
                 if (!drop || (Array.isArray(drop) && drop.length == 0)) added = true;
                 if (added != true) {
-                    for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
-                        let invSlot = player.inventory[slot];
-                        if (invSlot.id === drop && invSlot.amount < env.global.maxStackSize) {
-                            invSlot.amount++;
-                            added = true;
-                            break;
-                        }
-                    }
-                }
-                if (!added) {
-                    for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
-                        let invSlot = player.inventory[slot];
-                        if (invSlot.id === null || invSlot.amount === 0) {
-                            invSlot.id = drop;
-                            invSlot.amount = 1;
-                            break;
-                        }
-                    }
+                    player.inventory.addItem(block, 1);
                 }
                 createInventoryUI();
                 if (blockactions[block] && blockactions[block].onBreak) {
@@ -600,9 +692,9 @@ function blockModification() {
         // place the block if there's empty space and the held item is a block.
         if ((getBlockCollision(blockX, blockY, layer) == null && layer == 'fg' || block == null && layer == 'bg') && allblocks.includes(player.currentItem)) {
             setBlock(blockX, blockY, player.currentItem, layer);
-            player.inventory[player.currentSlot].amount--;
-            if (player.inventory[player.currentSlot].amount <= 0) {
-                player.inventory[player.currentSlot].id = null; // remove the block from the inventory if amount is 0
+            player.inventory.removeItem(player.currentItem, 1);
+            if (player.inventory.getSlot(player.currentSlot).amount <= 0) {
+                player.inventory.getSlot(player.currentSlot).id = null; // remove the block from the inventory if amount is 0
             }
             createInventoryUI();
             if (blockactions[player.currentItem] && blockactions[player.currentItem].onPlace) {

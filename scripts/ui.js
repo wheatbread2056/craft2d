@@ -118,7 +118,7 @@ function createInventoryUI() {
 
             blockSlot.appendChild(blockImage);
             blockSlot.addEventListener('click', () => {
-                player.inventory[player.currentSlot].id = blockId;
+                player.inventory.addItem(blockId, stacksizes[blockId] || env.global.maxStackSize);
             });
 
             inventoryGrid.appendChild(blockSlot);
@@ -204,105 +204,48 @@ function createInventoryUI() {
                     const recipe = recipes[player.currentRecipe];
                     // Check if player has enough ingredients (supporting item groups)
                     let canCraft = true;
-                    const usedSlots = {}; // Track which slots are used for each ingredient
 
                     for (const [ingredient, amount] of Object.entries(recipe.ingredients)) {
                         let required = amount;
-                        let groupItems = [];
                         if (ingredient.startsWith('#')) {
-                            // Item group: collect all matching items from groups
                             const groupName = ingredient.slice(1);
-                            const group = groups[groupName];
-                            groupItems = group ? group.items : [];
-                            console.log(groupItems);
-                        }
-                        let totalAvailable = 0;
-                        for (let slot of Object.values(player.inventory)) {
-                            if (
-                                (ingredient.startsWith('#') && groupItems.includes(slot.id)) ||
-                                (!ingredient.startsWith('#') && slot.id === ingredient)
-                            ) {
-                                totalAvailable += slot.amount;
+                            const groupItems = groups[groupName] ? groups[groupName].items : [];
+                            let groupTotal = 0;
+                            for (const itemId of groupItems) {
+                                groupTotal += player.inventory.totalItemCount(itemId);
                             }
-                        }
-                        if (totalAvailable < required) {
-                            canCraft = false;
-                            break;
+                            if (groupTotal < required) {
+                                canCraft = false;
+                                break;
+                            }
+                        } else {
+                            if (player.inventory.totalItemCount(ingredient) < required) {
+                                canCraft = false;
+                                break;
+                            }
                         }
                     }
 
                     if (canCraft) {
-                        // Deduct ingredients from inventory (supporting item groups)
+                        // Remove ingredients
                         for (const [ingredient, amount] of Object.entries(recipe.ingredients)) {
                             let required = amount;
                             if (ingredient.startsWith('#')) {
                                 const groupName = ingredient.slice(1);
                                 const groupItems = groups[groupName] ? groups[groupName].items : [];
-                                // Go through group items in order
-                                for (const groupItem of groupItems) {
-                                    for (let slot of Object.values(player.inventory)) {
-                                        if (slot.id === groupItem && required > 0) {
-                                            let deduct = Math.min(slot.amount, required);
-                                            slot.amount -= deduct;
-                                            required -= deduct;
-                                            if (slot.amount <= 0) {
-                                                slot.id = null;
-                                            }
-                                            if (required <= 0) break;
-                                        }
-                                    }
+                                for (const itemId of groupItems) {
+                                    let removed = player.inventory.removeItem(itemId, required);
+                                    required -= removed;
                                     if (required <= 0) break;
                                 }
                             } else {
-                                for (let slot of Object.values(player.inventory)) {
-                                    if (slot.id === ingredient && required > 0) {
-                                        let deduct = Math.min(slot.amount, required);
-                                        slot.amount -= deduct;
-                                        required -= deduct;
-                                        if (slot.amount <= 0) {
-                                            slot.id = null;
-                                        }
-                                        if (required <= 0) break;
-                                    }
-                                }
+                                player.inventory.removeItem(ingredient, required);
                             }
                         }
                         // Add result to inventory
-                        const resultId = player.currentRecipe; // Use the correct item ID for the result
-                        const resultAmount = recipe.output || 1; // Use the output amount (default to 1)
-                        let foundSlot = false;
-                        // Try to add to an existing stack first
-                        for (let slot of Object.values(player.inventory)) {
-                            if (slot.id === resultId) {
-                                // Use stack size from stacksizes[resultId] if defined, else fallback to env.global.maxStackSize, else 64
-                                const maxStackSize = (typeof stacksizes === 'object' && stacksizes[resultId]) ? stacksizes[resultId] : (env.global.maxStackSize || 64);
-                                if (slot.amount >= maxStackSize) continue;
-                                const spaceLeft = maxStackSize - slot.amount;
-                                if (resultAmount <= spaceLeft) {
-                                    slot.amount += resultAmount;
-                                    foundSlot = true;
-                                    break;
-                                } else {
-                                    slot.amount = maxStackSize;
-                                    resultAmount -= spaceLeft;
-                                    // Continue to try to add the rest to another stack or empty slot
-                                }
-                            }
-                        }
-                        // If no stack found, add to an empty slot
-                        if (!foundSlot) {
-                            for (let slot of Object.values(player.inventory)) {
-                                if (slot.id === null) {
-                                    slot.id = resultId;
-                                    slot.amount = resultAmount;
-                                    foundSlot = true;
-                                    break;
-                                }
-                            }
-                            if (!foundSlot) {
-                                console.warn('No space in inventory to craft the item');
-                            }
-                        }
+                        const resultId = player.currentRecipe;
+                        const resultAmount = recipe.output || 1;
+                        player.inventory.addItem(resultId, resultAmount);
                     } else {
                         console.warn('Not enough ingredients to craft the item');
                     }
@@ -345,16 +288,16 @@ function createInventoryUI() {
 
         } else {
 
-            for (let slotId in player.inventory) {
+            for (let slotId in player.inventory.slots) {
                 const blockSlot = newBlockSlot(slotId);
-                if (player.inventory[slotId].id !== null) {
-                    let blockImage = globalImages[player.inventory[slotId].id].cloneNode(true);
+                if (player.inventory.getSlot(slotId).id !== null) {
+                    let blockImage = globalImages[player.inventory.getSlot(slotId).id].cloneNode(true);
                     blockImage.style.width = '48px';
                     blockImage.style.height = '48px';
                     blockImage.style.imageRendering = 'pixelated';
                     blockSlot.appendChild(blockImage);
                     // add text thats the amount stored
-                    if (player.inventory[slotId].amount > 1) {
+                    if (player.inventory.getSlot(slotId).amount > 1 && player.inventory.getSlot(slotId).amount != Infinity) {
                         const amountText = document.createElement('span');
                         amountText.style.position = 'absolute';
                         amountText.style.bottom = '2px';
@@ -363,7 +306,7 @@ function createInventoryUI() {
                         amountText.style.fontSize = '16px';
                         amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
                         amountText.style.pointerEvents = 'none'; // Allow clicks to pass through
-                        amountText.textContent = player.inventory[slotId].amount;
+                        amountText.textContent = player.inventory.getSlot(slotId).amount;
                         blockSlot.appendChild(amountText);
                     }
                 }
@@ -376,10 +319,7 @@ function createInventoryUI() {
                     } else {
                         // Slot already selected, swap with this one
                         if (client.inventorySelectedSlot !== slotId) {
-                            // Swap the two slots
-                            const temp = { ...player.inventory[client.inventorySelectedSlot] };
-                            player.inventory[client.inventorySelectedSlot] = { ...player.inventory[slotId] };
-                            player.inventory[slotId] = temp;
+                            player.inventory.swapSlots(client.inventorySelectedSlot, slotId);
                         }
                         // Deselect after swap (or if same slot clicked)
                         client.inventorySelectedSlot = null;
@@ -403,8 +343,8 @@ function renderBlockSelector() {
         slot.style.display = 'inline-block';
         slot.style.marginRight = '8px';
         let image;
-        if (player.inventory[i] && globalImages[player.inventory[i].id]) {
-            image = globalImages[player.inventory[i].id].cloneNode(true);
+        if (player.inventory.getSlot(i) && globalImages[player.inventory.getSlot(i).id]) {
+            image = globalImages[player.inventory.getSlot(i).id].cloneNode(true);
         } else {
             image = document.createElement('img');
             // WHAT does this do.
@@ -419,7 +359,7 @@ function renderBlockSelector() {
         image.style.backgroundColor = 'rgba(100, 100, 100, 0.5)';
         image.style.imageRendering = 'pixelated';
         slot.appendChild(image);
-        if (player.inventory[i].amount > 1) {
+        if (player.inventory.getSlot(i).amount > 1 && player.inventory.getSlot(i).amount != Infinity) {
             const amountText = document.createElement('span');
             amountText.style.position = 'absolute';
             amountText.style.bottom = '8px';
@@ -427,7 +367,7 @@ function renderBlockSelector() {
             amountText.style.color = '#fff';
             amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
             amountText.style.fontSize = '16px';
-            amountText.textContent = player.inventory[i].amount;
+            amountText.textContent = player.inventory.getSlot(i).amount;
             slot.style.position = 'relative'; // Ensure parent is relative for absolute child
             slot.appendChild(amountText);
         }
