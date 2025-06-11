@@ -49,20 +49,22 @@ const env = {
         defaultInvincibility: false,
         defaultRegenRate: 7.5,
         defaultGamemode: 'survival', // survival, creative
+        defaultInventorySize: 5, // rows of 9 (so default = 5x9 = 45 slots)
+        defaultInventory: {
+            1: {id: 'pickaxe1', amount: 1},
+            2: {id: 'axe1', amount: 1},
+            3: {id: 'shovel1', amount: 1},
+            4: {id: 'crafter', amount: 1},
+            5: {id: null, amount: 0},
+            6: {id: null, amount: 0},
+            7: {id: null, amount: 0},
+            8: {id: null, amount: 0},
+            9: {id: null, amount: 0},
+        },
     },
 };
 const player = {
-    inventory: {
-        1: {id: 'pickaxe1', amount: 1},
-        2: {id: 'axe1', amount: 1},
-        3: {id: 'shovel1', amount: 1},
-        4: {id: 'crafter', amount: 1},
-        5: {id: null, amount: 0},
-        6: {id: null, amount: 0},
-        7: {id: null, amount: 0},
-        8: {id: null, amount: 0},
-        9: {id: 'test', amount: Infinity},
-    },
+    inventory: env.player.defaultInventory,
     gamemode: env.player.defaultGamemode,
     currentSlot: 1, // 1 to 9 (first row in the inventory). note 0 does not exist in the inventory
     currentItem: null,
@@ -122,11 +124,19 @@ const client = {
 const globalImages = {}
 
 // create inventory rows
-for (let row = 2; row <= 5; row++) { // generates 4 more rows (2-5), each with 9 slots
-    for (let col = 1; col <= 9; col++) {
-        const slot = (row - 1) * 9 + col;
-        player.inventory[slot] = { id: null, amount: 0 };
+function generateInventory(rows) {
+    player.inventory = {};
+    for (let row = 1; row <= rows; row++) {
+        for (let col = 1; col <= 9; col++) {
+            const slot = (row - 1) * 9 + col;
+            player.inventory[slot] = { id: null, amount: 0 };
+        }
     }
+}
+
+generateInventory(env.player.defaultInventorySize);
+for (let slot in env.player.defaultInventory) {
+    player.inventory[slot] = {...env.player.defaultInventory[slot]};
 }
 
 function getChunkAndBlock(x, y) {
@@ -264,6 +274,10 @@ function handlePlayerHealth() {
                 
                 if (timeLeft === 0) {
                     spawnPlayer(0);
+                    generateInventory(env.player.defaultInventorySize);
+                    for (slot in env.player.defaultInventory) {
+                        player.inventory[slot] = {...env.player.defaultInventory[slot]};
+                    }
                     player.health = player.maxHealth;
                     player.controlAllowed = true;
                     player.regenAllowed = true;
