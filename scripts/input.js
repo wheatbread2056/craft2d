@@ -18,17 +18,7 @@ const keybinds = {
     'inventory': ['e'],
     'layerToggle': ['l'],
 }
-const keys = {
-    // example keys
-    'a': false,
-    'w': false,
-    'd': false,
-    'ArrowLeft': false,
-    'ArrowRight': false,
-    'ArrowUp': false,
-    'Space': false,
-    'Control': false,
-};
+const keys = {}
 const movementKeys = {
     'left': false,
     'right': false,
@@ -159,8 +149,8 @@ function mousedownEvent(event) {
 }
 
 // key events
-window.addEventListener('keydown', (event) => { keydownEvent(event.key) });
-window.addEventListener('keyup', (event) => { keyupEvent(event.key) });
+window.addEventListener('keydown', (event) => { keydownEvent(event.key.toLowerCase()) });
+window.addEventListener('keyup', (event) => { keyupEvent(event.key.toLowerCase()) });
 window.addEventListener('mouseup', (event) => { mouseupEvent(event) });
 window.addEventListener('mousedown', (event) => { mousedownEvent(event) });
 
