@@ -669,7 +669,7 @@ function blockModification() {
                 let drop = blockdrops[block] || null;
                 if (!drop || (Array.isArray(drop) && drop.length == 0)) added = true;
                 if (added != true) {
-                    player.inventory.addItem(block, 1);
+                    player.inventory.addItem(drop, 1);
                 }
                 createInventoryUI();
                 if (blockactions[block] && blockactions[block].onBreak) {
