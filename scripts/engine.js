@@ -544,12 +544,15 @@ function blockModification() {
                 // then, if theres either no slots with the blocks, or all the slots with the block are full stacks, add to first empty slot.
                 let added = false;
                 let drop = blockdrops[block] || null;
-                for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
-                    let invSlot = player.inventory[slot];
-                    if (invSlot.id === drop && invSlot.amount < env.global.maxStackSize) {
-                        invSlot.amount++;
-                        added = true;
-                        break;
+                if (!drop || (Array.isArray(drop) && drop.length == 0)) added = true;
+                if (added != true) {
+                    for (let slot = 1; slot <= Object.keys(player.inventory).length; slot++) {
+                        let invSlot = player.inventory[slot];
+                        if (invSlot.id === drop && invSlot.amount < env.global.maxStackSize) {
+                            invSlot.amount++;
+                            added = true;
+                            break;
+                        }
                     }
                 }
                 if (!added) {

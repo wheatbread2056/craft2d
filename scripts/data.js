@@ -117,21 +117,21 @@ const initialBlockList = [
     { id: 'flower8', name: 'Pink Flower', col: false, sel: true, t: true },
 
     // grass (full blocks)
-    { id: 'grass1', name: 'Autumn Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 2 },
-    { id: 'grass2', name: 'Meadow Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 2 },
-    { id: 'grass3', name: 'Woods Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 2 },
-    { id: 'grass4', name: 'Snowy Grass', col: true, sel: true, h: 1.8, type: 'shovel', level: 3 },
+    { id: 'grass1', name: 'Autumn Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 1 },
+    { id: 'grass2', name: 'Meadow Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 1 },
+    { id: 'grass3', name: 'Woods Grass', col: true, sel: true, h: 1.5, type: 'shovel', level: 1 },
+    { id: 'grass4', name: 'Snowy Grass', col: true, sel: true, h: 1.8, type: 'shovel', level: 1 },
 
     // grass (backgrounds)
-    { id: 'grassbg1', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg2', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg3', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg4', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg5', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg6a', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg6b', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg7a', name: undefined, col: false, sel: false, t: true },
-    { id: 'grassbg7b', name: undefined, col: false, sel: false, t: true },
+    { id: 'grassbg1', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg2', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg3', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg4', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg5', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg6a', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg6b', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg7a', name: undefined, col: false, sel: false, t: true, drops: [] },
+    { id: 'grassbg7b', name: undefined, col: false, sel: false, t: true, drops: [] },
 
     // leaves (full blocks)
     { id: 'leaves1', name: 'Yellow Autumn Leaves', col: true, sel: true, h: 0.5 },
