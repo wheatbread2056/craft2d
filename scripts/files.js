@@ -6,9 +6,16 @@ function saveWorld(filename, metadata) {
     // example: {name: 'My epic world in craft2d!', author: 'me', version: '1.10-dev16'}
 
     // turn the world into a json file!
-    const blob = new Blob([JSON.stringify([metadata, env, [cells1d, scale1d, biome1d], ...world.fg, 'startloadingthebackgroundnow!', ...world.bg])], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({
+        metadata: metadata,
+        world: {
+            fg: Array.from(world.fg, ([key, map]) => [key, Array.from(map.entries())]),
+            bg: Array.from(world.bg, ([key, map]) => [key, Array.from(map.entries())]),
+        },
+        env: env,
+        player: player
+    })], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-
     // a
     const a = document.createElement('a');
     a.href = url;
@@ -23,44 +30,43 @@ Size: ${(blob.size / 1024).toFixed(2)}K
 Metadata: ${JSON.stringify(metadata)}`);
 }
 
-function loadWorld(clearMap = true, tp = true) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.craft2d';
-    input.onchange = (e) => {
+function loadWorld() {
+    const theInput = document.createElement('input');
+    theInput.type = 'file';
+    theInput.accept = '.craft2d';
+    theInput.onchange = e => {
         const file = e.target.files[0];
+        if (!file) return;
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const data = JSON.parse(e.target.result);
-            let metadata = data[0];
-            let envProperties = data[1];
-            [cells1d, scale1d, biome1d] = data[2];
-            let foreground = data.slice(3, data.indexOf('startloadingthebackgroundnow!'));
-            let background = data.slice(data.indexOf('startloadingthebackgroundnow!') + 1);
-
-            if (metadata.version !== versionID) {
-                console.warn(`World was saved in a different version (${metadata.version}, current version is ${versionID})`);
+        reader.onload = event => {
+            try {
+                const data = JSON.parse(event.target.result);
+                if (data.metadata && data.world && data.env && data.player) {
+                    // start with the world.
+                    world.fg = new Map(data.world.fg.map(([key, entries]) => [key, new Map(entries)]));
+                    world.bg = new Map(data.world.bg.map(([key, entries]) => [key, new Map(entries)]));
+                    // then env
+                    env.global = data.env.global;
+                    env.player = data.env.player;
+                    // then player.
+                    for (const key in data.player) {
+                        if (Object.prototype.hasOwnProperty.call(data.player, key) && key != 'inventory') {
+                            player[key] = data.player[key];
+                        }
+                    }
+                    player.inventory.slots = data.player.inventory.slots;
+                    console.log(`World loaded successfully from ${file.name}`);
+                } else {
+                    console.error('Invalid world file format.');
+                }
+            } catch (error) {
+                console.error('Error loading world:', error);
             }
-            env.global = envProperties.global;
-            env.player = envProperties.player;
-            if (clearMap) {
-                world.fg = new Map();
-                world.bg = new Map();
-            }
-            foreground.forEach((block) => {
-                let [xpos, ypos] = block[0].split(',');
-                setBlock(xpos, ypos, block[1], 'fg');
-            });
-            background.forEach((block) => {
-                let [xpos, ypos] = block[0].split(',');
-                setBlock(xpos, ypos, block[1], 'bg');
-            });
-            if (tp) spawnPlayer(0);
         };
         reader.readAsText(file);
-        console.log(`World successfully loaded:
-File: ${input.files[0].name}
-Size: ${(input.files[0].size / 1024).toFixed(2)}K`);
+        // Clean up input after use
+        document.body.removeChild(theInput);
     };
-    input.click();
+    document.body.appendChild(theInput);
+    theInput.click();
 }
