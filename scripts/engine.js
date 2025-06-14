@@ -790,7 +790,7 @@ function blockModification() {
         // place the block if there's empty space and the held item is a block.
         if ((getBlockCollision(blockX, blockY, layer) == null && layer == 'fg' || block == null && layer == 'bg') && allblocks.includes(player.currentItem)) {
             setBlock(blockX, blockY, player.currentItem, layer);
-            player.inventory.removeItem(player.currentItem, 1);
+            player.inventory.removeSlot(player.currentSlot, 1);
             if (player.inventory.getSlot(player.currentSlot).amount <= 0) {
                 player.inventory.getSlot(player.currentSlot).id = null; // remove the block from the inventory if amount is 0
             }
