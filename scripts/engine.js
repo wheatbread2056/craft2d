@@ -173,6 +173,11 @@ const player = {
                 return null; // slot does not exist
             }
         },
+        getItem: function (slotNumber) { // get which item in a slot
+            if (this.getSlot(slotNumber) && this.getSlot(slotNumber).id) {
+                return this.getSlot(slotNumber).id;
+            } else {return null;};
+        },
         clearSlot: function (slotNumber) {
             if (this.slots[slotNumber]) {
                 this.slots[slotNumber].id = null;
@@ -190,6 +195,30 @@ const player = {
             for (let slot in this.slots) {
                 this.slots[slot].id = null;
                 this.slots[slot].amount = 0;
+            }
+        },
+        removeSlot: function (slot, amount = 1) { // removeItem but just for 1 slot
+            if (this.slots[slot] && this.slots[slot].id) {
+                const removeNow = Math.min(amount, this.slots[slot].amount);
+                this.slots[slot].amount -= removeNow;
+                if (this.slots[slot].amount <= 0) {
+                    this.clearSlot(slot); // empty the slot
+                }
+                return true;
+            }
+        },
+        addSlot: function (slot, item, amount = 1) { // addItem but just for 1 slot
+            if (this.getItem(slot) == null) {
+                player.inventory.slots[slot].id = item;
+            }
+            let stackSize = (typeof stacksizes === 'object' && stacksizes[item]) ? stacksizes[item] : env.global.maxStackSize;
+            let toAdd = amount;
+            while (toAdd > 0) {
+                player.inventory.slots[slot].amount++;
+                toAdd--;
+                if (player.inventory.slots[slot].amount >= stackSize) {
+                    return;
+                }
             }
         },
         fixInventory: function () { // fixes: null with amount != 0, any items with amount <= 0, etc. note: overstacks are allowed.

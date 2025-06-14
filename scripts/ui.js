@@ -351,6 +351,26 @@ function createInventoryUI() {
                         createInventoryUI();
                     }
                 });
+                blockSlot.addEventListener('contextmenu', (e) => {
+                    e.preventDefault(); // Prevent default context menu
+                    if (client.inventorySelectedSlot == null) {
+                        // No slot selected yet, select this one
+                        client.inventorySelectedSlot = slotId;
+                        inventoryGrid.innerHTML = ''; // Clear the grid
+                        createInventoryUI();
+                    } else {
+                        // slot selected, take 1 item from it.
+                        if (client.inventorySelectedSlot !== slotId) {
+                            let item = player.inventory.getItem(client.inventorySelectedSlot);
+                            player.inventory.removeSlot(client.inventorySelectedSlot);
+                            player.inventory.addSlot(slotId, item, 1);
+                        }
+                        if (player.inventory.getSlot(client.inventorySelectedSlot).id == null) {
+                            client.inventorySelectedSlot = null;
+                        }
+                        createInventoryUI();
+                    }
+                });
                 inventoryGrid.appendChild(blockSlot);
             }
     }
