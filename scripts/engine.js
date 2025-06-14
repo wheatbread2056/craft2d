@@ -781,6 +781,12 @@ function blockModification() {
             return;
         }
 
+        // make sure the block will be placed either in front of a background block or right next to a block
+        let hasBgBlock = getBlock(blockX, blockY, 'bg') !== null;
+        let hasNearBlock = getBlockCollision(blockX - 1, blockY) || getBlockCollision(blockX + 1, blockY) || getBlockCollision(blockX, blockY - 1) || getBlockCollision(blockX, blockY + 1);
+        let hasNearBgBlock = getBlock(blockX - 1, blockY, 'bg') || getBlock(blockX + 1, blockY, 'bg') || getBlock(blockX, blockY - 1, 'bg') || getBlock(blockX, blockY + 1, 'bg');
+        if (!hasBgBlock && !hasNearBlock && !hasNearBgBlock) return;
+
         // place the block if there's empty space and the held item is a block.
         if ((getBlockCollision(blockX, blockY, layer) == null && layer == 'fg' || block == null && layer == 'bg') && allblocks.includes(player.currentItem)) {
             setBlock(blockX, blockY, player.currentItem, layer);
