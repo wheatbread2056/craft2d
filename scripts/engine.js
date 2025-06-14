@@ -416,10 +416,7 @@ function handlePlayerHealth() {
                 
                 if (timeLeft === 0) {
                     spawnPlayer(0);
-                    generateInventory(env.player.defaultInventorySize);
-                    for (slot in env.player.defaultInventory) {
-                        player.inventory[slot] = {...env.player.defaultInventory[slot]};
-                    }
+                    player.inventory.fullInit();
                     player.health = player.maxHealth;
                     player.controlAllowed = true;
                     player.regenAllowed = true;
