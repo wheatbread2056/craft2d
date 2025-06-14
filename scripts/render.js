@@ -86,7 +86,7 @@ function renderOverlay(ctx, camx, camy) {
     }
 
     // block selection overlay
-    if (getBlock(client.blockMx, client.blockMy, player.interactionLayer) !== null) {
+    if (getBlock(client.blockMx, client.blockMy, player.interactionLayer) !== null && client.withinReach) {
         if (!player.breakingBlock) ctx.globalAlpha = 0.5;
         else ctx.globalAlpha = 0.8;
         showBlock(ctx, client.blockMx - camx, client.blockMy - camy, `blockselect`);

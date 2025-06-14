@@ -61,6 +61,7 @@ const env = {
             8: {id: null, amount: 0},
             9: {id: null, amount: 0},
         },
+        defaultReachDistance: 5,
     },
 };
 const player = {
@@ -306,6 +307,7 @@ const player = {
     craftingOpen: false,
     currentRecipe: null, // current recipe being crafted
     interactionLayer: 'fg', // layer to interact with (foreground or background)
+    reachDistance: env.player.defaultReachDistance, // distance the player can reach to interact with blocks
 };
 const camera = {
     x: 0,
@@ -325,6 +327,7 @@ const client = {
     oldMy: 0, // previous mouse y position
     waterimg: 'watertop_render1', // current water image
     inventorySelectedSlot: null,
+    withinReach: true,
 }
 const globalImages = {};
 player.inventory.fullInit();
@@ -720,6 +723,15 @@ function blockModification() {
     if (!keybinds.delete.some(key => keys[key]) && player.breakingBlock == true) {
         player.breakingBlock = false;
     }
+
+    // make sure this block is within reach.
+    if (Math.abs(blockX - player.x) > player.reachDistance || Math.abs(blockY - player.y) > player.reachDistance) {
+        client.withinReach = false;
+        return; // out of reach
+    } else {
+        client.withinReach = true;
+    }
+
     if (player.breakingBlock) {
         if (blockX !== player.blockX || blockY !== player.blockY) {
             // reset block damage if breaking new block
