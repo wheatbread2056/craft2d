@@ -89,9 +89,9 @@ const player = {
             const maxStackSize = (typeof stacksizes === 'object' && stacksizes[slot.id]) ? stacksizes[slot.id] : env.global.maxStackSize;
             return slot.amount >= maxStackSize;
         },
-        firstItemSlot: function (item) {
+        firstItemSlot: function (item, atLeast = 0) {
             for (let slot of Object.values(this.slots)) {
-                if (slot.id === item) {
+                if (slot.id === item && Object.keys(this.slots).find(key => this.slots[key] === slot) >= atLeast) {
                     return slot;
                 }
             }
@@ -111,7 +111,17 @@ const player = {
             // Fill existing stacks first
             while (toAdd > 0) {
                 let slot = this.firstItemSlot(item);
-                if (slot && this.checkFullStack(slot)) {
+                let slotKeys = Object.keys(this.slots);
+                let foundNonFull = false;
+                for (let i = 0; i < slotKeys.length; i++) {
+                    let s = this.slots[slotKeys[i]];
+                    if (s.id === item && !this.checkFullStack(s)) {
+                        slot = s;
+                        foundNonFull = true;
+                        break;
+                    }
+                }
+                if (!foundNonFull) {
                     slot = this.nextEmptySlot();
                 }
                 if (!slot) {
@@ -132,18 +142,27 @@ const player = {
             }
             return toAdd === 0;
         },
-        removeItem: function (item, amount = 1) {
+        removeItem: function (item, amount = 1, slot = null) {
             let toRemove = amount;
-            for (let slot of Object.values(this.slots)) {
-                if (slot.id === item) {
-                    const removeNow = Math.min(toRemove, slot.amount);
-                    slot.amount -= removeNow;
-                    toRemove -= removeNow;
-                    if (slot.amount <= 0) {
-                        slot.id = null; // empty the slot
-                    }
-                    if (toRemove <= 0) break;
+            if (slot != null && this.slots[slot] && this.slots[slot].id === item) {
+            const removeNow = Math.min(toRemove, this.slots[slot].amount);
+            this.slots[slot].amount -= removeNow;
+            toRemove -= removeNow;
+            if (this.slots[slot].amount <= 0) {
+                this.slots[slot].id = null; // empty the slot
+            }
+            } else {
+            for (let slotObj of Object.values(this.slots)) {
+                if (slotObj.id === item) {
+                const removeNow = Math.min(toRemove, slotObj.amount);
+                slotObj.amount -= removeNow;
+                toRemove -= removeNow;
+                if (slotObj.amount <= 0) {
+                    slotObj.id = null; // empty the slot
                 }
+                if (toRemove <= 0) break;
+                }
+            }
             }
             return toRemove === 0;
         },
