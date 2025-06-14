@@ -23,7 +23,7 @@ const env = {
         respawnEnabled: true,
         respawnTime: 2, // seconds
         walljumpEnabled: false,
-        flyAllowed: true,
+        flyAllowed: false,
         baseSpeedVelocity: 7.2,
         baseJumpVelocity: 12.6,
         worldSeaLevel: 48,
