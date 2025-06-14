@@ -184,6 +184,39 @@ const player = {
                 }
             }
         },
+        getToolProperties: function(slot) {
+            if (this.getSlot(slot) && this.getSlot(slot).id) {
+                let tspmo = this.getSlot(slot);
+                let tool = Object.values(tools).find(t => t.id === tspmo.id) || null;
+                if (!tool) return null;
+                let name = tool && tool.name || null;
+                let type = tool && tool.type || null;
+                let tier = tool && tool.tier || null;
+                let efficiency = toolTiers[tool.tier].efficiency || null;
+                let maxDurability = toolTiers[tool.tier].durability || null;
+                let durability = tspmo.durability || null;
+                // auto fix durability
+                if (durability == null) {this.slots[slot].durability = maxDurability; durability = maxDurability;}
+                let damage = toolTiers[tool.tier].damage || null;
+                return {
+                    name,
+                    type,
+                    tier,
+                    efficiency,
+                    maxDurability,
+                    durability,
+                    damage
+                }
+            }
+        },
+        lowerDurability: function(slot, amount = 1) {
+            if (this.getToolProperties(slot)) {
+                let props = this.getToolProperties(slot);
+                this.slots[slot].durability -= amount;
+                if (this.slots[slot].durability <= 0) this.clearSlot(slot);
+                return this.slots[slot].durability;
+            }
+        },
         fullInit: function () {
             this.generateSlots(env.player.defaultInventorySize);
             this.generateDefault();
