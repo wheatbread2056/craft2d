@@ -704,6 +704,8 @@ function blockModification() {
                 if (added != true) {
                     player.inventory.addItem(drop, 1);
                 }
+                // lower durability
+                player.inventory.lowerDurability(player.currentSlot);
                 createInventoryUI();
                 if (blockactions[block] && blockactions[block].onBreak) {
                     blockactions[block].onBreak(player.blockX, player.blockY, layer);

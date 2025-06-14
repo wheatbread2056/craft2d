@@ -291,6 +291,7 @@ function createInventoryUI() {
             for (let slotId in player.inventory.slots) {
                 const blockSlot = newBlockSlot(slotId);
                 if (player.inventory.getSlot(slotId).id !== null) {
+                    let isTool = !!player.inventory.getToolProperties(slotId);
                     let blockImage = globalImages[player.inventory.getSlot(slotId).id].cloneNode(true);
                     blockImage.style.width = '48px';
                     blockImage.style.height = '48px';
@@ -307,6 +308,28 @@ function createInventoryUI() {
                         amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
                         amountText.style.pointerEvents = 'none'; // Allow clicks to pass through
                         amountText.textContent = player.inventory.getSlot(slotId).amount;
+                        blockSlot.appendChild(amountText);
+                    } else if (isTool) {
+                        let toolProps = player.inventory.getToolProperties(slotId);
+                        let durability = toolProps.durability;
+                        let maxDurability = toolProps.maxDurability || Infinity;
+                        let durabilityColor = durability / maxDurability > 0.75
+                        ? '#0f0'
+                        : durability / maxDurability > 0.5
+                            ? '#ff0'
+                            : durability / maxDurability > 0.25
+                                ? 'orange'
+                                : '#f00';
+                        // durability text.
+                        const amountText = document.createElement('span');
+                        amountText.style.position = 'absolute';
+                        amountText.style.bottom = '0px';
+                        amountText.style.right = '0px';
+                        amountText.style.color = durabilityColor;
+                        amountText.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+                        amountText.style.fontSize = '16px';
+                        amountText.textContent = durability;
+                        amountText.style.position = 'absolute';
                         blockSlot.appendChild(amountText);
                     }
                 }
@@ -359,6 +382,7 @@ function renderBlockSelector() {
         image.style.backgroundColor = 'rgba(100, 100, 100, 0.5)';
         image.style.imageRendering = 'pixelated';
         slot.appendChild(image);
+        let isTool = !!player.inventory.getToolProperties(i);
         if (player.inventory.getSlot(i).amount > 1 && player.inventory.getSlot(i).amount != Infinity) {
             const amountText = document.createElement('span');
             amountText.style.position = 'absolute';
@@ -368,6 +392,45 @@ function renderBlockSelector() {
             amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
             amountText.style.fontSize = '16px';
             amountText.textContent = player.inventory.getSlot(i).amount;
+            slot.style.position = 'relative'; // Ensure parent is relative for absolute child
+            slot.appendChild(amountText);
+        } else if (isTool) {
+            let toolProps = player.inventory.getToolProperties(i);
+            let durability = toolProps.durability;
+            let maxDurability = toolProps.maxDurability || Infinity;
+            // Create durability bar container
+            const durabilityBar = document.createElement('div');
+            durabilityBar.style.position = 'absolute';
+            durabilityBar.style.bottom = '8px';
+            durabilityBar.style.left = '4px';
+            durabilityBar.style.width = '48px';
+            durabilityBar.style.height = '4px';
+            durabilityBar.style.background = 'rgba(0,0,0,0.4)';
+            durabilityBar.style.overflow = 'hidden';
+            // inner fill.
+            const durabilityFill = document.createElement('div');
+            let durabilityColor = durability / maxDurability > 0.75
+                ? '#0f0'
+                : durability / maxDurability > 0.5
+                    ? '#ff0'
+                    : durability / maxDurability > 0.25
+                        ? 'orange'
+                        : '#f00';
+            durabilityFill.style.height = '100%';
+            durabilityFill.style.width = `${Math.max(0, Math.min(1, durability / maxDurability)) * 100}%`;
+            durabilityFill.style.background = durabilityColor;
+            durabilityBar.appendChild(durabilityFill);
+            slot.style.position = 'relative';
+            slot.appendChild(durabilityBar);
+            // durability text.
+            const amountText = document.createElement('span');
+            amountText.style.position = 'absolute';
+            amountText.style.bottom = '8px';
+            amountText.style.right = '4px';
+            amountText.style.color = durabilityColor;
+            amountText.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+            amountText.style.fontSize = '16px';
+            amountText.textContent = durability;
             slot.style.position = 'relative'; // Ensure parent is relative for absolute child
             slot.appendChild(amountText);
         }
