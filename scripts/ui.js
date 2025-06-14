@@ -362,6 +362,8 @@ function createInventoryUI() {
                         // slot selected, take 1 item from it.
                         if (client.inventorySelectedSlot !== slotId) {
                             let item = player.inventory.getItem(client.inventorySelectedSlot);
+                            let otherItem = player.inventory.getItem(slotId);
+                            if (item != otherItem && otherItem != null) {client.inventorySelectedSlot = null; createInventoryUI(); return;}
                             player.inventory.removeSlot(client.inventorySelectedSlot);
                             player.inventory.addSlot(slotId, item, 1);
                         }
