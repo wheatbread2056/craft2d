@@ -381,11 +381,11 @@ const recipes = {
     'dye1': { output: 1, ingredients: { 'flower1': 1 } }, // Red Dye
     'dye2': { output: 1, ingredients: { 'flower2': 1 } }, // Orange Dye
     'dye3': { output: 1, ingredients: { 'flower3': 1 } }, // Yellow Dye
-    'dye4': { output: 1, ingredients: { 'flower4': 1 } }, // Lime Dye (Green Flower)
-    'dye5': { output: 2, ingredients: { 'dye4': 1, 'dye6': 1 } }, // Green Dye (Lime + Aqua)
-    'dye6': { output: 1, ingredients: { 'flower5': 1 } }, // Aqua Dye (Teal Flower)
-    'dye7': { output: 2, ingredients: { 'dye6': 1, 'dye9': 1 } }, // Cyan Dye (Aqua + Blue)
-    'dye8': { output: 2, ingredients: { 'dye9': 1, 'dye3': 1 } }, // Light Blue Dye (Blue + Yellow)
+    'dye4': { output: 2, ingredients: { 'dye3': 1, 'dye5': 1 } }, // lime
+    'dye5': { output: 1, ingredients: { 'flower4': 1 } }, // green
+    'dye6': { output: 1, ingredients: { 'flower5': 1 } }, // aqau
+    'dye7': { output: 1, ingredients: { 'flower5': 1 } }, // cyan
+    'dye8': { output: 2, ingredients: { 'dye7': 1, 'dye9': 1} }, // lite blue.
     'dye9': { output: 1, ingredients: { 'flower6': 1 } }, // Blue Dye
     'dye10': { output: 2, ingredients: { 'dye9': 1, 'dye11': 1 } }, // Dark Purple Dye (Blue + Purple)
     'dye11': { output: 1, ingredients: { 'flower7': 1 } }, // Purple Dye (Violet Flower)
