@@ -351,20 +351,21 @@ function getChunkMap(layer, cx, cy, create = false) {
     return chunk;
 }
 
-function setBlock(x, y, block = 'test', layer = 'fg') {
+function setBlock(x, y, block = 'test', layer = 'fg', data = '') {
     const { cx, cy, bx, by } = getChunkAndBlock(x, y);
     const chunk = getChunkMap(layer, cx, cy, true);
-    chunk.set(blockKey(bx, by), block);
+    chunk.set(blockKey(bx, by), {id: block, data: data});
 }
 function getBlock(x, y, layer = 'fg') {
     const { cx, cy, bx, by } = getChunkAndBlock(x, y);
     const chunk = getChunkMap(layer, cx, cy, false);
     let block = chunk ? chunk.get(blockKey(bx, by)) : null;
+    if (block == undefined) block = null;
     if (y <= -27 && env.global.worldBottomEnabled && block == null) { // for world bottom
         return env.global.worldBottomBlock;
-    } else {
-        return block || null;
-    }
+    } else if (block) {
+        return block.id || null;
+    } else {return null;};
 }
 function deleteBlock(x, y, layer = 'fg') {
     const { cx, cy, bx, by } = getChunkAndBlock(x, y);
@@ -376,7 +377,8 @@ function deleteBlock(x, y, layer = 'fg') {
 // no layer for this one because background blocks will never have collision
 function getBlockCollision(x, y) {
     let block = getBlock(x, y);
-    if (nocollision.includes(block) || block == null) {
+    if (!block) return null;
+    if (nocollision.includes(block.id) || block == null) {
         return null;
     } else {
         return true;
