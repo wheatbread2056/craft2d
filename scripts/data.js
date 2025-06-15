@@ -314,11 +314,11 @@ const recipes = {
 
     // stick recipes
     'stick': {output: 2, ingredients: { '#planks': 1 } }, // 2 sticks from 1 plank
-    'gold_stick': {output: 2, ingredients: { 'stick': 1, 'gold_bar': 1 } },
-    'diamond_stick': {output: 2, ingredients: { 'stick': 1, 'diamond_bar': 2 } },
-    'emerald_stick': {output: 2, ingredients: { 'stick': 1, 'emerald_bar': 3 } },
-    'ruby_stick': {output: 2, ingredients: { 'stick': 1, 'ruby_bar': 4 } },
-    'zyrite_stick': {output: 2, ingredients: { 'stick': 1, 'zyrite_bar': 5 } },
+    'gold_stick': {output: 1, ingredients: { 'stick': 1, 'gold_bar': 1 } },
+    'diamond_stick': {output: 1, ingredients: { 'stick': 1, 'diamond_bar': 2 } },
+    'emerald_stick': {output: 1, ingredients: { 'stick': 1, 'emerald_bar': 3 } },
+    'ruby_stick': {output: 1, ingredients: { 'stick': 1, 'ruby_bar': 4 } },
+    'zyrite_stick': {output: 1, ingredients: { 'stick': 1, 'zyrite_bar': 5 } },
 
     // ingot recipes (smelting?)
     'copper_bar': { output: 1, ingredients: { '#copper': 1, '#coal': 1 } },
