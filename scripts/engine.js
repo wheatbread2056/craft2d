@@ -377,8 +377,8 @@ function deleteBlock(x, y, layer = 'fg') {
 // no layer for this one because background blocks will never have collision
 function getBlockCollision(x, y) {
     let block = getBlock(x, y);
-    if (!block) return null;
-    if (nocollision.includes(block.id) || block == null) {
+    if (block == undefined || block == null) return null;
+    if (nocollision.includes(block)) {
         return null;
     } else {
         return true;
