@@ -831,7 +831,7 @@ function blockPhysics() {
         const chunk = getChunkMap('fg', cx, cy, false);
         if (!chunk) continue;
         for (const [blockKey, block] of chunk.entries()) {
-            if (block == 'sand') {
+            if (block.id == 'sand') {
                 const [bx, by] = blockKey.split(',').map(Number);
                 const x = cx * env.global.chunksize + bx;
                 const y = cy * env.global.chunksize + by;
@@ -840,7 +840,7 @@ function blockPhysics() {
                 // check if the block below is empty
                 if (getBlockCollision(x, y - 1) == null) {
                     deleteBlock(x, y);
-                    setBlock(x, y - 1, block);
+                    setBlock(x, y - 1, block.id);
                     sandUpdated.add(`${x},${y-1}`);
                 }
             }
@@ -853,7 +853,7 @@ function blockPhysics() {
         const chunk = getChunkMap('fg', cx, cy, false);
         if (!chunk) continue;
         for (const [blockKey, block] of chunk.entries()) {
-            if (block == 'watertop') {
+            if (block.id == 'watertop') {
                 const [bx, by] = blockKey.split(',').map(Number);
                 const x = cx * env.global.chunksize + bx;
                 const y = cy * env.global.chunksize + by;
@@ -873,7 +873,7 @@ function blockPhysics() {
         const chunk = getChunkMap('fg', cx, cy, false);
         if (!chunk) continue;
         for (const [blockKey, block] of chunk.entries()) {
-            if (block == 'water') {
+            if (block && block.id == 'water') {
                 const [bx, by] = blockKey.split(',').map(Number);
                 const x = cx * env.global.chunksize + bx;
                 const y = cy * env.global.chunksize + by;
