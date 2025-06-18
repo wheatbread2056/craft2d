@@ -17,15 +17,22 @@ function fileMenu() {
     const description = document.createElement("p")
     const saveButton = document.createElement("button")
     const loadButton = document.createElement("button")
+    const menuButton = document.createElement("button")
 
     saveButton.textContent = "Save World"
     loadButton.textContent = "Load World"
+    menuButton.textContent = "Back to Menu"
 
     saveButton.className = "playButton"
     loadButton.className = "playButton"
+    menuButton.className = "playButton"
 
     saveButton.onclick = () => saveWorld(window.prompt("World name?") ?? "world")
     loadButton.onclick = loadWorld
+    menuButton.onclick = () => {
+        // Return to main menu
+        location.reload()
+    }
     
     title.innerText = "Save/Load World"
     description.innerText = "Import or save your world's state. In the future, this will be a fancy pause menu with more options."
@@ -46,12 +53,14 @@ function fileMenu() {
     subcontainer.style = `
         display: flex;
         gap: 25px;
+        flex-wrap: wrap;
     `
 
     container.id = "fileMenuContainer"
 
     subcontainer.appendChild(saveButton)
     subcontainer.appendChild(loadButton)
+    subcontainer.appendChild(menuButton)
     container.appendChild(title)
     container.appendChild(description)
     container.appendChild(subcontainer)
