@@ -41,4 +41,6 @@ The final step is to simply reload the game, and the scripts should load! If not
 ## Why are there no versions before alpha 1.7 available?
 Before alpha 1.7, I was not using GitHub with this project as I believed it would go nowhere.
 
+Though, there may be an older version that is recoverable, if we manage to get the ZIP archive of it.
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wheatbread2056/craft2d)
