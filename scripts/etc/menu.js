@@ -403,7 +403,7 @@ const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', on
 }});
 
 const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
-    alert('multiplayer does NOT exist yet');
+    alert('multiplayer DOES exist (in mod)');
 }});
 
 const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', onclick: () => {
