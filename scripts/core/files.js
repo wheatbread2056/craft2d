@@ -1,5 +1,66 @@
+/**
+ * Collection of functions to save
+ * and load craft2d save files/worlds
+ * 
+ * Last updated: June 17th, 2025
+ */
+
+function fileMenu() {
+    // here we actually construct our gui
+    
+    const c = document.getElementById("fileMenuContainer")
+    if (c) c.remove()
+
+    const container = document.createElement("div")
+    const subcontainer = document.createElement("div")
+    const title = document.createElement("h1")
+    const description = document.createElement("p")
+    const saveButton = document.createElement("button")
+    const loadButton = document.createElement("button")
+
+    saveButton.textContent = "Save World"
+    loadButton.textContent = "Load World"
+
+    saveButton.className = "playButton"
+    loadButton.className = "playButton"
+
+    saveButton.onclick = () => saveWorld(window.prompt("World name?") ?? "world")
+    loadButton.onclick = loadWorld
+    
+    title.innerText = "Save/Load World"
+    description.innerText = "Import or save your world's state. In the future, this will be a fancy pause menu with more options."
+
+    title.style = `margin: 0; padding: 0;`
+
+    container.style = `
+        z-index: 5100;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 65vw;
+        transform: translate(-50%, -50%);
+        background-color:rgba(0, 0, 0, 0.69);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+    `
+    subcontainer.style = `
+        display: flex;
+        gap: 25px;
+    `
+
+    container.id = "fileMenuContainer"
+
+    subcontainer.appendChild(saveButton)
+    subcontainer.appendChild(loadButton)
+    container.appendChild(title)
+    container.appendChild(description)
+    container.appendChild(subcontainer)
+
+    document.body.appendChild(container)
+}
+
 function saveWorld(filename, metadata) {
-    if (metadata === undefined) metadata = {};
+    if (!metadata) metadata = {};
     metadata.version = versionID;
     metadata.spawnpoint = metadata.spawnpoint || 0;
     // metadata would be an object
@@ -16,7 +77,7 @@ function saveWorld(filename, metadata) {
         player: player
     })], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    // a
+    // automatic downloading
     const a = document.createElement('a');
     a.href = url;
     a.download = `${filename}.craft2d`;
@@ -31,10 +92,10 @@ Metadata: ${JSON.stringify(metadata)}`);
 }
 
 function loadWorld() {
-    const theInput = document.createElement('input');
-    theInput.type = 'file';
-    theInput.accept = '.craft2d';
-    theInput.onchange = e => {
+    const dummyInput = document.createElement('input');
+    dummyInput.type = 'file';
+    dummyInput.accept = '.craft2d';
+    dummyInput.onchange = e => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -65,8 +126,8 @@ function loadWorld() {
         };
         reader.readAsText(file);
         // Clean up input after use
-        document.body.removeChild(theInput);
+        document.body.removeChild(dummyInput);
     };
-    document.body.appendChild(theInput);
-    theInput.click();
+    document.body.appendChild(dummyInput);
+    dummyInput.click();
 }

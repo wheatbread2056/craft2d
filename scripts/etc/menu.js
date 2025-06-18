@@ -10,10 +10,12 @@ function pauseGame() {
     window.pauseDim = document.createElement('div');
     pauseDim.style = 'position:absolute;width:100%;height:100%;top:0;left:0;margin:0;background-color:black;opacity:0.5';
     document.body.appendChild(pauseDim);
+    fileMenu()
 }
 function unpauseGame() {
     env.global.paused = false;
     setTickrate(env.global.targetRate);
+    document.body.removeChild(document.getElementById("fileMenuContainer"))
     document.body.removeChild(pauseDim);    
 }
 function showWorldSelector() {
