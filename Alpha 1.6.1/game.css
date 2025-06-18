@@ -1,0 +1,47 @@
+* {
+    font-family: 'Consolas', monospace;
+    color: #ffffff;
+}
+body {
+    background-color: rgb(36, 125, 207);
+    overflow: hidden;
+}
+p, pre {
+    font-size: 20px;
+}
+.infotext {
+    position: absolute;
+    margin: 8px;
+    top: 0;
+    left: 0;
+}
+.infotext2 {
+    position: absolute;
+    margin: 8px;
+    top: 0;
+    right: 0;
+}
+.infotext3 {
+    position: absolute;
+    margin: 16px;
+    bottom: 0;
+    left: 0;
+}
+.blockselector {
+    position: absolute;
+    margin: 0;
+    margin-bottom: 16px;
+    text-align: center;
+    width: 100%;
+    bottom: 0;
+}
+.block {
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    position: absolute;
+    image-rendering: pixelated;
+    top: 0;
+    left: 0;
+    user-select: none;
+}
