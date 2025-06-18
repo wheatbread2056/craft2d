@@ -15,8 +15,8 @@ const versionName = `${awerothiaergbyvze[versionID[0]]} ${versionID.slice(1)}`; 
 document.title = `craft2D - ${versionName}`; // make the version title
 
 // put the game script(s) in
-const scripts1 = ['engine', 'data', 'files', 'mobile', 'input', 'music', 'menu']; // stage1 (before game)
-const scripts2 = ['cmd', 'render', 'worldgen', 'ui', 'main']; // stage 2 (ingame)
+const scriptsS1 = ["core/env", "core/player", 'core/engine', 'core/data', 'core/files', 'etc/mobile', 'core/input', 'etc/music', 'etc/menu']; // stage1 (before game)
+const scriptsS2 = ['etc/cmd', 'core/render', 'core/worldgen', 'etc/ui', 'main']; // stage 2 (ingame)
 
 // wait until the document body is loaded
 // uses a different loadScript
@@ -26,9 +26,9 @@ function startGame(onLoadFunction) {
         onLoadFunction();
     });
     const initialLoadScript = (index) => {
-        if (index >= scripts2.length) return;
+        if (index >= scriptsS2.length) return;
 
-        const script = scripts2[index];
+        const script = scriptsS2[index];
         const gameScript = document.createElement('script');
         gameScript.src = `scripts/${script}.js?v=${versionID}`;
         gameScript.onload = () => {
@@ -60,9 +60,9 @@ function loadScript(src, version) {
 
 window.addEventListener('DOMContentLoaded', () => {
     const preGameScripts = (index) => {
-        if (index >= scripts1.length) return;
+        if (index >= scriptsS1.length) return;
 
-        const script = scripts1[index];
+        const script = scriptsS1[index];
         const gameScript = document.createElement('script');
         gameScript.src = `scripts/${script}.js?v=${versionID}`;
         gameScript.onload = () => {

@@ -10,6 +10,8 @@ You can also download the latest release, if there is one. If not, just clone th
 # Engine
 Craft2D's game engine is just the browser. There aren't any libraries besides the one for the seedrandom function.
 
+> In the future, the engine (or, source code) may be rewritten due to poor optimizations and lack of readability.
+
 # Future Plans
 Right now (Alpha 1.10, as of June 6th 2025) Craft2D only has a "creative" mode, where you can infinitely modify the world with no consequences, no items, nothing.
 
