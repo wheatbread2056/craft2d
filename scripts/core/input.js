@@ -25,24 +25,20 @@ const movementKeys = {
     'jump': false,
 };
 
+// We use this object to keep track of the player's current selection on mobile
+const mobileInputSelection = {
+    x: 0,
+    y: 0
+}
+
+// This is to keep track of which mobile controls are active
+const mobileControls = {
+    a: false,
+    b: false
+}
+
 // key events . part 1
 function keydownEvent(key) {
-    /* if (chatboxActive) {
-        keys[key] = true;
-        if (key == 'v' && keys.Control) {
-            navigator.clipboard.readText().then(text => {
-                chatboxText += text;
-            }).catch(err => {
-                console.error('Failed to read clipboard contents: ', err);
-            });
-        } else if (key.length === 1) { // only add printable characters
-            chatboxText += key;
-        } else if (key == 'Enter') {
-            enableChatbox();
-        } else if (key == 'Backspace') {
-            chatboxText = chatboxText.slice(0, -1);
-        } else 
-        return; */
     if (1 == 2) {
         1 + 1; // this is a placeholder to prevent the code from being empty
     } else {
@@ -173,6 +169,16 @@ document.addEventListener('mousemove', (event) => {
     client.mx = event.clientX;
     client.my = event.clientY;
 });
+
+document.addEventListener("touchstart", (event) => {
+    if (mobileControls.a) {
+        return
+    }
+
+    mobileInputSelection.x = event.touches[0].clientX
+    mobileInputSelection.y = event.touches[0].clientY
+    console.log(mobileInputSelection)
+})
 
 function updateCommonValues() {
     client.blockMx = Math.floor(client.mx / 64 / camera.scale + camera.x);

@@ -411,9 +411,16 @@ function blockModification() {
     if (!player.modificationAllowed) return;
     let layer = player.interactionLayer;
 
+    let blockX, blockY
+
     // get the coordinates for the block position under the mouse
-    let blockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
-    let blockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
+    if (getMobileStatus()) {
+        blockX = Math.floor(mobileInputSelection.x / 64 / camera.scale + camera.x);
+        blockY = Math.ceil(-mobileInputSelection.y / 64 / camera.scale + camera.y);
+    } else {
+        blockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
+        blockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
+    }
 
     // block breaking
     if (keybinds.delete.some(key => keys[key]) && player.breakingBlock == false) {

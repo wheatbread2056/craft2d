@@ -77,6 +77,7 @@ Tell your best friend, shut the fuck up, ayy`,
             document.body.removeChild(window.tipText);
 
             // music stuff
+            createMobileUI()
             endLoop();
             loopMusic([{src:'music/grass1.mp3',speed:1}]);
         });
@@ -416,6 +417,7 @@ const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', on
 }});
 
 const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
+    alert('multiplayer does NOT exist yet');
     alert('adding this in beta.');
 }});
 
