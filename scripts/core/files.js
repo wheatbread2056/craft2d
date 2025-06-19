@@ -8,36 +8,36 @@
 function fileMenu() {
     // here we actually construct our gui
     
-    const c = document.getElementById("fileMenuContainer")
-    if (c) c.remove()
+    const c = document.getElementById("fileMenuContainer");
+    if (c) c.remove();
 
-    const container = document.createElement("div")
-    const subcontainer = document.createElement("div")
-    const title = document.createElement("h1")
-    const description = document.createElement("p")
-    const saveButton = document.createElement("button")
-    const loadButton = document.createElement("button")
-    const menuButton = document.createElement("button")
+    const container = document.createElement("div");
+    const subcontainer = document.createElement("div");
+    const title = document.createElement("h1");
+    const description = document.createElement("p");
+    const saveButton = document.createElement("button");
+    const loadButton = document.createElement("button");
+    const menuButton = document.createElement("button");
 
-    saveButton.textContent = "Save World"
-    loadButton.textContent = "Load World"
-    menuButton.textContent = "Back to Menu"
+    saveButton.textContent = "Save World";
+    loadButton.textContent = "Load World";
+    menuButton.textContent = "Back to Menu";
 
-    saveButton.className = "playButton"
-    loadButton.className = "playButton"
-    menuButton.className = "playButton"
+    saveButton.className = "playButton";
+    loadButton.className = "playButton";
+    menuButton.className = "playButton";
 
-    saveButton.onclick = () => saveWorld(window.prompt("World name?") ?? "world")
-    loadButton.onclick = loadWorld
+    saveButton.onclick = () => saveWorld(window.prompt("World name?") ?? "world");
+    loadButton.onclick = loadWorld;
     menuButton.onclick = () => {
         // Return to main menu
-        location.reload()
-    }
+        location.reload();
+    };
     
-    title.innerText = "Save/Load World"
-    description.innerText = "Import or save your world's state. In the future, this will be a fancy pause menu with more options."
+    title.innerText = "Pause Menu";
+    description.innerText = "";
 
-    title.style = `margin: 0; padding: 0;`
+    title.style = `margin: 0; padding: 0; justify-content: center; text-align: center; color: white; font-size: 2.5em; padding-bottom: 32px;`;
 
     container.style = `
         z-index: 5100;
@@ -49,23 +49,24 @@ function fileMenu() {
         background-color:rgba(0, 0, 0, 0.69);
         backdrop-filter: blur(10px);
         padding: 25px;
-    `
+    `;
     subcontainer.style = `
         display: flex;
         gap: 25px;
         flex-wrap: wrap;
-    `
+        justify-content: center;
+    `;
 
-    container.id = "fileMenuContainer"
+    container.id = "fileMenuContainer";
 
-    subcontainer.appendChild(saveButton)
-    subcontainer.appendChild(loadButton)
-    subcontainer.appendChild(menuButton)
-    container.appendChild(title)
-    container.appendChild(description)
-    container.appendChild(subcontainer)
+    subcontainer.appendChild(saveButton);
+    subcontainer.appendChild(loadButton);
+    subcontainer.appendChild(menuButton);
+    container.appendChild(title);
+    container.appendChild(description);
+    container.appendChild(subcontainer);
 
-    document.body.appendChild(container)
+    document.body.appendChild(container);
 }
 
 function saveWorld(filename, metadata) {

@@ -16,7 +16,8 @@ function unpauseGame() {
     env.global.paused = false;
     setTickrate(env.global.targetRate);
     document.body.removeChild(document.getElementById("fileMenuContainer"))
-    document.body.removeChild(pauseDim);    
+    document.body.removeChild(pauseDim);
+    renderTick();
 }
 function showWorldSelector() {
     function openWorld(type) {
@@ -415,7 +416,7 @@ const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', on
 }});
 
 const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
-    alert('multiplayer DOES exist (in mod)');
+    alert('adding this in beta.');
 }});
 
 const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', onclick: () => {
