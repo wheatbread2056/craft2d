@@ -36,6 +36,18 @@ function showWorldSelector() {
             "the ai allegations are NOT true",
             "no bugs since 2038!",
             "what version is it?",
+            "i love you",
+            `[Chorus]
+Bitch, sit on my face, I attack that
+Choose up, lil' junt, I'm finna pack him
+When it comes to my bitch, I'm straight active
+Dirtball in the coupe smokin' cat piss
+Lil' bitch, shut the fuck up
+Tell your best friend, shut the fuck up, ayy
+Lil' bitch, shut the fuck up
+Tell your best friend, shut the fuck up, ayy`,
+            "There is no copyrighted content in craft2d.",
+            "music made in https://moddedbeepbox.github.io/3.0"
         ]
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
