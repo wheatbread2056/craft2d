@@ -64,6 +64,7 @@ function showWorldSelector() {
             document.body.removeChild(window.tipText);
 
             // music stuff
+            createMobileUI()
             endLoop();
             loopMusic([{src:'music/grass1.mp3',speed:1}]);
         });
@@ -403,7 +404,7 @@ const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', on
 }});
 
 const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
-    alert('multiplayer DOES exist (in mod)');
+    alert('multiplayer does NOT exist yet');
 }});
 
 const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', onclick: () => {
