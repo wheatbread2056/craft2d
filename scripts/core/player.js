@@ -242,6 +242,10 @@ const player = {
     currentRecipe: null, // current recipe being crafted
     interactionLayer: 'fg', // layer to interact with (foreground or background)
     reachDistance: env.player.defaultReachDistance, // distance the player can reach to interact with blocks
+    // Add crate storage system
+    crates: new Map(), // Map<"x,y", {items: {slotId: {id, amount}}, size: number}>
+    currentCrate: null, // coordinates of currently open crate "x,y"
+    crateOpen: false,
 };
 const camera = {
     x: 0,

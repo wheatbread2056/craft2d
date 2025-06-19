@@ -624,6 +624,28 @@ function openCraftingGUI() {
     }
 }
 
+function openCrateGUI(x, y) {
+    const crateKey = `${x},${y}`;
+    
+    if (!player.crates.has(crateKey)) {
+        const crateData = {
+            items: {},
+            size: 27
+        };
+        for (let i = 1; i <= crateData.size; i++) {
+            crateData.items[i] = {id: null, amount: 0};
+        }
+        player.crates.set(crateKey, crateData);
+    }
+    
+    player.currentCrate = crateKey;
+    player.crateOpen = true;
+    player.inventoryOpen = true;
+    createInventoryUI();
+    document.body.appendChild(inventoryGrid);
+    player.modificationAllowed = false;
+}
+
 function killClock() {
 	clearInterval(clock);
 }

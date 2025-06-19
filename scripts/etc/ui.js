@@ -86,7 +86,7 @@ inventoryGrid.addEventListener('dragstart', function(e) {
 
 function createInventoryUI() {
     inventoryGrid.innerHTML = ''; // clear grid... or else
-    function newBlockSlot(id = 'baby keem') {
+    function newBlockSlot(id = 'baby keem', isCrateSlot = false) {
         let blockSlot = document.createElement('div');
         blockSlot.setAttribute('class', 'inventory-block-slot');
         blockSlot.style.width = '50px';
@@ -96,17 +96,29 @@ function createInventoryUI() {
         blockSlot.style.justifyContent = 'center';
         blockSlot.style.backgroundColor = '#00000088';
         blockSlot.style.border = '2px solid #00000000';
-        blockSlot.style.position = 'relative'; // Ensure absolute children are positioned relative to this slot
-        if (id <= 9) {
-            blockSlot.style.border = '2px solid rgba(75, 0, 160, 0.5)';
-            blockSlot.style.backgroundColor = 'rgba(37, 0, 78, 0.5)';
-        }
-        if (client.inventorySelectedSlot == id) {
-            blockSlot.style.border = '2px solid rgb(119, 0, 255)';
-            blockSlot.style.backgroundColor = 'rgba(119, 0, 255, 0.5)';
+        blockSlot.style.position = 'relative';
+        
+        if (!isCrateSlot) {
+            if (id <= 9) {
+                blockSlot.style.border = '2px solid rgba(75, 0, 160, 0.5)';
+                blockSlot.style.backgroundColor = 'rgba(37, 0, 78, 0.5)';
+            }
+            if (client.inventorySelectedSlot == id) {
+                blockSlot.style.border = '2px solid rgb(119, 0, 255)';
+                blockSlot.style.backgroundColor = 'rgba(119, 0, 255, 0.5)';
+            }
+        } else {
+            // Crate slot styling
+            blockSlot.style.backgroundColor = 'rgba(139, 69, 19, 0.3)'; // Brown tint for crate
+            blockSlot.style.border = '2px solid rgba(139, 69, 19, 0.5)';
+            if (client.inventorySelectedSlot == `crate_${id}`) {
+                blockSlot.style.border = '2px solid rgb(255, 165, 0)';
+                blockSlot.style.backgroundColor = 'rgba(255, 165, 0, 0.5)';
+            }
         }
         return blockSlot;
     }
+    
     if (player.gamemode == 'creative') {
         for (let blockId in globalImages) {
             const blockSlot = newBlockSlot();
@@ -286,6 +298,110 @@ function createInventoryUI() {
             inventoryGrid.appendChild(craftingContainer);
             
 
+        } else if (player.crateOpen) {
+            // CRATE INTERFACE
+            const crateContainer = document.createElement('div');
+            crateContainer.style.display = 'flex';
+            crateContainer.style.flexDirection = 'column';
+            crateContainer.style.width = '576px';
+
+            // Crate title
+            const crateTitle = document.createElement('h2');
+            crateTitle.innerHTML = 'Wooden Crate';
+            crateTitle.style.textAlign = 'center';
+            crateTitle.style.margin = '0 0 16px 0';
+            crateContainer.appendChild(crateTitle);
+
+            // Crate slots
+            const crateGrid = document.createElement('div');
+            crateGrid.style.display = 'grid';
+            crateGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
+            crateGrid.style.gap = '4px';
+            crateGrid.style.justifyContent = 'center';
+            crateGrid.style.marginBottom = '16px';
+            crateGrid.style.padding = '8px';
+            crateGrid.style.backgroundColor = 'rgba(139, 69, 19, 0.2)';
+
+            const crateData = player.crates.get(player.currentCrate);
+            for (let slotId = 1; slotId <= crateData.size; slotId++) {
+                const crateSlot = newBlockSlot(slotId, true);
+                const item = crateData.items[slotId];
+                
+                if (item && item.id !== null) {
+                    let blockImage = globalImages[item.id].cloneNode(true);
+                    blockImage.style.width = '48px';
+                    blockImage.style.height = '48px';
+                    blockImage.style.imageRendering = 'pixelated';
+                    crateSlot.appendChild(blockImage);
+                    
+                    if (item.amount > 1) {
+                        const amountText = document.createElement('span');
+                        amountText.style.position = 'absolute';
+                        amountText.style.bottom = '2px';
+                        amountText.style.right = '2px';
+                        amountText.style.color = '#fff';
+                        amountText.style.fontSize = '16px';
+                        amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                        amountText.style.pointerEvents = 'none';
+                        amountText.textContent = item.amount;
+                        crateSlot.appendChild(amountText);
+                    }
+                }
+                
+                crateSlot.addEventListener('click', () => {
+                    handleCrateSlotClick(`crate_${slotId}`, slotId);
+                });
+                
+                crateGrid.appendChild(crateSlot);
+            }
+
+            // Player inventory (bottom part)
+            const playerInventoryTitle = document.createElement('h3');
+            playerInventoryTitle.innerHTML = 'Your Inventory';
+            playerInventoryTitle.style.textAlign = 'center';
+            playerInventoryTitle.style.margin = '16px 0 8px 0';
+
+            const playerGrid = document.createElement('div');
+            playerGrid.style.display = 'grid';
+            playerGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
+            playerGrid.style.gap = '4px';
+            playerGrid.style.justifyContent = 'center';
+
+            for (let slotId in player.inventory.slots) {
+                const playerSlot = newBlockSlot(slotId, false);
+                const item = player.inventory.getSlot(slotId);
+                
+                if (item && item.id !== null) {
+                    let blockImage = globalImages[item.id].cloneNode(true);
+                    blockImage.style.width = '48px';
+                    blockImage.style.height = '48px';
+                    blockImage.style.imageRendering = 'pixelated';
+                    playerSlot.appendChild(blockImage);
+                    
+                    if (item.amount > 1) {
+                        const amountText = document.createElement('span');
+                        amountText.style.position = 'absolute';
+                        amountText.style.bottom = '2px';
+                        amountText.style.right = '2px';
+                        amountText.style.color = '#fff';
+                        amountText.style.fontSize = '16px';
+                        amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                        amountText.textContent = item.amount;
+                        playerSlot.appendChild(amountText);
+                    }
+                }
+                
+                playerSlot.addEventListener('click', () => {
+                    handleCrateSlotClick(slotId, null);
+                });
+                
+                playerGrid.appendChild(playerSlot);
+            }
+
+            crateContainer.appendChild(crateGrid);
+            crateContainer.appendChild(playerInventoryTitle);
+            crateContainer.appendChild(playerGrid);
+            inventoryGrid.appendChild(crateContainer);
         } else {
 
             for (let slotId in player.inventory.slots) {
@@ -544,4 +660,60 @@ function renderInfoText() {
         interactionText = player.interactionLayer;
     }
     layerIndicator.innerHTML = `Layer: <b>${interactionText}</b>`;
+}
+
+function handleCrateSlotClick(slotId, crateSlotId) {
+    if (client.inventorySelectedSlot == null) {
+        client.inventorySelectedSlot = slotId;
+        createInventoryUI();
+    } else {
+        if (client.inventorySelectedSlot !== slotId) {
+            swapCrateItems(client.inventorySelectedSlot, slotId, crateSlotId);
+        }
+        client.inventorySelectedSlot = null;
+        createInventoryUI();
+    }
+}
+
+function swapCrateItems(fromSlot, toSlot, toCrateSlot) {
+    const crateData = player.crates.get(player.currentCrate);
+    
+    const fromIsCrate = fromSlot.startsWith('crate_');
+    const toIsCrate = toSlot.startsWith('crate_');
+    
+    let fromItem, toItem;
+    
+    if (fromIsCrate) {
+        const crateSlotNum = parseInt(fromSlot.replace('crate_', ''));
+        fromItem = crateData.items[crateSlotNum];
+    } else {
+        fromItem = player.inventory.getSlot(fromSlot);
+    }
+    
+    if (toIsCrate) {
+        const crateSlotNum = parseInt(toSlot.replace('crate_', ''));
+        toItem = crateData.items[crateSlotNum];
+    } else {
+        toItem = player.inventory.getSlot(toSlot);
+    }
+    
+    if (fromIsCrate && toIsCrate) {
+        const fromSlotNum = parseInt(fromSlot.replace('crate_', ''));
+        const toSlotNum = parseInt(toSlot.replace('crate_', ''));
+        const temp = {...crateData.items[fromSlotNum]};
+        crateData.items[fromSlotNum] = {...crateData.items[toSlotNum]};
+        crateData.items[toSlotNum] = temp;
+    } else if (fromIsCrate && !toIsCrate) {
+        const crateSlotNum = parseInt(fromSlot.replace('crate_', ''));
+        const temp = {...crateData.items[crateSlotNum]};
+        crateData.items[crateSlotNum] = {...player.inventory.slots[toSlot]};
+        player.inventory.slots[toSlot] = temp;
+    } else if (!fromIsCrate && toIsCrate) {
+        const crateSlotNum = parseInt(toSlot.replace('crate_', ''));
+        const temp = {...player.inventory.slots[fromSlot]};
+        player.inventory.slots[fromSlot] = {...crateData.items[crateSlotNum]};
+        crateData.items[crateSlotNum] = temp;
+    } else {
+        player.inventory.swapSlots(fromSlot, toSlot);
+    }
 }

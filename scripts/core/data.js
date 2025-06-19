@@ -92,7 +92,26 @@ const initialBlockList = [
     { id: 'planks3', name: 'Woods Planks', col: true, sel: true, h: 5, type: 'axe', level: 1},
 
     // other
-    { id: 'crate', name: 'Wooden Crate', col: true, sel: true, h: 8 },
+    { id: 'crate', name: 'Wooden Crate', col: true, sel: true, h: 8, actions: {
+        onInteract: (x, y, layer) => {
+            openCrateGUI(x, y);
+        },
+        onBreak: (x, y, layer) => {
+            // Drop all items from the crate when broken
+            const crateKey = `${x},${y}`;
+            const crateData = player.crates.get(crateKey);
+            if (crateData) {
+                // Add all crate items to player inventory (or drop them)
+                for (let slotId in crateData.items) {
+                    let item = crateData.items[slotId];
+                    if (item.id && item.amount > 0) {
+                        player.inventory.addItem(item.id, item.amount);
+                    }
+                }
+                player.crates.delete(crateKey);
+            }
+        }
+    }},
     { id: 'glass', name: 'Glass', col: true, sel: true, t: true, h: 3 },
 
     //
