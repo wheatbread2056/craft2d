@@ -16,7 +16,8 @@ function unpauseGame() {
     env.global.paused = false;
     setTickrate(env.global.targetRate);
     document.body.removeChild(document.getElementById("fileMenuContainer"))
-    document.body.removeChild(pauseDim);    
+    document.body.removeChild(pauseDim);
+    renderTick();
 }
 function showWorldSelector() {
     function openWorld(type) {
@@ -36,6 +37,18 @@ function showWorldSelector() {
             "the ai allegations are NOT true",
             "no bugs since 2038!",
             "what version is it?",
+            "i love you",
+            `[Chorus]
+Bitch, sit on my face, I attack that
+Choose up, lil' junt, I'm finna pack him
+When it comes to my bitch, I'm straight active
+Dirtball in the coupe smokin' cat piss
+Lil' bitch, shut the fuck up
+Tell your best friend, shut the fuck up, ayy
+Lil' bitch, shut the fuck up
+Tell your best friend, shut the fuck up, ayy`,
+            "There is no copyrighted content in craft2d.",
+            "music made in https://moddedbeepbox.github.io/3.0"
         ]
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
@@ -405,6 +418,7 @@ const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', on
 
 const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
     alert('multiplayer does NOT exist yet');
+    alert('adding this in beta.');
 }});
 
 const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', onclick: () => {

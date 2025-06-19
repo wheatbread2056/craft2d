@@ -306,7 +306,8 @@ function createInventoryUI() {
             crateContainer.style.width = '576px';
 
             // Crate title
-            const crateTitle = document.createElement('h2');
+            const crateTitle = document.createElement('h3');
+            crateTitle.style.fontWeight = 'normal';
             crateTitle.innerHTML = 'Wooden Crate';
             crateTitle.style.textAlign = 'center';
             crateTitle.style.margin = '0 0 16px 0';
@@ -316,11 +317,10 @@ function createInventoryUI() {
             const crateGrid = document.createElement('div');
             crateGrid.style.display = 'grid';
             crateGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
-            crateGrid.style.gap = '4px';
+            crateGrid.style.gap = '12px';
             crateGrid.style.justifyContent = 'center';
             crateGrid.style.marginBottom = '16px';
             crateGrid.style.padding = '8px';
-            crateGrid.style.backgroundColor = 'rgba(139, 69, 19, 0.2)';
 
             const crateData = player.crates.get(player.currentCrate);
             for (let slotId = 1; slotId <= crateData.size; slotId++) {
@@ -360,11 +360,12 @@ function createInventoryUI() {
             playerInventoryTitle.innerHTML = 'Your Inventory';
             playerInventoryTitle.style.textAlign = 'center';
             playerInventoryTitle.style.margin = '16px 0 8px 0';
+            playerInventoryTitle.style.fontWeight = 'normal';
 
             const playerGrid = document.createElement('div');
             playerGrid.style.display = 'grid';
             playerGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
-            playerGrid.style.gap = '4px';
+            playerGrid.style.gap = '12px';
             playerGrid.style.justifyContent = 'center';
 
             for (let slotId in player.inventory.slots) {

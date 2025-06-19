@@ -60,7 +60,9 @@ function renderTick() {
 
     env.global.renderTickNum++;
     client.oldMx = client.mx; client.oldMy = client.my;
-    requestAnimationFrame(renderTick);
+    if (!env.global.paused) {
+        requestAnimationFrame(renderTick);
+    }
 }
 
 worldGen(-256, 256);
