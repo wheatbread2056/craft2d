@@ -32,6 +32,7 @@ function gameTick() { // block physics and other things go here, but player phys
     client.lastGameTick = performance.now();
     blockPhysics();
     globalUpdateMovement();
+    updateLightmap();
     env.global.gameTickNum++;
 }
 
@@ -80,3 +81,4 @@ for (let i = 0; i < 32; i++) {
     mob.x = Math.random() * 200 - 100;
     mob.init();
 }
+updateLightmap();

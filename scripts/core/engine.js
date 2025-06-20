@@ -9,7 +9,8 @@ function blockKey(bx, by) {
 
 const world = {
     fg: new Map(), // Map<chunkKey, Map<blockKey, block>>
-    bg: new Map()
+    bg: new Map(),
+    light: new Map()
 };
 const client = {
     gameTickrateComputed: 60, // computed game tickrate
@@ -82,21 +83,25 @@ function getBlockCollision(x, y) {
         return true;
     }
 }
-function showBlock(ctx, x, y, block, darken = false) { // x and y are relative to document
+function showBlock(ctx, x, y, block, bg = false, darkenLevel = 0) { // x and y are relative to document
     // ctx added in alpha 1.5.5 to draw onto a canvas context
-    if (darken) {
+    if (darkenLevel != 0 || bg) {
         if (!transparentblocks.includes(block)) {
             ctx.fillStyle = 'black';
             ctx.fillRect(Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
         }
-        ctx.globalAlpha = 0.7;
+        if (!bg) {
+            ctx.globalAlpha = 1 - darkenLevel;
+        } else {
+            ctx.globalAlpha = 0.7 * (1 - darkenLevel);
+        }
     }
     try {
         ctx.drawImage(globalImages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     } catch (e) {
         ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     }
-    if (darken) {
+    if (bg || darkenLevel != 0) {
         ctx.globalAlpha = 1.0;
     }
 }
@@ -116,6 +121,93 @@ function showMob(ctx, x, y, mob) { // same as showBlock, but things like water t
         ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     }
     ctx.globalAlpha = 1.0; // reset alpha
+}
+
+// notes about light: 0 to 10, affects render darkness of both layers.
+function setLight(x, y, value = 10) {
+    const { cx, cy, bx, by } = getChunkAndBlock(x, y);
+    const chunk = getChunkMap('light', cx, cy, true);
+    chunk.set(blockKey(bx, by), value);
+}
+
+var lightTempChunk = null; // temporary chunk for light calculations
+function getLight(x, y, invert = false) { // invert returns darken level rather than light level (for rendering)
+    const { cx, cy, bx, by } = getChunkAndBlock(x, y);
+    let chunk;
+    if (
+        lightTempChunk &&
+        lightTempChunk.cx === cx &&
+        lightTempChunk.cy === cy
+    ) {
+        chunk = lightTempChunk.chunk;
+    } else {
+        chunk = getChunkMap('light', cx, cy, false);
+        lightTempChunk = { cx, cy, chunk };
+    }
+    let lightValue = chunk ? chunk.get(blockKey(bx, by)) : null;
+    if (lightValue == undefined) lightValue = null;
+    if (!invert) {
+        if (lightValue === null) {
+            return 16; // max value
+        } else {
+            return lightValue;
+        }
+    } else {
+        if (lightValue === null) {
+            return 0;
+        } else {
+            return (16 - lightValue) * (1 / 16);
+        }
+    }
+}
+
+function updateLightmap() {
+    // start timer
+    const startTime = performance.now();
+    // Use getNearChunks to only update lightmap near the player
+    const nearChunks = getNearChunks(env.global.simulationRadius); // radius can be adjusted as needed
+    // Build a collision map for only the near chunks
+    const collisionMap = new Set();
+    for (const {cx, cy} of nearChunks) {
+        const chunk = getChunkMap('fg', cx, cy, false);
+        if (!chunk) continue;
+        for (const [blockKey, block] of chunk) {
+            // Only check blocks that are not in nocollision
+            if (!nocollision.includes(block.id)) {
+                const [bx, by] = blockKey.split(',').map(Number);
+                const x = cx * env.global.chunksize + bx;
+                const y = cy * env.global.chunksize + by;
+                collisionMap.add(`${x},${y}`);
+            }
+        }
+    }
+    // For each chunk in nearChunks, update the lightmap column by column
+    for (const {cx, cy} of nearChunks) {
+        for (let bx = 0; bx < env.global.chunksize; bx++) {
+            const x = cx * env.global.chunksize + bx;
+            let foundBlock = false;
+            let lightValue = 16;
+            for (let y = 175; y >= -32; y--) {
+                // Optimization: skip setLight if value is unchanged
+                if (!foundBlock && collisionMap.has(`${x},${y}`)) {
+                    foundBlock = true;
+                    if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
+                    continue;
+                }
+                if (foundBlock) {
+                    if (lightValue > 0) {
+                        lightValue -= 1;
+                    } else {
+                        lightValue = 0;
+                    }
+                }
+                if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
+            }
+        }
+    }
+    // report total time spent
+    const endTime = performance.now();
+    console.log(`Lightmap updated in ${Math.round(endTime - startTime)}ms`);
 }
 
 function spawnPlayer(spawnx) {

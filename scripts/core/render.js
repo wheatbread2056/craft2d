@@ -53,13 +53,13 @@ function renderWorld(camx, camy) {
                 let block = getBlock(x + Math.floor(camx), -y + Math.floor(camy));
                 if (transparentblocks.includes(block) || block == null) {
                     let block1 = getBlock(x + Math.floor(camx), -y + Math.floor(camy), 'bg');
-                    if (block1 !== null) showBlock(globalCtx, x - camx2, -y - camy2, block1, true);
+                    if (block1 !== null) showBlock(globalCtx, x - camx2, -y - camy2, block1, true, getLight(x + Math.floor(camx), -y + Math.floor(camy), true));
                 }
                 if (!(block == null)) {
                     if (block == 'watertop') { // show water animated
                         showBlock(globalCtx, x - camx2, -y - camy2, waterimg);
                     } else {
-                        showBlock(globalCtx, x - camx2, -y - camy2, block);
+                        showBlock(globalCtx, x - camx2, -y - camy2, block, false, getLight(x + Math.floor(camx), -y + Math.floor(camy), true));
                     }
                     blocksRendered++;
                 }
