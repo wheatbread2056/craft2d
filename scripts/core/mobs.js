@@ -65,9 +65,9 @@ function globalUpdateMovement() {
 }
 
 // TEST MOB
-setInterval(() => {for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 32; i++) {
     const mob = new Mob('player');
-    mob.x = Math.random() * 256 + player.x;
+    mob.x = Math.random() * 1024 + player.x;
     mob.y = 256;
     mob.init();
-}}, 1 * 1000); // spawn mobs around the player every 60sec
+}
