@@ -51,8 +51,17 @@ class Mob {
         if (Math.random() < 0.1) {
             this.movement.direction = !this.movement.direction;
         }
-        this.movement.left = !this.movement.direction;
-        this.movement.right = this.movement.direction;
+        // 5% toggle if moving
+        if (Math.random() < 0.05) {
+            this.movement.moving = !this.movement.moving;
+        }
+        if (this.movement.moving) {
+            this.movement.left = this.movement.direction;
+            this.movement.right = !this.movement.direction;
+        } else {
+            this.movement.left = false;
+            this.movement.right = false;
+        }
     }
 }
 
