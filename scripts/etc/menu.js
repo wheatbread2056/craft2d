@@ -16,8 +16,7 @@ function unpauseGame() {
     env.global.paused = false;
     setTickrate(env.global.targetRate);
     document.body.removeChild(document.getElementById("fileMenuContainer"))
-    document.body.removeChild(pauseDim);
-    renderTick();
+    document.body.removeChild(pauseDim);    
 }
 function showWorldSelector() {
     function openWorld(type) {
@@ -36,17 +35,7 @@ function showWorldSelector() {
             "(:",
             "the ai allegations are NOT true",
             "no bugs since 2038!",
-            "what version is it?",,
-            "There is no copyrighted content in craft2d.",
-            "music made in https://moddedbeepbox.github.io/3.0",
-            "the game is LOADING.",
-            "OG devs: bread, spark, ansh!",
-            "Also try Terraria!",
-            "Did you know that craft2D is open source?",
-            "javascript is the best",
-            "You should contribute to the game.",
-            "<red>this is a red tip!</red>",
-            "<red>r</red><orange>a</orange><yellow>i</yellow><green>n</green><blue>b</blue><purple>o</purple><pink>w</pink>",
+            "what version is it?",
         ]
         document.body.removeChild(theDiv);
         document.body.removeChild(menuTitle);
@@ -58,14 +47,14 @@ function showWorldSelector() {
 
         // loading screen
         window.loadingText = document.createElement('p');
-        window.loadingText.innerHTML = '<b>Loading...</b>';
+        window.loadingText.innerHTML = 'Loading...';
         window.loadingText.style = 'font-size: 36px; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin:0';
         document.body.appendChild(window.loadingText);
 
         // random tip
         let randomTip = tips[Math.floor(Math.random() * tips.length)];
         window.tipText = document.createElement('p');
-        window.tipText.innerHTML = `${randomTip}`;
+        window.tipText.innerHTML = `<i>${randomTip}</i>`;
         window.tipText.style = 'font-size: 24px; text-align: center; position: absolute; top: 57%; left: 50%; transform: translate(-50%, -50%); margin:0; opacity:0.8';
         document.body.appendChild(window.tipText);
 
@@ -75,7 +64,6 @@ function showWorldSelector() {
             document.body.removeChild(window.tipText);
 
             // music stuff
-            createMobileUI()
             endLoop();
             loopMusic([{src:'music/grass1.mp3',speed:1}]);
         });
@@ -415,8 +403,7 @@ const playButton = new MenuButton({text: 'Singleplayer', class: 'playButton', on
 }});
 
 const playButton2 = new MenuButton({text: 'Multiplayer', class: 'playButton', onclick: () => {
-    alert('multiplayer does NOT exist yet');
-    alert('adding this in beta.');
+    alert('multiplayer DOES exist (in mod)');
 }});
 
 const settingsButton = new MenuButton({text: 'Settings', class: 'playButton', onclick: () => {
