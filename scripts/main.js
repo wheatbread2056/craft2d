@@ -42,7 +42,6 @@ function gameTick() { // block physics and other things go here, but player phys
     client.lastGameTick = performance.now();
     blockPhysics();
     globalUpdateMovement();
-    updateLightmap();
     env.global.gameTickNum++;
 }
 
@@ -64,6 +63,7 @@ function renderTick() {
     playerPhysics(player);
     globalPhysics();
     blockModification();
+    roamingAround();
     renderWorld(camera.x, camera.y);
     renderOverlay(globalCtx, camera.x, camera.y);
     updateTime();

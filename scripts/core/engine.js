@@ -96,10 +96,12 @@ function showBlock(ctx, x, y, block, bg = false, darkenLevel = 0) { // x and y a
             ctx.globalAlpha = 0.7 * (1 - darkenLevel);
         }
     }
-    try {
-        ctx.drawImage(globalImages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
-    } catch (e) {
-        ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    if (darkenLevel < 1) {
+        try {
+            ctx.drawImage(globalImages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        } catch (e) {
+            ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+        }
     }
     if (bg || darkenLevel != 0) {
         ctx.globalAlpha = 1.0;
@@ -586,6 +588,7 @@ function blockModification() {
                 if (blockactions[block] && blockactions[block].onBreak) {
                     blockactions[block].onBreak(player.blockX, player.blockY, layer);
                 }
+                updateLightmap();
             }
         }
     }
@@ -617,6 +620,7 @@ function blockModification() {
             if (blockactions[player.currentItem] && blockactions[player.currentItem].onPlace) {
                 blockactions[player.currentItem].onPlace(blockX, blockY, layer);
             }
+            updateLightmap();
         } else { // assume placing without those conditions = interact
             if (blockactions[block] && blockactions[block].onInteract) blockactions[block].onInteract(blockX, blockY, layer);
         }
@@ -728,6 +732,7 @@ function explosion(x, y, radius = 3, fg = true, bg = false) {
             }
         }
     }
+    updateLightmap();
 }
 function openCraftingGUI() {
     // set crafting mode
@@ -769,6 +774,17 @@ function openCrateGUI(x, y) {
     createInventoryUI();
     document.body.appendChild(inventoryGrid);
     player.modificationAllowed = false;
+}
+
+function roamingAround() { // this function idk what to call it, but it just checks if the player is in a new chunk since the last frame, and does things if it does
+    const cx = Math.floor(player.x / env.global.chunksize);
+    const cy = Math.floor(player.y / env.global.chunksize);
+    if (cx !== player.lastChunkX || cy !== player.lastChunkY) {
+        player.lastChunkX = cx;
+        player.lastChunkY = cy;
+        // do things here, like update lightmap or spawn mobs
+        updateLightmap();
+    }
 }
 
 function killClock() {
