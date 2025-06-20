@@ -42,8 +42,8 @@ class Mob {
         mobs.push(this);
     }
     updateMovement() {
-        if (!this.movement.direction) { // direction doesnt directly mess with physics, just used to determine movement
-            this.movement.direction = Math.random() < 0.5; // false = left, true = right
+        if (typeof this.movement.direction === 'undefined') { // direction doesnt directly mess with physics, just used to determine movement
+            this.movement.direction = Math.random() <= 0.5; // false = left, true = right
         }
         this.movement.up = Math.random() < 0.2;
         this.movement.down = Math.random() < 0.5;
@@ -54,6 +54,13 @@ class Mob {
         this.movement.left = !this.movement.direction;
         this.movement.right = this.movement.direction;
     }
+}
+
+function spawnMob(type, x, y, image) { // shortcut to spawn mob
+    const mob = new Mob(type, image);
+    mob.x = x || 0;
+    mob.y = y || 200;
+    mob.init();
 }
 
 function globalPhysics() { // do physics on every mob

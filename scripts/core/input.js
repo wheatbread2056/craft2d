@@ -17,6 +17,7 @@ const keybinds = {
     'pause': ['p'],
     'inventory': ['e'],
     'layerToggle': ['l'],
+    'MOBTEST': ['b'],
 }
 const keys = {}
 const movementKeys = {
@@ -108,6 +109,9 @@ function keydownEvent(key) {
             } else {
                 player.interactionLayer = 'fg';
             }
+        }
+        if (keybinds.MOBTEST.includes(key)) {
+            spawnMob(null, player.x, player.y);
         }
 
         // fixes for capslock / shift
