@@ -31,9 +31,7 @@ class Mob {
         if (!type) {
             this.type = mobTypes[Math.floor(Math.random() * mobTypes.length)];
         }
-        if (!image) {
-            this.image = this.type;
-        } else {
+        if (image) {
             this.image = image;
         }
         this.movement = {};
@@ -103,6 +101,7 @@ function spawnMob(type, x, y, image) { // shortcut to spawn mob
     }
     
     const mob = new Mob(type, image);
+    if (type) mob.type = type;
     mob.x = x || 0;
     mob.y = y || 200;
     mob.init();
