@@ -662,3 +662,9 @@ function setTickrate(rate) {
 	killClock();
 	window.clock = setInterval(gameTick, 1000/tickrate);
 }
+
+function globalPhysics() { // do physics on every mob
+    for (const mob of mobs) {
+        playerPhysics(mob);
+    }
+}

@@ -66,11 +66,17 @@ function renderWorld(camx, camy) {
             }
         }
     }
+    renderMobs(globalCtx, camera.x, camera.y);
     renderPlayer(globalCtx, camera.x, camera.y);
 }
 
 function renderPlayer(ctx, camx, camy) {
     showBlock(ctx, player.x - camx, player.y - camy, 'player');
+}
+function renderMobs(ctx, camx, camy) {
+    for (const mob of mobs) {
+        showBlock(ctx, mob.x - camx, mob.y - camy, 'player');
+    }
 }
 
 function renderOverlay(ctx, camx, camy) {
