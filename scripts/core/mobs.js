@@ -3,6 +3,8 @@ const mobs = [];
 // mob class
 class Mob {
     constructor(type, image) {
+        // Exclude 'player' from random mob types
+        let mobTypes = ['woman','chicken','cow','pig','slime_blue','slime_green','slime_red','slime_yellow','slime_purple','slime_orange','zombie'];
         // properties taken from player
         this.x = 0;
         this.y = 200;
@@ -26,7 +28,9 @@ class Mob {
         this.regenAllowed = true;
 
         // mob properties
-        this.type = type; // type of mob
+        if (!type) {
+            this.type = mobTypes[Math.floor(Math.random() * mobTypes.length)];
+        }
         if (!image) {
             this.image = this.type;
         } else {
@@ -62,12 +66,4 @@ function globalUpdateMovement() {
     for (const mob of mobs) {
         mob.updateMovement();
     }
-}
-
-// TEST MOB
-for (let i = 0; i < 32; i++) {
-    const mob = new Mob('player');
-    mob.x = Math.random() * 1024 + player.x;
-    mob.y = 256;
-    mob.init();
 }

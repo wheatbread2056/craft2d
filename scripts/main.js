@@ -74,3 +74,9 @@ const finishedLoadTime = Date.now();
 renderTick();
 
 var clock = setInterval(gameTick, 1000/env.global.tickrate);
+
+for (let i = 0; i < 32; i++) {
+    const mob = new Mob();
+    mob.x = Math.random() * 200 - 100;
+    mob.init();
+}

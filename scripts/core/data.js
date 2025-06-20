@@ -231,7 +231,22 @@ const initialBlockList = [
     ///// Category: testing / internal
     //
 
+    // mobs (these shouldnt be blocks but whatever)
     { id: 'player', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'woman', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'pig', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'cow', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'chicken', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'zombie', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    // slimes (blue, green, orange, purple, red, yellow)
+    { id: 'slime_blue', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'slime_green', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'slime_orange', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'slime_purple', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'slime_red', name: undefined, col: false, sel: false, t: true, h: Infinity },
+    { id: 'slime_yellow', name: undefined, col: false, sel: false, t: true, h: Infinity },
+
+    // rest of testing
     { id: 'test', name: undefined, col: true, sel: false, h: 5, actions: { onPlace() {console.log('placed test block');}, onBreak() {console.log('broke test block');}, onInteract(x,y) {console.log('interacted with test block');}, onTouch() {console.log('touched test block');} } }, // test block, used for testing purposes
     { id: 'watertop_render1', name: undefined, col: false, sel: false, t: true, h: Infinity },
     { id: 'watertop_render2', name: undefined, col: false, sel: false, t: true, h: Infinity },
