@@ -2,7 +2,7 @@ const mobs = [];
 
 // mob class
 class Mob {
-    constructor(type) {
+    constructor(type, image) {
         // properties taken from player
         this.x = 0;
         this.y = 200;
@@ -27,11 +27,47 @@ class Mob {
 
         // mob properties
         this.type = type; // type of mob
+        if (!image) {
+            this.image = this.type;
+        } else {
+            this.image = image;
+        }
+        this.movement = {};
     }
     init() {
         mobs.push(this);
     }
+    updateMovement() {
+        if (!this.movement.direction) { // direction doesnt directly mess with physics, just used to determine movement
+            this.movement.direction = Math.random() < 0.5; // false = left, true = right
+        }
+        this.movement.up = Math.random() < 0.2;
+        this.movement.down = Math.random() < 0.5;
+        // 10% change direction
+        if (Math.random() < 0.1) {
+            this.movement.direction = !this.movement.direction;
+        }
+        this.movement.left = !this.movement.direction;
+        this.movement.right = this.movement.direction;
+    }
+}
+
+function globalPhysics() { // do physics on every mob
+    for (const mob of mobs) {
+        playerPhysics(mob);
+    }
+}
+
+function globalUpdateMovement() {
+    for (const mob of mobs) {
+        mob.updateMovement();
+    }
 }
 
 // TEST MOB
-const testMob = new Mob('baby keem').init();
+setInterval(() => {for (let i = 0; i < 10; i++) {
+    const mob = new Mob('player');
+    mob.x = Math.random() * 256 + player.x;
+    mob.y = 256;
+    mob.init();
+}}, 1 * 1000); // spawn mobs around the player every 60sec

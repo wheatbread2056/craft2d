@@ -17,6 +17,7 @@ const client = {
     lastGameTick: Date.now(), // last game tick time
     lastRenderTick: Date.now(), // last render tick time
     blocksRendered: 0, // number of blocks rendered in the last render tick
+    mobsRendered: 0,
     debug: false,
     mx: 0, // mouse x position
     my: 0, // mouse y position
@@ -83,7 +84,6 @@ function getBlockCollision(x, y) {
 }
 function showBlock(ctx, x, y, block, darken = false) { // x and y are relative to document
     // ctx added in alpha 1.5.5 to draw onto a canvas context
-    const isPlayer = (block == 'player' && player.inWater == true && player.fly == false);
     if (darken) {
         if (!transparentblocks.includes(block)) {
             ctx.fillStyle = 'black';
@@ -91,17 +91,31 @@ function showBlock(ctx, x, y, block, darken = false) { // x and y are relative t
         }
         ctx.globalAlpha = 0.7;
     }
-    if (isPlayer) {
-        ctx.globalAlpha = 0.5;
-    }
     try {
         ctx.drawImage(globalImages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     } catch (e) {
         ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     }
-    if (isPlayer || darken) {
+    if (darken) {
         ctx.globalAlpha = 1.0;
     }
+}
+function showMob(ctx, x, y, mob) { // same as showBlock, but things like water transparency are handled based on mob properties
+    // ctx added in alpha 1.5.5 to draw onto a canvas context
+    let image = mob.image ?? mob.type ?? 'player';
+    if (mob == player) mobType = 'player';
+    if (mob.inWater) {
+        ctx.globalAlpha = 0.5; // water transparency
+    } else {
+        ctx.globalAlpha = 1.0;
+    }
+    try {
+        ctx.drawImage(globalImages[image], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    }
+    catch (e) {
+        ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
+    }
+    ctx.globalAlpha = 1.0; // reset alpha
 }
 
 function spawnPlayer(spawnx) {
@@ -184,18 +198,24 @@ function handlePlayerHealth() {
 // manages both physics/collision and movement
 // this says player physics but its also for mobs, just not renaming it cause it will break a LOT.
 function playerPhysics(target) {
+    let movement = {};
+    if (target == player) {
+        movement = movementKeys;
+    } else if (target.movement) {
+        movement = target.movement;
+    };
     // user-triggered actions aka movement
     if (target.controlAllowed) {
         if (target.fly == false) {
             if (!target.air && !target.inWater) {
-                if (movementKeys.left) {
+                if (movement.left) {
                     target.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
                     if (target.mx < -env.global.baseSpeedVelocity * target.speedMult) {
                         target.mx = -env.global.baseSpeedVelocity * target.speedMult;
                     }
                     target.acc = true;
                 }
-                if (movementKeys.right) {
+                if (movement.right) {
                     target.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
                     if (target.mx > env.global.baseSpeedVelocity * target.speedMult) {
                         target.mx = env.global.baseSpeedVelocity * target.speedMult;
@@ -203,27 +223,27 @@ function playerPhysics(target) {
                     target.acc = true;
                 }
             } else {
-                if (movementKeys.left) {
+                if (movement.left) {
                     target.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
                 }
-                if (movementKeys.right) {
+                if (movement.right) {
                     target.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
                 }
             }
             if (!target.inWater) {
                 // took me an insanely long amount of time to find this
                 // but this is for the target ** JUMP **
-                if (movementKeys.up && target.air == false) {
+                if (movement.up && target.air == false) {
                     // 0.21 y vel = around 2.1 block jump height and 0.2 is under 2 blocks
                     target.my = env.global.baseJumpVelocity * target.jumpMult;
                     target.air = true;
                 }
             }
             else { // water movement
-                if (movementKeys.up) {
+                if (movement.up) {
                     target.my += 0.1 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 }
-                if (movementKeys.down) {
+                if (movement.down) {
                     target.my -= 0.2 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 }
             }
@@ -232,28 +252,28 @@ function playerPhysics(target) {
         // fly movement
 
         else if (target.fly == true) {
-            if (movementKeys.left) {
+            if (movement.left) {
                 target.mx += -7.2 / (client.renderTickrateComputed / 60) * target.speedMult;
                 if (target.mx < -24 * target.speedMult) {
                     target.mx = -24 * target.speedMult;
                 }
                 target.flyx = true;
             }
-            if (movementKeys.right) {
+            if (movement.right) {
                 target.mx += 7.2 / (client.renderTickrateComputed / 60) * target.speedMult;
                 if (target.mx > 24 * target.speedMult) {
                     target.mx = 24 * target.speedMult;
                 }
                 target.flyx = true;
             }
-            if (movementKeys.up) {
+            if (movement.up) {
                 target.my += 2.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 if (target.my > 12 * target.jumpMult) {
                     target.my = 12 * target.jumpMult;
                 }
                 target.flyy = true;
             }
-            if (movementKeys.down) {
+            if (movement.down) {
                 target.my -= 2.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 if (target.my < -12 * target.jumpMult) {
                     target.my = -12 * target.jumpMult;
@@ -276,14 +296,14 @@ function playerPhysics(target) {
 
     // disable acceleration mode when needed (prevents endless sliding)
     if (target.fly == false) {
-        if (!(movementKeys.left || movementKeys.right)) {
+        if (!(movement.left || movement.right)) {
             target.acc = false;
         }
     } else {
-        if (!(movementKeys.left || movementKeys.right)) {
+        if (!(movement.left || movement.right)) {
             target.flyx = false;
         }
-        if (!(movementKeys.up || movementKeys.down)) {
+        if (!(movement.up || movement.down)) {
             target.flyy = false;
         }
     }
@@ -342,7 +362,7 @@ function playerPhysics(target) {
                 if (target.my < -21.6 && !target.invulnerable) {
                     // fall damage based on the target's vertical velocity
                     target.health -= ((target.my*2/60) * (target.my*2/60) * (target.my*2/60) * (target.my*2/60)) * 160;
-                    handlePlayerHealth();
+                    handlePlayerHealth(target);
                     playSound('sfx/hitHurt.wav');
                 };
                 target.air = false;
@@ -362,12 +382,12 @@ function playerPhysics(target) {
     }
     // walljumping
     if (env.global.walljumpEnabled) {
-        if (playerLeftTouching && movementKeys.up && movementKeys.left && target.air) {
+        if (playerLeftTouching && movement.up && movement.left && target.air) {
             target.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
             target.my = env.global.baseJumpVelocity * target.jumpMult;
             target.air = true;
         }
-        if (playerRightTouching && movementKeys.up && movementKeys.right && target.air) {
+        if (playerRightTouching && movement.up && movement.right && target.air) {
             target.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
             target.my = env.global.baseJumpVelocity * target.jumpMult;
             target.air = true;
@@ -661,10 +681,4 @@ function setTickrate(rate) {
 	tickrate = rate;
 	killClock();
 	window.clock = setInterval(gameTick, 1000/tickrate);
-}
-
-function globalPhysics() { // do physics on every mob
-    for (const mob of mobs) {
-        playerPhysics(mob);
-    }
 }

@@ -71,11 +71,17 @@ function renderWorld(camx, camy) {
 }
 
 function renderPlayer(ctx, camx, camy) {
-    showBlock(ctx, player.x - camx, player.y - camy, 'player');
+    showMob(ctx, player.x - camx, player.y - camy, player);
 }
 function renderMobs(ctx, camx, camy) {
+    client.mobsRendered = 0;
     for (const mob of mobs) {
-        showBlock(ctx, mob.x - camx, mob.y - camy, 'player');
+        // camera X and y are only used to calculate if within viewport
+        mob.cameraX = (mob.x - camx) * 64 * camera.scale;
+        mob.cameraY = (mob.y - camy) * 64 * camera.scale;
+        if (mob.cameraX < -64 || mob.cameraX > window.innerWidth + 64 || !mob.cameraY < -64 || mob.cameraY > window.innerHeight + 64) continue; // only render mobs within the viewport
+        showMob(ctx, mob.x - camx, mob.y - camy, mob);
+        client.mobsRendered++;
     }
 }
 

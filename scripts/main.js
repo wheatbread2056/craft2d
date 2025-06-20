@@ -31,6 +31,7 @@ function gameTick() { // block physics and other things go here, but player phys
     }
     client.lastGameTick = performance.now();
     blockPhysics();
+    globalUpdateMovement();
     env.global.gameTickNum++;
 }
 
