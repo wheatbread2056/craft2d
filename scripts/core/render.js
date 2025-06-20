@@ -75,6 +75,12 @@ function renderPlayer(ctx, camx, camy) {
 }
 function renderMobs(ctx, camx, camy) {
     client.mobsRendered = 0;
+    
+    // dont render mobs if they're disabled
+    if (!env.global.mobsEnabled) {
+        return;
+    }
+    
     for (const mob of mobs) {
         // camera X and y are only used to calculate if within viewport
         mob.cameraX = (mob.x - camx) * 64 * camera.scale;

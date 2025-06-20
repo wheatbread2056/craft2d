@@ -28,6 +28,7 @@ const env = {
         simulationRadius: 2, // radius in chunks, to do game ticks
         chunksize: 32, // size of a chunk in blocks (16x16 = 256 blocks (small), 32x32 = 1024 blocks (default), 64x64 = 4096 blocks (large))
         seed: Math.round(Math.random() * (2147483647*2) - 2147483647),
+        mobsEnabled: true, // whether mobs are enabled or not
     },
     player: {
         defaultMaxHealth: 1000,
