@@ -37,6 +37,7 @@ class Mob {
             this.image = image;
         }
         this.movement = {};
+        this.followingPlayer = false;
     }
     init() {
         mobs.push(this);
@@ -45,22 +46,52 @@ class Mob {
         if (typeof this.movement.direction === 'undefined') { // direction doesnt directly mess with physics, just used to determine movement
             this.movement.direction = Math.random() <= 0.5; // false = left, true = right
         }
-        this.movement.up = Math.random() < 0.2;
-        this.movement.down = Math.random() < 0.5;
-        // 10% change direction
-        if (Math.random() < 0.1) {
-            this.movement.direction = !this.movement.direction;
-        }
-        // 5% toggle if moving
-        if (Math.random() < 0.05) {
-            this.movement.moving = !this.movement.moving;
-        }
-        if (this.movement.moving) {
-            this.movement.left = this.movement.direction;
-            this.movement.right = !this.movement.direction;
+        if (!this.followingPlayer) {
+            this.movement.up = Math.random() < 0.2;
+            this.movement.down = Math.random() < 0.5;
+            // 10% change direction
+            if (Math.random() < 0.1) {
+                this.movement.direction = !this.movement.direction;
+            }
+            // 5% toggle if moving
+            if (Math.random() < 0.05) {
+                this.movement.moving = !this.movement.moving;
+            }
+            if (this.movement.moving) {
+                this.movement.left = this.movement.direction;
+                this.movement.right = !this.movement.direction;
+            } else {
+                this.movement.left = false;
+                this.movement.right = false;
+            }
         } else {
-            this.movement.left = false;
-            this.movement.right = false;
+            if (this.x < player.x) {
+                this.movement.left = false;
+                this.movement.right = true;
+            } else {
+                this.movement.left = true;
+                this.movement.right = false;
+            }
+            if (this.y < player.y) {
+                this.movement.up = true;
+                this.movement.down = false;
+            } else {
+                this.movement.up = false;
+                this.movement.down = true;
+            }
+            // jump either way, avoids getting stuck
+            if (!this.movement.up) {
+                this.movement.up = Math.random() < 0.2;
+            }
+        }
+        // 1% chance toggle following
+        if (Math.random() < 0.01) {
+            this.followingPlayer = !this.followingPlayer;
+            if (this.followingPlayer) {
+                console.warn(`WARNING: You are being chased by a ${this.type}!`);
+            } else {
+                console.warn(`${this.type} gave up on you 🥀🥀🥀`);
+            }
         }
     }
 }
