@@ -57,19 +57,35 @@ class Mob {
 }
 
 function spawnMob(type, x, y, image) { // shortcut to spawn mob
+    // Check if mobs are enabled before spawning
+    if (!env.global.mobsEnabled) {
+        return null;
+    }
+    
     const mob = new Mob(type, image);
     mob.x = x || 0;
     mob.y = y || 200;
     mob.init();
+    return mob;
 }
 
 function globalPhysics() { // do physics on every mob
+    // Only process mob physics if mobs are enabled
+    if (!env.global.mobsEnabled) {
+        return;
+    }
+    
     for (const mob of mobs) {
         playerPhysics(mob);
     }
 }
 
 function globalUpdateMovement() {
+    // Only update mob movement if mobs are enabled
+    if (!env.global.mobsEnabled) {
+        return;
+    }
+    
     for (const mob of mobs) {
         mob.updateMovement();
     }

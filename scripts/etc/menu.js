@@ -238,6 +238,11 @@ overflow: auto;
         if (max !== undefined) input.max = max;
         if (value !== undefined) input.value = value;
         if (inputType === 'checkbox') {
+            // Load the stored value properly for checkboxes
+            if (localStorage.getItem(settingId) !== null) {
+                value = localStorage.getItem(settingId) === 'true';
+            }
+            
             // custom because the normal checkbox sucks
             input = document.createElement('span');
             input.innerHTML = value ? '✅' : '❌';
@@ -247,7 +252,15 @@ overflow: auto;
                 value = !value;
                 input.innerHTML = value ? '✅' : '❌';
                 input.style.color = value ? 'green' : 'red';
-                localStorage.setItem(settingId, value);
+                localStorage.setItem(settingId, value.toString());
+                
+                // Special handling for mobs enabled setting
+                if (settingId === 'gameplay.mobsEnabled') {
+                    env.global.mobsEnabled = value;
+                    if (!value && typeof mobs !== 'undefined') {
+                        mobs.length = 0; // Clear all existing mobs
+                    }
+                }
             });
             input.style.color = value ? 'green' : 'red';
         }
@@ -322,6 +335,7 @@ overflow: auto;
             createSetting('gameplay.regenRate', 'Regen rate', 'range', -100, 500, 75, 0.1, 1);
             createSetting('gameplay.invincibility', 'Invincibility', 'checkbox', undefined, undefined, false);
             createSetting('gameplay.physicsQuality', 'Collision quality', 'range', 1, 32, 16);
+            createSetting('gameplay.mobsEnabled', 'Mobs enabled', 'checkbox', undefined, undefined, true);
             break;
         case 'controls':
             // for each thing in keybinds (input.js), create a setting with text input.

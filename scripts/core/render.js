@@ -75,11 +75,17 @@ function renderPlayer(ctx, camx, camy) {
 }
 function renderMobs(ctx, camx, camy) {
     client.mobsRendered = 0;
+    
+    // dont render mobs if they're disabled
+    if (!env.global.mobsEnabled) {
+        return;
+    }
+    
     for (const mob of mobs) {
         // camera X and y are only used to calculate if within viewport
         mob.cameraX = (mob.x - camx) * 64 * camera.scale;
         mob.cameraY = (mob.y - camy) * 64 * camera.scale;
-        if (mob.cameraX < -64 || mob.cameraX > window.innerWidth + 64 || !mob.cameraY < -64 || mob.cameraY > window.innerHeight + 64) continue; // only render mobs within the viewport
+        if (mob.cameraX < -64 || mob.cameraX > window.innerWidth + 64 || mob.cameraY < -64 || mob.cameraY > window.innerHeight + 64) continue; // only render mobs within the viewport
         showMob(ctx, mob.x - camx, mob.y - camy, mob);
         client.mobsRendered++;
     }

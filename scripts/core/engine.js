@@ -745,6 +745,11 @@ function openCraftingGUI() {
 }
 
 function openCrateGUI(x, y) {
+    // Ensure crates is initialized as a Map // safety check from bröt
+    if (!(player.crates instanceof Map)) {
+        player.crates = new Map();
+    }
+    
     const crateKey = `${x},${y}`;
     
     if (!player.crates.has(crateKey)) {

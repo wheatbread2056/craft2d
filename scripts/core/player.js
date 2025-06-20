@@ -203,6 +203,7 @@ const player = {
         fullInit: function () {
             this.generateSlots(env.player.defaultInventorySize);
             this.generateDefault();
+            player.initCrates(); // Initialize crates Map
         },
     },
     gamemode: env.player.defaultGamemode,
@@ -246,6 +247,12 @@ const player = {
     crates: new Map(), // Map<"x,y", {items: {slotId: {id, amount}}, size: number}>
     currentCrate: null, // coordinates of currently open crate "x,y"
     crateOpen: false,
+    // Add initialization method for crates
+    initCrates: function() {
+        if (!(this.crates instanceof Map)) {
+            this.crates = new Map();
+        }
+    }
 };
 const camera = {
     x: 0,

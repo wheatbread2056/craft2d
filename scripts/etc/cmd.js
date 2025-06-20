@@ -26,6 +26,7 @@ function command(cmd) { // take a command input for the chatbox, then return the
 /tickrate <yellow>val</yellow>
 /putils <yellow>action</yellow>
 /seed
+/mobs <yellow>on/off</yellow>
 /<magenta>save</magenta> <yellow>filename</yellow>
 /<magenta>load</magenta>`;
     }
@@ -68,7 +69,7 @@ function command(cmd) { // take a command input for the chatbox, then return the
         } catch (e) {
             return `<red>${e.message}</red>`;
         }
-    } else if (args[0] == 'set') { // set a variable
+    } else if (args[0] == 'set' ) { // set a variable
         let name = args[1];
         let val = args[2];
         let newValue;
@@ -102,6 +103,21 @@ function command(cmd) { // take a command input for the chatbox, then return the
             return `tickrate set to <yellow>${args[1]}</yellow>`;
         } else {
             return `<yellow>invalid syntax</yellow>`;
+        }
+    } else if (args[0] == 'mobs') { // toggle mobs
+        if (args[1] === 'on' || args[1] === 'true') {
+            env.global.mobsEnabled = true;
+            localStorage.setItem('gameplay.mobsEnabled', 'true');
+            return `<green>Mobs enabled</green>`;
+        } else if (args[1] === 'off' || args[1] === 'false') {
+            env.global.mobsEnabled = false;
+            localStorage.setItem('gameplay.mobsEnabled', 'false');
+            if (typeof mobs !== 'undefined') {
+                mobs.length = 0; // Clear all existing mobs
+            }
+            return `<red>Mobs disabled</red>`;
+        } else {
+            return `Mobs are currently <yellow>${env.global.mobsEnabled ? 'enabled' : 'disabled'}</yellow>`;
         }
     } else if (args[0] == 'putils' || args[0] == 'p') { // player utilities
         if (args[1] == 'heal' || args[1] == 'h') {

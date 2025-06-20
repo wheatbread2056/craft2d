@@ -14,6 +14,16 @@ player.regenRate = parseInt(localStorage.getItem('gameplay.regenRate'))|| env.pl
 player.invulnerable = localStorage.getItem('gameplay.invincibility') === 'true' || env.player.defaultInvincibility;
 player.health = player.maxHealth; // update player's health
 env.global.physicsQuality = parseInt(localStorage.getItem('gameplay.physicsQuality')) || env.global.physicsQuality;
+env.global.mobsEnabled = localStorage.getItem('gameplay.mobsEnabled') === null ? true : localStorage.getItem('gameplay.mobsEnabled') === 'true';
+
+// only spawn mobs if they are enabled
+if (env.global.mobsEnabled) {
+    for (let i = 0; i < 32; i++) {
+        const mob = new Mob();
+        mob.x = Math.random() * 200 - 100;
+        mob.init();
+    }
+}
 
 // update the keybinds
 for (const key in keybinds) {
