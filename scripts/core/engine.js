@@ -17,7 +17,6 @@ const client = {
     lastGameTick: Date.now(), // last game tick time
     lastRenderTick: Date.now(), // last render tick time
     blocksRendered: 0, // number of blocks rendered in the last render tick
-    mobsRendered: 0,
     debug: false,
     mx: 0, // mouse x position
     my: 0, // mouse y position
@@ -84,6 +83,7 @@ function getBlockCollision(x, y) {
 }
 function showBlock(ctx, x, y, block, darken = false) { // x and y are relative to document
     // ctx added in alpha 1.5.5 to draw onto a canvas context
+    const isPlayer = (block == 'player' && player.inWater == true && player.fly == false);
     if (darken) {
         if (!transparentblocks.includes(block)) {
             ctx.fillStyle = 'black';
@@ -91,31 +91,17 @@ function showBlock(ctx, x, y, block, darken = false) { // x and y are relative t
         }
         ctx.globalAlpha = 0.7;
     }
+    if (isPlayer) {
+        ctx.globalAlpha = 0.5;
+    }
     try {
         ctx.drawImage(globalImages[block], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     } catch (e) {
         ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
     }
-    if (darken) {
+    if (isPlayer || darken) {
         ctx.globalAlpha = 1.0;
     }
-}
-function showMob(ctx, x, y, mob) { // same as showBlock, but things like water transparency are handled based on mob properties
-    // ctx added in alpha 1.5.5 to draw onto a canvas context
-    let image = mob.image ?? mob.type ?? 'player';
-    if (mob == player) mobType = 'player';
-    if (mob.inWater) {
-        ctx.globalAlpha = 0.5; // water transparency
-    } else {
-        ctx.globalAlpha = 1.0;
-    }
-    try {
-        ctx.drawImage(globalImages[image], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
-    }
-    catch (e) {
-        ctx.drawImage(globalImages['test'], Math.floor(x * 64 * camera.scale), Math.floor(-y * 64 * camera.scale), 64 * camera.scale, 64 * camera.scale);
-    }
-    ctx.globalAlpha = 1.0; // reset alpha
 }
 
 function spawnPlayer(spawnx) {
@@ -196,204 +182,197 @@ function handlePlayerHealth() {
 }
 
 // manages both physics/collision and movement
-// this says player physics but its also for mobs, just not renaming it cause it will break a LOT.
-function playerPhysics(target) {
-    let movement = {};
-    if (target == player) {
-        movement = movementKeys;
-    } else if (target.movement) {
-        movement = target.movement;
-    };
+function playerPhysics() {
     // user-triggered actions aka movement
-    if (target.controlAllowed) {
-        if (target.fly == false) {
-            if (!target.air && !target.inWater) {
-                if (movement.left) {
-                    target.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
-                    if (target.mx < -env.global.baseSpeedVelocity * target.speedMult) {
-                        target.mx = -env.global.baseSpeedVelocity * target.speedMult;
+    if (player.controlAllowed) {
+        if (player.fly == false) {
+            if (!player.air && !player.inWater) {
+                if (movementKeys.left) {
+                    player.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * player.speedMult;
+                    if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
+                        player.mx = -env.global.baseSpeedVelocity * player.speedMult;
                     }
-                    target.acc = true;
+                    player.acc = true;
                 }
-                if (movement.right) {
-                    target.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
-                    if (target.mx > env.global.baseSpeedVelocity * target.speedMult) {
-                        target.mx = env.global.baseSpeedVelocity * target.speedMult;
+                if (movementKeys.right) {
+                    player.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * player.speedMult;
+                    if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
+                        player.mx = env.global.baseSpeedVelocity * player.speedMult;
                     }
-                    target.acc = true;
+                    player.acc = true;
                 }
             } else {
-                if (movement.left) {
-                    target.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
+                if (movementKeys.left) {
+                    player.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * player.speedMult;
                 }
-                if (movement.right) {
-                    target.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
+                if (movementKeys.right) {
+                    player.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * player.speedMult;
                 }
             }
-            if (!target.inWater) {
+            if (!player.inWater) {
                 // took me an insanely long amount of time to find this
-                // but this is for the target ** JUMP **
-                if (movement.up && target.air == false) {
+                // but this is for the player ** JUMP **
+                if (movementKeys.up && player.air == false) {
                     // 0.21 y vel = around 2.1 block jump height and 0.2 is under 2 blocks
-                    target.my = env.global.baseJumpVelocity * target.jumpMult;
-                    target.air = true;
+                    player.my = env.global.baseJumpVelocity * player.jumpMult;
+                    player.air = true;
                 }
             }
             else { // water movement
-                if (movement.up) {
-                    target.my += 0.1 / (client.renderTickrateComputed / 60) * target.jumpMult;
+                if (movementKeys.up) {
+                    player.my += 0.1 / (client.renderTickrateComputed / 60) * player.jumpMult;
                 }
-                if (movement.down) {
-                    target.my -= 0.2 / (client.renderTickrateComputed / 60) * target.jumpMult;
+                if (movementKeys.down) {
+                    player.my -= 0.2 / (client.renderTickrateComputed / 60) * player.jumpMult;
                 }
             }
         }
         
         // fly movement
 
-        else if (target.fly == true) {
-            if (movement.left) {
-                target.mx += -7.2 / (client.renderTickrateComputed / 60) * target.speedMult;
-                if (target.mx < -24 * target.speedMult) {
-                    target.mx = -24 * target.speedMult;
+        else if (player.fly == true) {
+            if (movementKeys.left) {
+                player.mx += -7.2 / (client.renderTickrateComputed / 60) * player.speedMult;
+                if (player.mx < -24 * player.speedMult) {
+                    player.mx = -24 * player.speedMult;
                 }
-                target.flyx = true;
+                player.flyx = true;
             }
-            if (movement.right) {
-                target.mx += 7.2 / (client.renderTickrateComputed / 60) * target.speedMult;
-                if (target.mx > 24 * target.speedMult) {
-                    target.mx = 24 * target.speedMult;
+            if (movementKeys.right) {
+                player.mx += 7.2 / (client.renderTickrateComputed / 60) * player.speedMult;
+                if (player.mx > 24 * player.speedMult) {
+                    player.mx = 24 * player.speedMult;
                 }
-                target.flyx = true;
+                player.flyx = true;
             }
-            if (movement.up) {
-                target.my += 2.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
-                if (target.my > 12 * target.jumpMult) {
-                    target.my = 12 * target.jumpMult;
+            if (movementKeys.up) {
+                player.my += 2.4 / (client.renderTickrateComputed / 60) * player.jumpMult;
+                if (player.my > 12 * player.jumpMult) {
+                    player.my = 12 * player.jumpMult;
                 }
-                target.flyy = true;
+                player.flyy = true;
             }
-            if (movement.down) {
-                target.my -= 2.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
-                if (target.my < -12 * target.jumpMult) {
-                    target.my = -12 * target.jumpMult;
+            if (movementKeys.down) {
+                player.my -= 2.4 / (client.renderTickrateComputed / 60) * player.jumpMult;
+                if (player.my < -12 * player.jumpMult) {
+                    player.my = -12 * player.jumpMult;
                 }
-                target.flyy = true;
+                player.flyy = true;
             }
         }
     }
 
     // check if in water
-    let previousWater = target.inWater;
-    target.inWater = getBlock(Math.round(target.x),Math.floor(target.y)) == 'water' || getBlock(Math.round(target.x),Math.floor(target.y + 0.5)) == 'watertop';
-    if (target.inWater) {
-        target.air = false;
+    let previousWater = player.inWater;
+    player.inWater = getBlock(Math.round(player.x),Math.floor(player.y)) == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5)) == 'watertop';
+    if (player.inWater) {
+        player.air = false;
     }
-    if (target.inWater && !previousWater) {
+    if (player.inWater && !previousWater) {
         // this is very loud.
         // playSound('sfx/splash.wav', 0.4);
     }
 
     // disable acceleration mode when needed (prevents endless sliding)
-    if (target.fly == false) {
-        if (!(movement.left || movement.right)) {
-            target.acc = false;
+    if (player.fly == false) {
+        if (!(movementKeys.left || movementKeys.right)) {
+            player.acc = false;
         }
     } else {
-        if (!(movement.left || movement.right)) {
-            target.flyx = false;
+        if (!(movementKeys.left || movementKeys.right)) {
+            player.flyx = false;
         }
-        if (!(movement.up || movement.down)) {
-            target.flyy = false;
+        if (!(movementKeys.up || movementKeys.down)) {
+            player.flyy = false;
         }
     }
     
 
     // gravity
-    if (target.fly == false) {
-        if (target.inWater) { // buoyancy
-            target.my += 0.1 / (client.renderTickrateComputed / 60);
-            target.my *= Math.pow(0.98, 60 / client.renderTickrateComputed);
+    if (player.fly == false) {
+        if (player.inWater) { // buoyancy
+            player.my += 0.1 / (client.renderTickrateComputed / 60);
+            player.my *= Math.pow(0.98, 60 / client.renderTickrateComputed);
         } else {
-            target.my += env.global.gravity * (60 / client.renderTickrateComputed);
+            player.my += env.global.gravity * (60 / client.renderTickrateComputed);
         }
     }
     
     for (let i = 0; i < env.global.physicsQuality; i++) {
         // momentum & friction
-        target.x += target.mx / client.renderTickrateComputed / env.global.physicsQuality;
-        target.y += target.my / client.renderTickrateComputed / env.global.physicsQuality;
-        if (target.fly == false) { // normal non-flying friction
-            if (target.air || target.inWater) { // air friction
-                target.mx *= Math.pow(0.98, 60 / client.renderTickrateComputed / env.global.physicsQuality);
-            } else if (!target.acc) { // ground friction
-                target.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+        player.x += player.mx / client.renderTickrateComputed / env.global.physicsQuality;
+        player.y += player.my / client.renderTickrateComputed / env.global.physicsQuality;
+        if (player.fly == false) { // normal non-flying friction
+            if (player.air || player.inWater) { // air friction
+                player.mx *= Math.pow(0.98, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            } else if (!player.acc) { // ground friction
+                player.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
         } else { // flying friction
-            if (target.flyx == false) {
-                target.mx *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            if (player.flyx == false) {
+                player.mx *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
-            if (target.flyy == false) {
-                target.my *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            if (player.flyy == false) {
+                player.my *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
         }
         
         // COLLISION
         // rewritten in alpha 1.8 - should be much better
         // this is actually AMAZING.
-        if (!target.noclip) {
-            playertop = target.y;
-            playerbottom = target.y - 1;
-            playerleft = target.x;
-            playerright = target.x + 1;
-            playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(target.y)));
-            playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(target.y)));
-            // target bottom collision
+        if (!player.noclip) {
+            playertop = player.y;
+            playerbottom = player.y - 1;
+            playerleft = player.x;
+            playerright = player.x + 1;
+            playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(player.y)));
+            playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(player.y)));
+            // player bottom collision
             if (playerLeftTouching) {
-                target.mx = 0;
-                target.x = Math.ceil(playerleft);
+                player.mx = 0;
+                player.x = Math.ceil(playerleft);
             }
             if (playerRightTouching) {
-                target.mx = 0;
-                target.x = Math.floor(playerleft);
+                player.mx = 0;
+                player.x = Math.floor(playerleft);
             }
             playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
             if (playerBottomTouching) {
-                if (target.my < -21.6 && !target.invulnerable) {
-                    // fall damage based on the target's vertical velocity
-                    target.health -= ((target.my*2/60) * (target.my*2/60) * (target.my*2/60) * (target.my*2/60)) * 160;
-                    handlePlayerHealth(target);
+                if (player.my < -21.6 && !player.invulnerable) {
+                    // fall damage based on the player's vertical velocity
+                    player.health -= ((player.my*2/60) * (player.my*2/60) * (player.my*2/60) * (player.my*2/60)) * 160;
+                    handlePlayerHealth();
                     playSound('sfx/hitHurt.wav');
                 };
-                target.air = false;
-                target.my = 0;
-                target.y = Math.ceil(target.y);
+                player.air = false;
+                player.my = 0;
+                player.y = Math.ceil(player.y);
             } else {
-                if (!target.inWater) {
-                    target.air = true;
+                if (!player.inWater) {
+                    player.air = true;
                 }
             }
             playerTopTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.floor(playertop + 1)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.floor(playertop + 1)))
             if (playerTopTouching && !playerBottomTouching) {
-                target.my = 0;
-                target.y = Math.floor(playertop);
+                player.my = 0;
+                player.y = Math.floor(playertop);
             }
         }
     }
     // walljumping
     if (env.global.walljumpEnabled) {
-        if (playerLeftTouching && movement.up && movement.left && target.air) {
-            target.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
-            target.my = env.global.baseJumpVelocity * target.jumpMult;
-            target.air = true;
+        if (playerLeftTouching && movementKeys.up && movementKeys.left && player.air) {
+            player.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
+            player.my = env.global.baseJumpVelocity * player.jumpMult;
+            player.air = true;
         }
-        if (playerRightTouching && movement.up && movement.right && target.air) {
-            target.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
-            target.my = env.global.baseJumpVelocity * target.jumpMult;
-            target.air = true;
+        if (playerRightTouching && movementKeys.up && movementKeys.right && player.air) {
+            player.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
+            player.my = env.global.baseJumpVelocity * player.jumpMult;
+            player.air = true;
         }
     }
-    // get every target-touched block (up to 6, i think?) and run its onTouch action if it exists
+    // get every player-touched block (up to 6, i think?) and run its onTouch action if it exists
 
     
 }
@@ -432,16 +411,9 @@ function blockModification() {
     if (!player.modificationAllowed) return;
     let layer = player.interactionLayer;
 
-    let blockX, blockY
-
     // get the coordinates for the block position under the mouse
-    if (getMobileStatus()) {
-        blockX = Math.floor(mobileInputSelection.x / 64 / camera.scale + camera.x);
-        blockY = Math.ceil(-mobileInputSelection.y / 64 / camera.scale + camera.y);
-    } else {
-        blockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
-        blockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
-    }
+    let blockX = Math.floor(client.mx / 64 / camera.scale + camera.x);
+    let blockY = Math.ceil(-client.my / 64 / camera.scale + camera.y);
 
     // block breaking
     if (keybinds.delete.some(key => keys[key]) && player.breakingBlock == false) {
@@ -674,11 +646,37 @@ function openCrateGUI(x, y) {
     player.modificationAllowed = false;
 }
 
-function killClock() {
-	clearInterval(clock);
+function openFurnaceGUI(x, y, tier) {
+    const furnaceKey = `${x},${y}`;
+    
+    if (!player.furnaces.has(furnaceKey)) {
+        const furnaceData = {
+            items: {
+                input: {id: null, amount: 0},
+                fuel: {id: null, amount: 0},
+                output: {id: null, amount: 0}
+            },
+            tier: tier
+        };
+        player.furnaces.set(furnaceKey, furnaceData);
+    }
+    
+    player.currentFurnace = furnaceKey;
+    player.furnaceOpen = true;
+    player.inventoryOpen = true;
+    createInventoryUI();
+    document.body.appendChild(inventoryGrid);
+    player.modificationAllowed = false;
 }
+
+function killClock() {
+    if (typeof window.clock !== 'undefined') {
+        clearInterval(window.clock);
+    }
+}
+
 function setTickrate(rate) {
-	tickrate = rate;
-	killClock();
-	window.clock = setInterval(gameTick, 1000/tickrate);
+    env.global.tickrate = rate;
+    killClock();
+    window.clock = setInterval(gameTick, 1000/rate);
 }

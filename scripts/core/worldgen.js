@@ -198,12 +198,10 @@ function worldGen(start, end) {
                 setBlock(worldgen.x, env.global.worldSeaLevel, 'watertop');
                 setBlock(worldgen.x, worldgen.y, 'sand');
                 setBlock(worldgen.x, worldgen.y, 'sand', 'bg');
-                setBlock(worldgen.x, worldgen.y-1, 'sand');
-                setBlock(worldgen.x, worldgen.y-1, 'sand', 'bg');
                 for (var i = env.global.worldSeaLevel - 1; i > worldgen.y; i--) {
                     setBlock(worldgen.x, i, 'water');
                 }
-                for (var i = worldgen.y - 2; i > worldgen.y - 5 + layerOffset0; i--) {
+                for (var i = worldgen.y - 1; i > worldgen.y - 5 + layerOffset0; i--) {
                     setBlock(worldgen.x, i, 'dirt');
                     setBlock(worldgen.x, i, 'dirt', 'bg');
                 }

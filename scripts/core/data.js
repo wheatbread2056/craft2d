@@ -74,8 +74,67 @@ const initialBlockList = [
     //
     
     // crafting table aka the crafter
+
     { id: 'crafter', name: 'Crafter', col: true, sel: true, h: 5, actions: {onInteract: () => {openCraftingGUI();}}},
     
+    // furnace blocks
+    { id: 'furnace1', name: 'Basic Smelter', col: true, sel: true, h: 15, type: 'pickaxe', level: 2, actions: {
+        onInteract: (x, y, layer) => {
+            openFurnaceGUI(x, y, 1);
+        },
+        onBreak: (x, y, layer) => {
+            // Drop all items from the furnace when broken
+            const furnaceKey = `${x},${y}`;
+            const furnaceData = player.furnaces.get(furnaceKey);
+            if (furnaceData) {
+                // Add all furnace items to player inventory
+                for (let slotId in furnaceData.items) {
+                    let item = furnaceData.items[slotId];
+                    if (item.id && item.amount > 0) {
+                        player.inventory.addItem(item.id, item.amount);
+                    }
+                }
+                player.furnaces.delete(furnaceKey);
+            }
+        }
+    }},
+    { id: 'furnace2', name: 'Advanced Smelter', col: true, sel: true, h: 25, type: 'pickaxe', level: 4, actions: {
+        onInteract: (x, y, layer) => {
+            openFurnaceGUI(x, y, 2);
+        },
+        onBreak: (x, y, layer) => {
+            const furnaceKey = `${x},${y}`;
+            const furnaceData = player.furnaces.get(furnaceKey);
+            if (furnaceData) {
+                for (let slotId in furnaceData.items) {
+                    let item = furnaceData.items[slotId];
+                    if (item.id && item.amount > 0) {
+                        player.inventory.addItem(item.id, item.amount);
+                    }
+                }
+                player.furnaces.delete(furnaceKey);
+            }
+        }
+    }},
+    { id: 'furnace3', name: 'Master Furnace', col: true, sel: true, h: 35, type: 'pickaxe', level: 6, actions: {
+        onInteract: (x, y, layer) => {
+            openFurnaceGUI(x, y, 3);
+        },
+        onBreak: (x, y, layer) => {
+            const furnaceKey = `${x},${y}`;
+            const furnaceData = player.furnaces.get(furnaceKey);
+            if (furnaceData) {
+                for (let slotId in furnaceData.items) {
+                    let item = furnaceData.items[slotId];
+                    if (item.id && item.amount > 0) {
+                        player.inventory.addItem(item.id, item.amount);
+                    }
+                }
+                player.furnaces.delete(furnaceKey);
+            }
+        }
+    }},
+
     //
     ///// Category: Construction blocks
     //
@@ -231,28 +290,14 @@ const initialBlockList = [
     ///// Category: testing / internal
     //
 
-    // mobs (these shouldnt be blocks but whatever)
     { id: 'player', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'woman', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'pig', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'cow', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'chicken', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'zombie', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    // slimes (blue, green, orange, purple, red, yellow)
-    { id: 'slime_blue', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'slime_green', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'slime_orange', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'slime_purple', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'slime_red', name: undefined, col: false, sel: false, t: true, h: Infinity },
-    { id: 'slime_yellow', name: undefined, col: false, sel: false, t: true, h: Infinity },
-
-    // rest of testing
     { id: 'test', name: undefined, col: true, sel: false, h: 5, actions: { onPlace() {console.log('placed test block');}, onBreak() {console.log('broke test block');}, onInteract(x,y) {console.log('interacted with test block');}, onTouch() {console.log('touched test block');} } }, // test block, used for testing purposes
     { id: 'watertop_render1', name: undefined, col: false, sel: false, t: true, h: Infinity },
     { id: 'watertop_render2', name: undefined, col: false, sel: false, t: true, h: Infinity },
     { id: 'watertop_render3', name: undefined, col: false, sel: false, t: true, h: Infinity },
     { id: 'watertop_render4', name: undefined, col: false, sel: false, t: true, h: Infinity },
 ];
+// Remove the duplicate furnace definitions that were outside the array
 const tools = [ // 
     // wooden, stone, copper, iron, gold, diamond, emerald, ruby, zyrite
     // dev tools (template textures)
@@ -293,6 +338,7 @@ const tools = [ //
 ];
 const items = [
     { id: 'stick', name: 'Stick'},
+    { id: 'coal', name: 'Coal' },
     { id: 'gold_stick', name: 'Gold Stick' },
     { id: 'diamond_stick', name: 'Diamond Stick' },
     { id: 'emerald_stick', name: 'Emerald Stick' },
@@ -446,6 +492,11 @@ const recipes = {
     'cglass14': { output: 4, ingredients: { 'glass': 4, 'dye14': 1 } },
     'cglass15': { output: 4, ingredients: { 'glass': 4, 'dye15': 1 } },
     'cglass16': { output: 4, ingredients: { 'glass': 4, 'dye16': 1 } },
+    // furnace recipes
+    // Add furnace recipes to recipes object
+    'furnace1': { output: 1, ingredients: { 'cobblestone1': 4 } },
+    'furnace2': { output: 1, ingredients: { 'iron_bar': 3, 'copper_bar': 3, 'gold_bar': 3 } },
+    'furnace3': { output: 1, ingredients: { 'copper_bar': 3, 'iron_bar': 3, 'gold_bar': 3, 'diamond_bar': 3, 'emerald_bar': 3 } },
 }
 const overlays = ['breaking1', 'breaking2', 'breaking3', 'breaking4','blockselect'];
 for (let block of initialBlockList) {
