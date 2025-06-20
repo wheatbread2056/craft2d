@@ -46,8 +46,6 @@ function fileMenu() {
         left: 50%;
         width: 65vw;
         transform: translate(-50%, -50%);
-        background-color:rgba(0, 0, 0, 0.69);
-        backdrop-filter: blur(10px);
         padding: 25px;
     `;
     subcontainer.style = `
