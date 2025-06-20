@@ -182,197 +182,198 @@ function handlePlayerHealth() {
 }
 
 // manages both physics/collision and movement
-function playerPhysics() {
+// this says player physics but its also for mobs, just not renaming it cause it will break a LOT.
+function playerPhysics(target) {
     // user-triggered actions aka movement
-    if (player.controlAllowed) {
-        if (player.fly == false) {
-            if (!player.air && !player.inWater) {
+    if (target.controlAllowed) {
+        if (target.fly == false) {
+            if (!target.air && !target.inWater) {
                 if (movementKeys.left) {
-                    player.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * player.speedMult;
-                    if (player.mx < -env.global.baseSpeedVelocity * player.speedMult) {
-                        player.mx = -env.global.baseSpeedVelocity * player.speedMult;
+                    target.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
+                    if (target.mx < -env.global.baseSpeedVelocity * target.speedMult) {
+                        target.mx = -env.global.baseSpeedVelocity * target.speedMult;
                     }
-                    player.acc = true;
+                    target.acc = true;
                 }
                 if (movementKeys.right) {
-                    player.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * player.speedMult;
-                    if (player.mx > env.global.baseSpeedVelocity * player.speedMult) {
-                        player.mx = env.global.baseSpeedVelocity * player.speedMult;
+                    target.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
+                    if (target.mx > env.global.baseSpeedVelocity * target.speedMult) {
+                        target.mx = env.global.baseSpeedVelocity * target.speedMult;
                     }
-                    player.acc = true;
+                    target.acc = true;
                 }
             } else {
                 if (movementKeys.left) {
-                    player.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * player.speedMult;
+                    target.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
                 }
                 if (movementKeys.right) {
-                    player.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * player.speedMult;
+                    target.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
                 }
             }
-            if (!player.inWater) {
+            if (!target.inWater) {
                 // took me an insanely long amount of time to find this
-                // but this is for the player ** JUMP **
-                if (movementKeys.up && player.air == false) {
+                // but this is for the target ** JUMP **
+                if (movementKeys.up && target.air == false) {
                     // 0.21 y vel = around 2.1 block jump height and 0.2 is under 2 blocks
-                    player.my = env.global.baseJumpVelocity * player.jumpMult;
-                    player.air = true;
+                    target.my = env.global.baseJumpVelocity * target.jumpMult;
+                    target.air = true;
                 }
             }
             else { // water movement
                 if (movementKeys.up) {
-                    player.my += 0.1 / (client.renderTickrateComputed / 60) * player.jumpMult;
+                    target.my += 0.1 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 }
                 if (movementKeys.down) {
-                    player.my -= 0.2 / (client.renderTickrateComputed / 60) * player.jumpMult;
+                    target.my -= 0.2 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 }
             }
         }
         
         // fly movement
 
-        else if (player.fly == true) {
+        else if (target.fly == true) {
             if (movementKeys.left) {
-                player.mx += -7.2 / (client.renderTickrateComputed / 60) * player.speedMult;
-                if (player.mx < -24 * player.speedMult) {
-                    player.mx = -24 * player.speedMult;
+                target.mx += -7.2 / (client.renderTickrateComputed / 60) * target.speedMult;
+                if (target.mx < -24 * target.speedMult) {
+                    target.mx = -24 * target.speedMult;
                 }
-                player.flyx = true;
+                target.flyx = true;
             }
             if (movementKeys.right) {
-                player.mx += 7.2 / (client.renderTickrateComputed / 60) * player.speedMult;
-                if (player.mx > 24 * player.speedMult) {
-                    player.mx = 24 * player.speedMult;
+                target.mx += 7.2 / (client.renderTickrateComputed / 60) * target.speedMult;
+                if (target.mx > 24 * target.speedMult) {
+                    target.mx = 24 * target.speedMult;
                 }
-                player.flyx = true;
+                target.flyx = true;
             }
             if (movementKeys.up) {
-                player.my += 2.4 / (client.renderTickrateComputed / 60) * player.jumpMult;
-                if (player.my > 12 * player.jumpMult) {
-                    player.my = 12 * player.jumpMult;
+                target.my += 2.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
+                if (target.my > 12 * target.jumpMult) {
+                    target.my = 12 * target.jumpMult;
                 }
-                player.flyy = true;
+                target.flyy = true;
             }
             if (movementKeys.down) {
-                player.my -= 2.4 / (client.renderTickrateComputed / 60) * player.jumpMult;
-                if (player.my < -12 * player.jumpMult) {
-                    player.my = -12 * player.jumpMult;
+                target.my -= 2.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
+                if (target.my < -12 * target.jumpMult) {
+                    target.my = -12 * target.jumpMult;
                 }
-                player.flyy = true;
+                target.flyy = true;
             }
         }
     }
 
     // check if in water
-    let previousWater = player.inWater;
-    player.inWater = getBlock(Math.round(player.x),Math.floor(player.y)) == 'water' || getBlock(Math.round(player.x),Math.floor(player.y + 0.5)) == 'watertop';
-    if (player.inWater) {
-        player.air = false;
+    let previousWater = target.inWater;
+    target.inWater = getBlock(Math.round(target.x),Math.floor(target.y)) == 'water' || getBlock(Math.round(target.x),Math.floor(target.y + 0.5)) == 'watertop';
+    if (target.inWater) {
+        target.air = false;
     }
-    if (player.inWater && !previousWater) {
+    if (target.inWater && !previousWater) {
         // this is very loud.
         // playSound('sfx/splash.wav', 0.4);
     }
 
     // disable acceleration mode when needed (prevents endless sliding)
-    if (player.fly == false) {
+    if (target.fly == false) {
         if (!(movementKeys.left || movementKeys.right)) {
-            player.acc = false;
+            target.acc = false;
         }
     } else {
         if (!(movementKeys.left || movementKeys.right)) {
-            player.flyx = false;
+            target.flyx = false;
         }
         if (!(movementKeys.up || movementKeys.down)) {
-            player.flyy = false;
+            target.flyy = false;
         }
     }
     
 
     // gravity
-    if (player.fly == false) {
-        if (player.inWater) { // buoyancy
-            player.my += 0.1 / (client.renderTickrateComputed / 60);
-            player.my *= Math.pow(0.98, 60 / client.renderTickrateComputed);
+    if (target.fly == false) {
+        if (target.inWater) { // buoyancy
+            target.my += 0.1 / (client.renderTickrateComputed / 60);
+            target.my *= Math.pow(0.98, 60 / client.renderTickrateComputed);
         } else {
-            player.my += env.global.gravity * (60 / client.renderTickrateComputed);
+            target.my += env.global.gravity * (60 / client.renderTickrateComputed);
         }
     }
     
     for (let i = 0; i < env.global.physicsQuality; i++) {
         // momentum & friction
-        player.x += player.mx / client.renderTickrateComputed / env.global.physicsQuality;
-        player.y += player.my / client.renderTickrateComputed / env.global.physicsQuality;
-        if (player.fly == false) { // normal non-flying friction
-            if (player.air || player.inWater) { // air friction
-                player.mx *= Math.pow(0.98, 60 / client.renderTickrateComputed / env.global.physicsQuality);
-            } else if (!player.acc) { // ground friction
-                player.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+        target.x += target.mx / client.renderTickrateComputed / env.global.physicsQuality;
+        target.y += target.my / client.renderTickrateComputed / env.global.physicsQuality;
+        if (target.fly == false) { // normal non-flying friction
+            if (target.air || target.inWater) { // air friction
+                target.mx *= Math.pow(0.98, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            } else if (!target.acc) { // ground friction
+                target.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
         } else { // flying friction
-            if (player.flyx == false) {
-                player.mx *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            if (target.flyx == false) {
+                target.mx *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
-            if (player.flyy == false) {
-                player.my *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            if (target.flyy == false) {
+                target.my *= Math.pow(0.8, 60 / client.renderTickrateComputed / env.global.physicsQuality);
             }
         }
         
         // COLLISION
         // rewritten in alpha 1.8 - should be much better
         // this is actually AMAZING.
-        if (!player.noclip) {
-            playertop = player.y;
-            playerbottom = player.y - 1;
-            playerleft = player.x;
-            playerright = player.x + 1;
-            playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(player.y)));
-            playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(player.y)));
-            // player bottom collision
+        if (!target.noclip) {
+            playertop = target.y;
+            playerbottom = target.y - 1;
+            playerleft = target.x;
+            playerright = target.x + 1;
+            playerLeftTouching = (getBlockCollision(Math.floor(playerleft), Math.round(target.y)));
+            playerRightTouching = (getBlockCollision(Math.floor(playerright), Math.round(target.y)));
+            // target bottom collision
             if (playerLeftTouching) {
-                player.mx = 0;
-                player.x = Math.ceil(playerleft);
+                target.mx = 0;
+                target.x = Math.ceil(playerleft);
             }
             if (playerRightTouching) {
-                player.mx = 0;
-                player.x = Math.floor(playerleft);
+                target.mx = 0;
+                target.x = Math.floor(playerleft);
             }
             playerBottomTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.ceil(playerbottom)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.ceil(playerbottom)));
             if (playerBottomTouching) {
-                if (player.my < -21.6 && !player.invulnerable) {
-                    // fall damage based on the player's vertical velocity
-                    player.health -= ((player.my*2/60) * (player.my*2/60) * (player.my*2/60) * (player.my*2/60)) * 160;
+                if (target.my < -21.6 && !target.invulnerable) {
+                    // fall damage based on the target's vertical velocity
+                    target.health -= ((target.my*2/60) * (target.my*2/60) * (target.my*2/60) * (target.my*2/60)) * 160;
                     handlePlayerHealth();
                     playSound('sfx/hitHurt.wav');
                 };
-                player.air = false;
-                player.my = 0;
-                player.y = Math.ceil(player.y);
+                target.air = false;
+                target.my = 0;
+                target.y = Math.ceil(target.y);
             } else {
-                if (!player.inWater) {
-                    player.air = true;
+                if (!target.inWater) {
+                    target.air = true;
                 }
             }
             playerTopTouching = (getBlockCollision(Math.floor(playerleft + (1/8)), Math.floor(playertop + 1)) || getBlockCollision(Math.floor(playerright - (1/8)), Math.floor(playertop + 1)))
             if (playerTopTouching && !playerBottomTouching) {
-                player.my = 0;
-                player.y = Math.floor(playertop);
+                target.my = 0;
+                target.y = Math.floor(playertop);
             }
         }
     }
     // walljumping
     if (env.global.walljumpEnabled) {
-        if (playerLeftTouching && movementKeys.up && movementKeys.left && player.air) {
-            player.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
-            player.my = env.global.baseJumpVelocity * player.jumpMult;
-            player.air = true;
+        if (playerLeftTouching && movementKeys.up && movementKeys.left && target.air) {
+            target.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
+            target.my = env.global.baseJumpVelocity * target.jumpMult;
+            target.air = true;
         }
-        if (playerRightTouching && movementKeys.up && movementKeys.right && player.air) {
-            player.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * player.jumpMult;
-            player.my = env.global.baseJumpVelocity * player.jumpMult;
-            player.air = true;
+        if (playerRightTouching && movementKeys.up && movementKeys.right && target.air) {
+            target.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
+            target.my = env.global.baseJumpVelocity * target.jumpMult;
+            target.air = true;
         }
     }
-    // get every player-touched block (up to 6, i think?) and run its onTouch action if it exists
+    // get every target-touched block (up to 6, i think?) and run its onTouch action if it exists
 
     
 }

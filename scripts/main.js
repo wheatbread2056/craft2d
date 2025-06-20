@@ -49,7 +49,7 @@ function renderTick() {
     }
     // visible
     updateCommonValues();
-    playerPhysics();
+    playerPhysics(player);
     blockModification();
     renderWorld(camera.x, camera.y);
     renderOverlay(globalCtx, camera.x, camera.y);
