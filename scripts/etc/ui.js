@@ -306,7 +306,8 @@ function createInventoryUI() {
             crateContainer.style.width = '576px';
 
             // Crate title
-            const crateTitle = document.createElement('h2');
+            const crateTitle = document.createElement('h3');
+            crateTitle.style.fontWeight = 'normal';
             crateTitle.innerHTML = 'Wooden Crate';
             crateTitle.style.textAlign = 'center';
             crateTitle.style.margin = '0 0 16px 0';
@@ -316,11 +317,10 @@ function createInventoryUI() {
             const crateGrid = document.createElement('div');
             crateGrid.style.display = 'grid';
             crateGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
-            crateGrid.style.gap = '4px';
+            crateGrid.style.gap = '12px';
             crateGrid.style.justifyContent = 'center';
             crateGrid.style.marginBottom = '16px';
             crateGrid.style.padding = '8px';
-            crateGrid.style.backgroundColor = 'rgba(139, 69, 19, 0.2)';
 
             const crateData = player.crates.get(player.currentCrate);
             for (let slotId = 1; slotId <= crateData.size; slotId++) {
@@ -360,11 +360,12 @@ function createInventoryUI() {
             playerInventoryTitle.innerHTML = 'Your Inventory';
             playerInventoryTitle.style.textAlign = 'center';
             playerInventoryTitle.style.margin = '16px 0 8px 0';
+            playerInventoryTitle.style.fontWeight = 'normal';
 
             const playerGrid = document.createElement('div');
             playerGrid.style.display = 'grid';
             playerGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
-            playerGrid.style.gap = '4px';
+            playerGrid.style.gap = '12px';
             playerGrid.style.justifyContent = 'center';
 
             for (let slotId in player.inventory.slots) {
@@ -402,212 +403,6 @@ function createInventoryUI() {
             crateContainer.appendChild(playerInventoryTitle);
             crateContainer.appendChild(playerGrid);
             inventoryGrid.appendChild(crateContainer);
-        } else if (player.furnaceOpen) {
-            // FURNACE INTERFACE
-            const furnaceContainer = document.createElement('div');
-            furnaceContainer.style.display = 'flex';
-            furnaceContainer.style.flexDirection = 'column';
-            furnaceContainer.style.width = '576px';
-
-            // Furnace title
-            const furnaceData = player.furnaces.get(player.currentFurnace);
-            const furnaceTitle = document.createElement('h2');
-            furnaceTitle.innerHTML = `Tier ${furnaceData.tier} Furnace`;
-            furnaceTitle.style.textAlign = 'center';
-            furnaceTitle.style.margin = '0 0 16px 0';
-            furnaceContainer.appendChild(furnaceTitle);
-
-            // Furnace slots container
-            const furnaceSlotContainer = document.createElement('div');
-            furnaceSlotContainer.style.display = 'flex';
-            furnaceSlotContainer.style.justifyContent = 'center';
-            furnaceSlotContainer.style.alignItems = 'center';
-            furnaceSlotContainer.style.gap = '20px';
-            furnaceSlotContainer.style.marginBottom = '16px';
-            furnaceSlotContainer.style.padding = '16px';
-            furnaceSlotContainer.style.backgroundColor = 'rgba(139, 69, 19, 0.2)';
-
-            // Input slot
-            const inputSlot = newBlockSlot('furnace_input', true);
-            const inputItem = furnaceData.items.input;
-            if (inputItem && inputItem.id !== null) {
-                let blockImage = globalImages[inputItem.id].cloneNode(true);
-                blockImage.style.width = '48px';
-                blockImage.style.height = '48px';
-                blockImage.style.imageRendering = 'pixelated';
-                inputSlot.appendChild(blockImage);
-                
-                if (inputItem.amount > 1) {
-                    const amountText = document.createElement('span');
-                    amountText.style.position = 'absolute';
-                    amountText.style.bottom = '2px';
-                    amountText.style.right = '2px';
-                    amountText.style.color = '#fff';
-                    amountText.style.fontSize = '16px';
-                    amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-                    amountText.textContent = inputItem.amount;
-                    inputSlot.appendChild(amountText);
-                }
-            }
-            inputSlot.addEventListener('click', () => {
-                handleFurnaceSlotClick('furnace_input', 'input');
-            });
-
-            // Fuel slot (for all tiers, but different fuels)
-            const fuelSlot = newBlockSlot('furnace_fuel', true);
-            const fuelItem = furnaceData.items.fuel;
-            if (fuelItem && fuelItem.id !== null) {
-                let blockImage = globalImages[fuelItem.id].cloneNode(true);
-                blockImage.style.width = '48px';
-                blockImage.style.height = '48px';
-                blockImage.style.imageRendering = 'pixelated';
-                fuelSlot.appendChild(blockImage);
-                
-                if (fuelItem.amount > 1) {
-                    const amountText = document.createElement('span');
-                    amountText.style.position = 'absolute';
-                    amountText.style.bottom = '2px';
-                    amountText.style.right = '2px';
-                    amountText.style.color = '#fff';
-                    amountText.style.fontSize = '16px';
-                    amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-                    amountText.textContent = fuelItem.amount;
-                    fuelSlot.appendChild(amountText);
-                }
-            }
-            fuelSlot.addEventListener('click', () => {
-                handleFurnaceSlotClick('furnace_fuel', 'fuel');
-            });
-
-            // Output slot
-            const outputSlot = newBlockSlot('furnace_output', true);
-            const outputItem = furnaceData.items.output;
-            if (outputItem && outputItem.id !== null) {
-                let blockImage = globalImages[outputItem.id].cloneNode(true);
-                blockImage.style.width = '48px';
-                blockImage.style.height = '48px';
-                blockImage.style.imageRendering = 'pixelated';
-                outputSlot.appendChild(blockImage);
-                
-                if (outputItem.amount > 1) {
-                    const amountText = document.createElement('span');
-                    amountText.style.position = 'absolute';
-                    amountText.style.bottom = '2px';
-                    amountText.style.right = '2px';
-                    amountText.style.color = '#fff';
-                    amountText.style.fontSize = '16px';
-                    amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-                    amountText.textContent = outputItem.amount;
-                    outputSlot.appendChild(amountText);
-                }
-            }
-            outputSlot.addEventListener('click', () => {
-                handleFurnaceSlotClick('furnace_output', 'output');
-            });
-
-            // Smelt button
-            const smeltButton = document.createElement('button');
-            smeltButton.style.height = '32px';
-            smeltButton.style.width = '128px';
-            smeltButton.style.backgroundColor = '#000000ff';
-            smeltButton.style.border = '2px solid #ffffff';
-            smeltButton.style.margin = '0 10px';
-            smeltButton.innerHTML = 'Smelt';
-            smeltButton.onclick = () => {
-                smeltOre(furnaceData);
-            };
-
-            // Add slots to container
-            const inputLabel = document.createElement('div');
-            inputLabel.innerHTML = 'Input<br>Ore';
-            inputLabel.style.textAlign = 'center';
-            inputLabel.style.fontSize = '12px';
-            const inputContainer = document.createElement('div');
-            inputContainer.style.display = 'flex';
-            inputContainer.style.flexDirection = 'column';
-            inputContainer.style.alignItems = 'center';
-            inputContainer.appendChild(inputLabel);
-            inputContainer.appendChild(inputSlot);
-            furnaceSlotContainer.appendChild(inputContainer);
-
-            // Fuel label based on tier
-            const fuelLabel = document.createElement('div');
-            if (furnaceData.tier === 1) {
-                fuelLabel.innerHTML = 'Fuel<br>Stick/Coal';
-            } else {
-                fuelLabel.innerHTML = 'Fuel<br>Coal';
-            }
-            fuelLabel.style.textAlign = 'center';
-            fuelLabel.style.fontSize = '12px';
-            const fuelContainer = document.createElement('div');
-            fuelContainer.style.display = 'flex';
-            fuelContainer.style.flexDirection = 'column';
-            fuelContainer.style.alignItems = 'center';
-            fuelContainer.appendChild(fuelLabel);
-            fuelContainer.appendChild(fuelSlot);
-            furnaceSlotContainer.appendChild(fuelContainer);
-
-            furnaceSlotContainer.appendChild(smeltButton);
-
-            const outputLabel = document.createElement('div');
-            outputLabel.innerHTML = 'Output<br>Bar';
-            outputLabel.style.textAlign = 'center';
-            outputLabel.style.fontSize = '12px';
-            const outputContainer = document.createElement('div');
-            outputContainer.style.display = 'flex';
-            outputContainer.style.flexDirection = 'column';
-            outputContainer.style.alignItems = 'center';
-            outputContainer.appendChild(outputLabel);
-            outputContainer.appendChild(outputSlot);
-            furnaceSlotContainer.appendChild(outputContainer);
-
-            // Player inventory (bottom part)
-            const playerInventoryTitle = document.createElement('h3');
-            playerInventoryTitle.innerHTML = 'Your Inventory';
-            playerInventoryTitle.style.textAlign = 'center';
-            playerInventoryTitle.style.margin = '16px 0 8px 0';
-
-            const playerGrid = document.createElement('div');
-            playerGrid.style.display = 'grid';
-            playerGrid.style.gridTemplateColumns = 'repeat(9, 50px)';
-            playerGrid.style.gap = '4px';
-            playerGrid.style.justifyContent = 'center';
-
-            for (let slotId in player.inventory.slots) {
-                const playerSlot = newBlockSlot(slotId, false);
-                const item = player.inventory.getSlot(slotId);
-                
-                if (item && item.id !== null) {
-                    let blockImage = globalImages[item.id].cloneNode(true);
-                    blockImage.style.width = '48px';
-                    blockImage.style.height = '48px';
-                    blockImage.style.imageRendering = 'pixelated';
-                    playerSlot.appendChild(blockImage);
-                    
-                    if (item.amount > 1) {
-                        const amountText = document.createElement('span');
-                        amountText.style.position = 'absolute';
-                        amountText.style.bottom = '2px';
-                        amountText.style.right = '2px';
-                        amountText.style.color = '#fff';
-                        amountText.style.fontSize = '16px';
-                        amountText.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-                        amountText.textContent = item.amount;
-                        playerSlot.appendChild(amountText);
-                    }
-                }
-                
-                playerSlot.addEventListener('click', () => {
-                    handleFurnaceSlotClick(slotId, null);
-                });
-                
-                playerGrid.appendChild(playerSlot);
-            }
-
-            furnaceContainer.appendChild(furnaceSlotContainer);
-            furnaceContainer.appendChild(playerInventoryTitle);
-            furnaceContainer.appendChild(playerGrid);
-            inventoryGrid.appendChild(furnaceContainer);
         } else {
 
             for (let slotId in player.inventory.slots) {
@@ -834,7 +629,7 @@ function renderInfoText() {
         }
         infoLn1.innerHTML = `<b>player</b>: (<red>${player.x.toFixed(2)}</red>, <cyan>${player.y.toFixed(2)}</cyan>) | velocity (<yellow>${player.mx.toFixed(2)}</yellow>, <yellow>${player.my.toFixed(2)}</yellow>) | air <${player.air}>${player.air}</${player.air}>, acc <${player.acc}>${player.acc}</${player.acc}>, fly <${player.fly}>${player.fly}</${player.fly}>, water <${player.inWater}>${player.inWater}</${player.inWater}>`;
         infoLn2.innerHTML = `<b>world</b>: <yellow>${blocksRendered}</yellow> blocks rendered, <yellow>${world.fg.size + world.bg.size}</yellow> (<${worldSizeColor}>${((world.fg.size + world.bg.size) / (2**24*2) * 200).toFixed(2)}%</${worldSizeColor}>) chunks stored, <yellow>${env.global.mapxsize}</yellow> map x size, <yellow>${camera.scale}</yellow> camera scale`;
-        infoLn3.innerHTML = `<b>time</b>: rt <yellow>${env.global.renderTickNum}</yellow>, gt <blue>${env.global.gameTickNum}</blue> | target rate <cyan>${env.global.tickrate}</cyan>, actual rate <magenta>${client.gameTickrateComputed}</magenta>, fps <green>${client.renderTickrateComputed}</green> | grade <${performanceColor}>${performanceGrade}</${performanceColor}>`;
+        infoLn3.innerHTML = `<b>time</b>: rt <yellow>${env.global.renderTickNum}</yellow>, gt <blue>${env.global.gameTickNum}</blue> | target rate <cyan>${env.global.tickrate}</cyan>, actual rate <magenta>${client.gameTickrateComputed}</magenta>, fps <green>${client.renderTickrateComputed}</green> | grade <${performanceColor}>${performanceGrade}</${performanceColor}> | <red>${client.mobsRendered}</red> mobs rendered`;
     } else {
         infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
@@ -922,162 +717,4 @@ function swapCrateItems(fromSlot, toSlot, toCrateSlot) {
     } else {
         player.inventory.swapSlots(fromSlot, toSlot);
     }
-}
-
-function handleFurnaceSlotClick(slotId, furnaceSlotType) {
-    if (client.inventorySelectedSlot == null) {
-        client.inventorySelectedSlot = slotId;
-        createInventoryUI();
-    } else {
-        if (client.inventorySelectedSlot !== slotId) {
-            swapFurnaceItems(client.inventorySelectedSlot, slotId, furnaceSlotType);
-        }
-        client.inventorySelectedSlot = null;
-        createInventoryUI();
-    }
-}
-
-function swapFurnaceItems(fromSlot, toSlot, toFurnaceSlot) {
-    const furnaceData = player.furnaces.get(player.currentFurnace);
-    
-    const fromIsFurnace = fromSlot.startsWith('furnace_');
-    const toIsFurnace = toSlot.startsWith('furnace_');
-    
-    let fromItem, toItem;
-    
-    if (fromIsFurnace) {
-        const furnaceSlotType = fromSlot.replace('furnace_', '');
-        fromItem = furnaceData.items[furnaceSlotType];
-    } else {
-        fromItem = player.inventory.getSlot(fromSlot);
-    }
-    
-    if (toIsFurnace) {
-        toItem = furnaceData.items[toFurnaceSlot];
-    } else {
-        toItem = player.inventory.getSlot(toSlot);
-    }
-    
-    // Validate furnace slot restrictions
-    if (toIsFurnace) {
-        if (toFurnaceSlot === 'input') {
-            const validOres = getValidOresForTier(furnaceData.tier);
-            if (fromItem.id && !validOres.includes(fromItem.id)) {
-                return; // Invalid ore for this furnace tier
-            }
-        } else if (toFurnaceSlot === 'fuel') {
-            const validFuels = getValidFuelsForTier(furnaceData.tier);
-            if (fromItem.id && !validFuels.includes(fromItem.id)) {
-                return; // Invalid fuel for this furnace tier
-            }
-        } else if (toFurnaceSlot === 'output') {
-            return; // Cannot manually place items in output slot
-        }
-    }
-    
-    if (fromIsFurnace && toIsFurnace) {
-        const fromSlotType = fromSlot.replace('furnace_', '');
-        const temp = {...furnaceData.items[fromSlotType]};
-        furnaceData.items[fromSlotType] = {...furnaceData.items[toFurnaceSlot]};
-        furnaceData.items[toFurnaceSlot] = temp;
-    } else if (fromIsFurnace && !toIsFurnace) {
-        const furnaceSlotType = fromSlot.replace('furnace_', '');
-        const temp = {...furnaceData.items[furnaceSlotType]};
-        furnaceData.items[furnaceSlotType] = {...player.inventory.slots[toSlot]};
-        player.inventory.slots[toSlot] = temp;
-    } else if (!fromIsFurnace && toIsFurnace) {
-        const temp = {...player.inventory.slots[fromSlot]};
-        player.inventory.slots[fromSlot] = {...furnaceData.items[toFurnaceSlot]};
-        furnaceData.items[toFurnaceSlot] = temp;
-    } else {
-        player.inventory.swapSlots(fromSlot, toSlot);
-    }
-}
-
-function getValidFuelsForTier(tier) {
-    switch (tier) {
-        case 1:
-            return ['stick', 'coal']; // Tier 1 uses sticks AND coal 
-        case 2:
-        case 3:
-            return ['coal']; // Tier 2 and 3 use coal 
-        default:
-            return [];
-    }
-}
-
-function getValidOresForTier(tier) {
-    switch (tier) {
-        case 1:
-            return ['coal_ore', 'copper_ore', 'iron_ore']; // Tier 1 can smelt basic ores
-        case 2:
-            return ['coal_ore', 'copper_ore', 'iron_ore', 'gold_ore']; // Tier 2 adds iron and gold
-        case 3:
-            return ['coal_ore', 'copper_ore', 'iron_ore', 'gold_ore', 'diamond_ore', 'emerald_ore', 'ruby_ore', 'zyrite_ore']; // Tier 3 can smelt all ores
-        default:
-            return [];
-    }
-}
-
-function smeltOre(furnaceData) {
-    const inputItem = furnaceData.items.input;
-    const fuelItem = furnaceData.items.fuel;
-    const outputItem = furnaceData.items.output;
-    
-    if (!inputItem.id || inputItem.amount <= 0) {
-        return; // No input ore
-    }
-    
-    // Check fuel requirement for all tiers
-    const validFuels = getValidFuelsForTier(furnaceData.tier);
-    if (!fuelItem.id || !validFuels.includes(fuelItem.id) || fuelItem.amount <= 0) {
-        return; // No fuel or invalid fuel
-    }
-    
-    // Determine output bar type
-    let outputBarType = null;
-    if (inputItem.id.includes('coal')) outputBarType = 'coal'; // Coal ore becomes coal item
-    else if (inputItem.id.includes('copper')) outputBarType = 'copper_bar';
-    else if (inputItem.id.includes('iron')) outputBarType = 'iron_bar';
-    else if (inputItem.id.includes('gold')) outputBarType = 'gold_bar';
-    else if (inputItem.id.includes('diamond')) outputBarType = 'diamond_bar';
-    else if (inputItem.id.includes('emerald')) outputBarType = 'emerald_bar';
-    else if (inputItem.id.includes('ruby')) outputBarType = 'ruby_bar';
-    else if (inputItem.id.includes('zyrite')) outputBarType = 'zyrite_bar';
-    
-    if (!outputBarType) return; // Invalid ore type
-    
-    // Check if output slot can accept the bar
-    if (outputItem.id && outputItem.id !== outputBarType) {
-        return; // Output slot has different item type
-    }
-    
-    const maxStackSize = stacksizes[outputBarType] || env.global.maxStackSize;
-    if (outputItem.amount >= maxStackSize) {
-        return; // Output slot is full
-    }
-    
-    // Perform smelting
-    inputItem.amount -= 1;
-    if (inputItem.amount <= 0) {
-        inputItem.id = null;
-        inputItem.amount = 0;
-    }
-    
-    // Consume fuel
-    fuelItem.amount -= 1;
-    if (fuelItem.amount <= 0) {
-        fuelItem.id = null;
-        fuelItem.amount = 0;
-    }
-    
-    // Add to output
-    if (!outputItem.id) {
-        outputItem.id = outputBarType;
-        outputItem.amount = 1;
-    } else {
-        outputItem.amount += 1;
-    }
-    
-    createInventoryUI();
 }

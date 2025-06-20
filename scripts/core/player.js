@@ -246,10 +246,6 @@ const player = {
     crates: new Map(), // Map<"x,y", {items: {slotId: {id, amount}}, size: number}>
     currentCrate: null, // coordinates of currently open crate "x,y"
     crateOpen: false,
-    // Add furnace storage system
-    furnaces: new Map(), // Map<"x,y", {items: {input: {id, amount}, fuel: {id, amount}, output: {id, amount}}, tier: number}>
-    currentFurnace: null,
-    furnaceOpen: false,
 };
 const camera = {
     x: 0,

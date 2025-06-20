@@ -31,6 +31,7 @@ function gameTick() { // block physics and other things go here, but player phys
     }
     client.lastGameTick = performance.now();
     blockPhysics();
+    globalUpdateMovement();
     env.global.gameTickNum++;
 }
 
@@ -49,7 +50,8 @@ function renderTick() {
     }
     // visible
     updateCommonValues();
-    playerPhysics();
+    playerPhysics(player);
+    globalPhysics();
     blockModification();
     renderWorld(camera.x, camera.y);
     renderOverlay(globalCtx, camera.x, camera.y);
@@ -60,7 +62,9 @@ function renderTick() {
 
     env.global.renderTickNum++;
     client.oldMx = client.mx; client.oldMy = client.my;
-    requestAnimationFrame(renderTick);
+    if (!env.global.paused) {
+        requestAnimationFrame(renderTick);
+    }
 }
 
 worldGen(-256, 256);
@@ -70,3 +74,9 @@ const finishedLoadTime = Date.now();
 renderTick();
 
 var clock = setInterval(gameTick, 1000/env.global.tickrate);
+
+for (let i = 0; i < 32; i++) {
+    const mob = new Mob();
+    mob.x = Math.random() * 200 - 100;
+    mob.init();
+}
