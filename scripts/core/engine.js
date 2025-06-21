@@ -305,28 +305,19 @@ function playerPhysics(target) {
     // user-triggered actions aka movement
     if (target.controlAllowed) {
         if (target.fly == false) {
-            if (!target.air && !target.inWater) {
-                if (movement.left) {
-                    target.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
-                    if (target.mx < -env.global.baseSpeedVelocity * target.speedMult) {
-                        target.mx = -env.global.baseSpeedVelocity * target.speedMult;
-                    }
-                    target.acc = true;
+            if (movement.left) {
+                target.mx += -env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
+                if (target.mx < -env.global.baseSpeedVelocity * target.speedMult) {
+                    target.mx = -env.global.baseSpeedVelocity * target.speedMult;
                 }
-                if (movement.right) {
-                    target.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
-                    if (target.mx > env.global.baseSpeedVelocity * target.speedMult) {
-                        target.mx = env.global.baseSpeedVelocity * target.speedMult;
-                    }
-                    target.acc = true;
+                target.acc = true;
+            }
+            if (movement.right) {
+                target.mx += env.global.baseSpeedVelocity / 3 / (client.renderTickrateComputed / 60) * target.speedMult;
+                if (target.mx > env.global.baseSpeedVelocity * target.speedMult) {
+                    target.mx = env.global.baseSpeedVelocity * target.speedMult;
                 }
-            } else {
-                if (movement.left) {
-                    target.mx += -env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
-                }
-                if (movement.right) {
-                    target.mx += env.global.baseSpeedVelocity / 24 / (client.renderTickrateComputed / 60) * target.speedMult;
-                }
+                target.acc = true;
             }
             if (!target.inWater) {
                 // took me an insanely long amount of time to find this
@@ -342,7 +333,7 @@ function playerPhysics(target) {
                     target.my += 0.1 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 }
                 if (movement.down) {
-                    target.my -= 0.2 / (client.renderTickrateComputed / 60) * target.jumpMult;
+                    target.my -= 0.4 / (client.renderTickrateComputed / 60) * target.jumpMult;
                 }
             }
         }
@@ -410,8 +401,8 @@ function playerPhysics(target) {
     // gravity
     if (target.fly == false) {
         if (target.inWater) { // buoyancy
-            target.my += 0.1 / (client.renderTickrateComputed / 60);
-            target.my *= Math.pow(0.98, 60 / client.renderTickrateComputed);
+            target.my += 0.2 / (client.renderTickrateComputed / 60);
+            target.my *= Math.pow(0.99, 60 / client.renderTickrateComputed);
         } else {
             target.my += env.global.gravity * (60 / client.renderTickrateComputed);
         }
@@ -422,10 +413,19 @@ function playerPhysics(target) {
         target.x += target.mx / client.renderTickrateComputed / env.global.physicsQuality;
         target.y += target.my / client.renderTickrateComputed / env.global.physicsQuality;
         if (target.fly == false) { // normal non-flying friction
-            if (target.air || target.inWater) { // air friction
-                target.mx *= Math.pow(0.98, 60 / client.renderTickrateComputed / env.global.physicsQuality);
-            } else if (!target.acc) { // ground friction
-                target.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+            if (!target.acc) {
+                if (target.air || target.inWater) { // air friction
+                    target.mx *= Math.pow(0.65, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+                } else { // ground friction
+                    target.mx *= Math.pow(0.5, 60 / client.renderTickrateComputed / env.global.physicsQuality);
+                }
+            }
+            if (Math.abs(target.mx) > env.global.baseSpeedVelocity * target.speedMult) {
+                if (target.mx > 0) {
+                    target.mx = env.global.baseSpeedVelocity * target.speedMult;
+                } else {
+                    target.mx = -env.global.baseSpeedVelocity * target.speedMult;
+                }
             }
         } else { // flying friction
             if (target.flyx == false) {
@@ -478,22 +478,6 @@ function playerPhysics(target) {
             }
         }
     }
-    // walljumping
-    if (env.global.walljumpEnabled) {
-        if (playerLeftTouching && movement.up && movement.left && target.air) {
-            target.mx = 7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
-            target.my = env.global.baseJumpVelocity * target.jumpMult;
-            target.air = true;
-        }
-        if (playerRightTouching && movement.up && movement.right && target.air) {
-            target.mx = -7.2 * (env.global.baseJumpVelocity/12.6) * target.jumpMult;
-            target.my = env.global.baseJumpVelocity * target.jumpMult;
-            target.air = true;
-        }
-    }
-    // get every target-touched block (up to 6, i think?) and run its onTouch action if it exists
-
-    
 }
 
 // not currently used - but might be useful later
