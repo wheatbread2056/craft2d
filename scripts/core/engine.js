@@ -125,8 +125,8 @@ function showMob(ctx, x, y, mob) { // same as showBlock, but things like water t
     ctx.globalAlpha = 1.0; // reset alpha
 }
 
-// notes about light: 0 to 10, affects render darkness of both layers.
-function setLight(x, y, value = 10) {
+// notes about light: 0 to 8, affects render darkness of both layers.
+function setLight(x, y, value = 8) {
     const { cx, cy, bx, by } = getChunkAndBlock(x, y);
     const chunk = getChunkMap('light', cx, cy, true);
     chunk.set(blockKey(bx, by), value);
@@ -150,7 +150,7 @@ function getLight(x, y, invert = false) { // invert returns darken level rather 
     if (lightValue == undefined) lightValue = null;
     if (!invert) {
         if (lightValue === null) {
-            return 16; // max value
+            return 8; // max value
         } else {
             return lightValue;
         }
@@ -158,7 +158,7 @@ function getLight(x, y, invert = false) { // invert returns darken level rather 
         if (lightValue === null) {
             return 0;
         } else {
-            return (16 - lightValue) * (1 / 16);
+            return (8 - lightValue) * (1 / 8);
         }
     }
 }
@@ -188,7 +188,7 @@ function updateLightmap() {
         for (let bx = 0; bx < env.global.chunksize; bx++) {
             const x = cx * env.global.chunksize + bx;
             let foundBlock = false;
-            let lightValue = 16;
+            let lightValue = 8;
             for (let y = 175; y >= -32; y--) {
                 // Optimization: skip setLight if value is unchanged
                 if (!foundBlock && collisionMap.has(`${x},${y}`)) {
