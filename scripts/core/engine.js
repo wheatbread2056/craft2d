@@ -184,29 +184,33 @@ function updateLightmap() {
         }
     }
     // For each chunk in nearChunks, update the lightmap column by column
-    for (const {cx, cy} of nearChunks) {
-        for (let bx = 0; bx < env.global.chunksize; bx++) {
-            const x = cx * env.global.chunksize + bx;
-            let foundBlock = false;
-            let lightValue = 8;
-            for (let y = 175; y >= -32; y--) {
-                // Optimization: skip setLight if value is unchanged
-                if (!foundBlock && collisionMap.has(`${x},${y}`)) {
-                    foundBlock = true;
-                    if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
-                    continue;
-                }
-                if (foundBlock) {
-                    if (lightValue > 0) {
-                        lightValue -= 1;
-                    } else {
-                        lightValue = 0;
+    (async () => {
+        for (const {cx, cy} of nearChunks) {
+            for (let bx = 0; bx < env.global.chunksize; bx++) {
+                const x = cx * env.global.chunksize + bx;
+                let foundBlock = false;
+                let lightValue = 8;
+                for (let y = 175; y >= -32; y--) {
+                    // Optimization: skip setLight if value is unchanged
+                    if (!foundBlock && collisionMap.has(`${x},${y}`)) {
+                        foundBlock = true;
+                        if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
+                        continue;
                     }
+                    if (foundBlock) {
+                        if (lightValue > 0) {
+                            lightValue -= 1;
+                        } else {
+                            lightValue = 0;
+                        }
+                    }
+                    if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
                 }
-                if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
             }
+            // Yield to event loop to avoid blocking UI
+            await new Promise(resolve => setTimeout(resolve, 0));
         }
-    }
+    })();
     // report total time spent
     const endTime = performance.now();
     console.log(`Lightmap updated in ${Math.round(endTime - startTime)}ms`);
