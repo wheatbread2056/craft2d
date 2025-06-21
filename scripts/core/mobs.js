@@ -2,7 +2,7 @@ const mobs = [];
 
 // mob class
 class Mob {
-    constructor(type, image) {
+    constructor(type, image, ai, minFollowDistance) {
         // Exclude 'player' from random mob types
         let mobTypes = ['woman','chicken','cow','pig','slime_blue','slime_green','slime_red','slime_yellow','slime_purple','slime_orange','zombie'];
         // properties taken from player
@@ -34,8 +34,23 @@ class Mob {
         if (image) {
             this.image = image;
         }
+        if (ai) {
+            this.ai = ai;
+        } else {
+            this.ai = null;
+        }
+        if (this.ai == 'follow') {
+            this.alwaysFollow = true;
+        } else if (this.ai == 'wander') {
+            this.neverFollow = true;
+        } else {
+            this.alwaysFollow = false;
+            this.neverFollow = false;
+        }
         this.movement = {};
         this.followingPlayer = false;
+        if (minFollowDistance) this.minFollowDistance = minFollowDistance;
+        else this.minFollowDistance = 2;
     }
     init() {
         mobs.push(this);
@@ -44,6 +59,14 @@ class Mob {
         if (typeof this.movement.direction === 'undefined') { // direction doesnt directly mess with physics, just used to determine movement
             this.movement.direction = Math.random() <= 0.5; // false = left, true = right
         }
+
+        // Handle alwaysFollow and neverFollow flags
+        if (this.alwaysFollow) {
+            this.followingPlayer = true;
+        } else if (this.neverFollow) {
+            this.followingPlayer = false;
+        }
+
         if (!this.followingPlayer) {
             this.movement.up = Math.random() < 0.2;
             this.movement.down = Math.random() < 0.5;
@@ -63,6 +86,12 @@ class Mob {
                 this.movement.right = false;
             }
         } else {
+            let distanceToPlayer = Math.sqrt(Math.pow(this.x - player.x, 2) + Math.pow(this.y - player.y, 2));
+            if (distanceToPlayer < this.minFollowDistance) {
+                this.movement.left = false;
+                this.movement.right = false;
+                return;
+            }
             if (this.x < player.x) {
                 this.movement.left = false;
                 this.movement.right = true;
@@ -82,26 +111,27 @@ class Mob {
                 this.movement.up = Math.random() < 0.2;
             }
         }
-        // 1% chance toggle following
-        if (Math.random() < 0.01) {
+
+        // Only toggle followingPlayer if not forced by alwaysFollow/neverFollow
+        if (!this.alwaysFollow && !this.neverFollow && Math.random() < 0.01) {
             this.followingPlayer = !this.followingPlayer;
-            if (this.followingPlayer) {
-                console.warn(`WARNING: You are being chased by a ${this.type}!`);
-            } else {
-                console.warn(`${this.type} gave up on you 🥀🥀🥀`);
-            }
         }
     }
 }
 
-function spawnMob(type, x, y, image) { // shortcut to spawn mob
+function spawnMob(type, x, y, props) { // shortcut to spawn mob
     // Check if mobs are enabled before spawning
     if (!env.global.mobsEnabled) {
         return null;
     }
     
-    const mob = new Mob(type, image);
+    const mob = new Mob(type);
     if (type) mob.type = type;
+    for (const prop in props) {
+        if (props.hasOwnProperty(prop)) {
+            mob[prop] = props[prop];
+        }
+    }
     mob.x = x || 0;
     mob.y = y || 200;
     mob.init();
