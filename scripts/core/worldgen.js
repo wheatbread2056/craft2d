@@ -125,12 +125,6 @@ function worldGen(start, end) {
             }
             const treerng = mapgenrandom(2);
 
-            let hole = false;
-            let holerng = mapgenrandom(3);
-            if (holerng < 0.02) {
-                hole = true;
-            }
-
             let underwater = false;
             if (worldgen.y <= env.global.worldSeaLevel) {
                 underwater = true;
@@ -367,12 +361,7 @@ function worldGen(start, end) {
                     }
                 }
             }
-
-            // make hole
-            if (hole) {
-               explosion(worldgen.x, worldgen.y, 3, true, false);
-            }
-
+            
             worldgen.treedelay--;
 
             worldgen.x++;
