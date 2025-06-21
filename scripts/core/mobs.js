@@ -3,8 +3,8 @@ const mobs = [];
 // mob class
 class Mob {
     constructor(type, image, ai, minFollowDistance) {
-        // Exclude 'player' from random mob types
-        let mobTypes = ['woman','chicken','cow','pig','slime_blue','slime_green','slime_red','slime_yellow','slime_purple','slime_orange','zombie'];
+        // all mob types.
+        let mobTypes = ['player','woman','chicken','cow','pig','slime_blue','slime_green','slime_red','slime_yellow','slime_purple','slime_orange','zombie'];
         // properties taken from player
         this.x = 0;
         this.y = 200;
@@ -27,25 +27,14 @@ class Mob {
         this.regenRate = env.player.defaultRegenRate;
         this.regenAllowed = true;
 
+        if (ai) this.ai = ai;
+
         // mob properties
         if (!type) {
             this.type = mobTypes[Math.floor(Math.random() * mobTypes.length)];
         }
         if (image) {
             this.image = image;
-        }
-        if (ai) {
-            this.ai = ai;
-        } else {
-            this.ai = null;
-        }
-        if (this.ai == 'follow') {
-            this.alwaysFollow = true;
-        } else if (this.ai == 'wander') {
-            this.neverFollow = true;
-        } else {
-            this.alwaysFollow = false;
-            this.neverFollow = false;
         }
         this.movement = {};
         this.followingPlayer = false;
@@ -58,6 +47,17 @@ class Mob {
     updateMovement() {
         if (typeof this.movement.direction === 'undefined') { // direction doesnt directly mess with physics, just used to determine movement
             this.movement.direction = Math.random() <= 0.5; // false = left, true = right
+        }
+
+        if (this.ai == 'follow') {
+            this.alwaysFollow = true;
+            this.neverFollow = false;
+        } else if (this.ai == 'wander') {
+            this.neverFollow = true;
+            this.alwaysFollow = false;
+        } else {
+            this.alwaysFollow = false;
+            this.neverFollow = false;
         }
 
         // Handle alwaysFollow and neverFollow flags
@@ -127,9 +127,11 @@ function spawnMob(type, x, y, props) { // shortcut to spawn mob
     
     const mob = new Mob(type);
     if (type) mob.type = type;
-    for (const prop in props) {
-        if (props.hasOwnProperty(prop)) {
-            mob[prop] = props[prop];
+    if (props) {
+        for (const prop in props) {
+            if (props.hasOwnProperty(prop)) {
+                mob[prop] = props[prop];
+            }
         }
     }
     mob.x = x || 0;
