@@ -42,6 +42,16 @@ const player = {
             return count;
         },
         addItem: function (item, amount = 1) {
+            // Check if item exists in blocks, tools, or items (with safety checks)
+            const itemExists = (typeof blocks !== 'undefined' && blocks[item]) || 
+                              (typeof tools !== 'undefined' && tools.some(tool => tool.id === item)) || 
+                              (typeof items !== 'undefined' && items.some(gameItem => gameItem.id === item));
+            
+            if (!itemExists) {
+                console.error(`Cannot add item "${item}": Item does not exist in game registry (blocks, tools, or items)`);
+                return false;
+            }
+            
             let toAdd = amount;
             // Fill existing stacks first
             while (toAdd > 0) {
@@ -62,7 +72,10 @@ const player = {
                 if (!slot) {
                     slot = this.nextEmptySlot();
                 }
-                if (slot == null) return false;
+                if (slot == null) {
+                    console.warn(`Cannot add item "${item}": Inventory is full`);
+                    return false;
+                }
                 const maxStackSize = (typeof stacksizes === 'object' && stacksizes[item]) ? stacksizes[item] : env.global.maxStackSize;
                 const spaceLeft = maxStackSize - slot.amount;
                 if (spaceLeft <= 0) {
@@ -75,9 +88,22 @@ const player = {
                 slot.amount += addNow;
                 toAdd -= addNow;
             }
+            if (toAdd > 0) {
+                console.warn(`Could only add ${amount - toAdd} of ${amount} "${item}" items due to inventory space`);
+            }
             return toAdd === 0;
         },
         removeItem: function (item, amount = 1, slot = null) {
+            // Check if item exists in blocks, tools, or items (with safety checks)
+            const itemExists = (typeof blocks !== 'undefined' && blocks[item]) || 
+                              (typeof tools !== 'undefined' && tools.some(tool => tool.id === item)) || 
+                              (typeof items !== 'undefined' && items.some(gameItem => gameItem.id === item));
+            
+            if (!itemExists) {
+                console.error(`Cannot remove item "${item}": Item does not exist in game registry (blocks, tools, or items)`);
+                return false;
+            }
+            
             let toRemove = amount;
             if (slot != null && this.slots[slot] && this.slots[slot].id === item) {
             const removeNow = Math.min(toRemove, this.slots[slot].amount);
@@ -98,6 +124,9 @@ const player = {
                 if (toRemove <= 0) break;
                 }
             }
+            }
+            if (toRemove > 0) {
+                console.warn(`Could only remove ${amount - toRemove} of ${amount} "${item}" items from inventory`);
             }
             return toRemove === 0;
         },
@@ -143,6 +172,16 @@ const player = {
             }
         },
         addSlot: function (slot, item, amount = 1) { // addItem but just for 1 slot
+            // Check if item exists in blocks, tools, or items (with safety checks)
+            const itemExists = (typeof blocks !== 'undefined' && blocks[item]) || 
+                              (typeof tools !== 'undefined' && tools.some(tool => tool.id === item)) || 
+                              (typeof items !== 'undefined' && items.some(gameItem => gameItem.id === item));
+            
+            if (!itemExists) {
+                console.error(`Cannot add item "${item}" to slot ${slot}: Item does not exist in game registry (blocks, tools, or items)`);
+                return false;
+            }
+            
             if (this.getItem(slot) == null) {
                 player.inventory.slots[slot].id = item;
             }
@@ -152,12 +191,30 @@ const player = {
                 player.inventory.slots[slot].amount++;
                 toAdd--;
                 if (player.inventory.slots[slot].amount >= stackSize) {
+                    if (toAdd > 0) {
+                        console.warn(`Could only add ${amount - toAdd} of ${amount} "${item}" to slot ${slot} due to stack size limit`);
+                    }
                     return;
                 }
             }
+            return true;
         },
         fixInventory: function () { // fixes: null with amount != 0, any items with amount <= 0, etc. note: overstacks are allowed.
             for (let slot in this.slots) {
+                // Check if slot has an invalid item ID (with safety checks)
+                if (this.slots[slot].id) {
+                    const itemExists = (typeof blocks !== 'undefined' && blocks[this.slots[slot].id]) || 
+                                      (typeof tools !== 'undefined' && tools.some(tool => tool.id === this.slots[slot].id)) || 
+                                      (typeof items !== 'undefined' && items.some(gameItem => gameItem.id === this.slots[slot].id));
+                    
+                    if (!itemExists) {
+                        console.warn(`Removing invalid item "${this.slots[slot].id}" from slot ${slot}: Item does not exist in game registry`);
+                        this.slots[slot].id = null;
+                        this.slots[slot].amount = 0;
+                        continue;
+                    }
+                }
+                
                 if (this.slots[slot].id === null && this.slots[slot].amount > 0) {
                     this.slots[slot].amount = 0; // empty the slot
                 }
