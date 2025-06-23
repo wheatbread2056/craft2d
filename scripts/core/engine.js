@@ -189,7 +189,7 @@ function updateLightmap() {
             for (let bx = 0; bx < env.global.chunksize; bx++) {
                 const x = cx * env.global.chunksize + bx;
                 let foundBlock = false;
-                let lightValue = 8;
+                let lightValue = 16; // update to the poll (we voted on 16)
                 for (let y = 175; y >= -32; y--) {
                     // Optimization: skip setLight if value is unchanged
                     if (!foundBlock && collisionMap.has(`${x},${y}`)) {
