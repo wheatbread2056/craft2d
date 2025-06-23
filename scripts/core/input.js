@@ -193,19 +193,3 @@ function updateCommonValues() {
     player.currentToolType = currentTool?.type || 'none';
     player.currentToolLevel = toolTiers[currentTool?.tier]?.level || 0;
 }
-
-canvas.addEventListener('contextmenu', function(event) {
-    event.preventDefault();
-    
-    if (!player.controlAllowed) return;
-    
-    const mouseX = Math.floor((event.clientX - camera.x) / env.global.blockSize);
-    const mouseY = Math.floor((event.clientY - camera.y) / env.global.blockSize);
-    
-    const blockId = getBlock(mouseX, mouseY);
-    
-    const blockData = allblocks.find(block => block.id === blockId);
-    if (blockData && blockData.actions && blockData.actions.onInteract) {
-        blockData.actions.onInteract(mouseX, mouseY, 'fg');
-    }
-});
