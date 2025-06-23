@@ -345,8 +345,103 @@ overflow: auto;
             // createSetting('controls.blockModificationMode', 'Block modification mode', 'toggle', 'Modern', 'Classic', 'Modern');
             break;
         case 'scripts':
-            createCategory2('adding this later');
+            createCategory2('Custom Script Manager');
             createSetting('scripts.loadCustomScripts', 'Load custom scripts', 'checkbox', undefined, undefined, false);
+            
+            // Upload script button
+            const uploadButton = new MenuButton({text: 'Upload Script', onclick: () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.js';
+                input.onchange = (event) => {
+                    const file = event.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const scriptContent = e.target.result;
+                        const scriptName = file.name.replace('.js', '');
+                        
+                        // Save to localStorage
+                        const existingScripts = JSON.parse(localStorage.getItem('customScripts') || '{}');
+                        existingScripts[scriptName] = scriptContent;
+                        localStorage.setItem('customScripts', JSON.stringify(existingScripts));
+                        
+                        alert(`Script "${scriptName}" uploaded successfully!`);
+                        location.reload(); // Refresh to show new script
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }});
+            
+            uploadButton.button.style.display = 'block';
+            uploadButton.button.style.marginBottom = '8px';
+            uploadButton.appendTo(settingDivs[setting.id]);
+            
+            // List installed scripts
+            createCategory2('Installed Scripts');
+            const customScripts = JSON.parse(localStorage.getItem('customScripts') || '{}');
+            
+            if (Object.keys(customScripts).length === 0) {
+                createCategory('No custom scripts installed');
+            } else {
+                Object.keys(customScripts).forEach(scriptName => {
+                    let container = document.createElement('div');
+                    container.style.display = 'flex';
+                    container.style.justifyContent = 'space-between';
+                    container.style.alignItems = 'center';
+                    container.style.margin = '8px 0';
+                    container.style.padding = '8px';
+                    container.style.backgroundColor = '#ffffff20';
+                    container.style.borderRadius = '4px';
+                    
+                    let label = document.createElement('span');
+                    label.innerHTML = scriptName;
+                    label.style.flex = '1';
+                    container.appendChild(label);
+                    
+                    // Run button
+                    const runButton = new MenuButton({text: 'Run', onclick: () => {
+                        try {
+                            eval(customScripts[scriptName]);
+                            console.log(`Executed script: ${scriptName}`);
+                        } catch (error) {
+                            console.error(`Error running script ${scriptName}:`, error);
+                            alert(`Error running script: ${error.message}`);
+                        }
+                    }});
+                    runButton.button.style.marginRight = '4px';
+                    runButton.button.style.fontSize = '12px';
+                    runButton.button.style.padding = '4px 8px';
+                    runButton.appendTo(container);
+                    
+                    // Remove button
+                    const removeButton = new MenuButton({text: 'Remove', onclick: () => {
+                        if (confirm(`Remove script "${scriptName}"?`)) {
+                            const scripts = JSON.parse(localStorage.getItem('customScripts') || '{}');
+                            delete scripts[scriptName];
+                            localStorage.setItem('customScripts', JSON.stringify(scripts));
+                            location.reload();
+                        }
+                    }});
+                    removeButton.button.style.fontSize = '12px';
+                    removeButton.button.style.padding = '4px 8px';
+                    removeButton.button.style.backgroundColor = '#ff4444';
+                    removeButton.appendTo(container);
+                    
+                    settingDivs[setting.id].appendChild(container);
+                });
+            }
+            
+            // Auto-load scripts if enabled
+            if (localStorage.getItem('scripts.loadCustomScripts') === 'true') {
+                Object.values(customScripts).forEach(scriptContent => {
+                    try {
+                        eval(scriptContent);
+                    } catch (error) {
+                        console.error('Error auto-loading script:', error);
+                    }
+                });
+            }
             break;
         case 'extra':
             // createSetting('extra.playerImage', 'Player image', 'text', undefined, undefined, 'images/blocks/player.png');
