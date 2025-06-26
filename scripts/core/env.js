@@ -29,6 +29,7 @@ const env = {
         chunksize: 32, // size of a chunk in blocks (16x16 = 256 blocks (small), 32x32 = 1024 blocks (default), 64x64 = 4096 blocks (large))
         seed: Math.round(Math.random() * (2147483647*2) - 2147483647),
         mobsEnabled: true, // whether mobs are enabled or not
+        lightEnabled: false, // cant get lighting to work rn and its really annoying that it cant work so just disabling it for now.
     },
     player: {
         defaultMaxHealth: 1000,

@@ -164,6 +164,7 @@ function getLight(x, y, invert = false) { // invert returns darken level rather 
 }
 
 function updateLightmap() {
+    if (!env.global.lightEnabled) {console.warn('no tengo lighte'); return;};
     // start timer
     const startTime = performance.now();
     // Use getNearChunks to only update lightmap near the player
