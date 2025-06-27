@@ -714,7 +714,7 @@ function updateTime() {
 
     // Update the time of day (7200 game ticks = 1 day)
     let startingHour = 7; // 7 AM is the starting hour, in Sunrise stage 2. startingHour isn't meant to be changed.
-    let hour = (env.global.gameTickNum + (startingHour * 300) % 7200) / 7200 * 24;
+    let hour = ((env.global.gameTickNum + (startingHour * 300)) % 7200) / 7200 * 24;
     env.global.time = hour;
 
     // code taken from an old version and slightly modified. and by slightly i mean a lot.
