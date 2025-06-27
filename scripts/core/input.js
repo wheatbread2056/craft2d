@@ -111,7 +111,7 @@ function keydownEvent(key) {
             }
         }
         if (keybinds.MOBTEST.includes(key)) {
-            spawnMob(null, player.x, player.y);
+            spawnMob(null, player.x, player.y, {ai: 'wander'});
         }
 
         // fixes for capslock / shift

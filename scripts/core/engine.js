@@ -164,11 +164,22 @@ function getLight(x, y, invert = false) { // invert returns darken level rather 
 }
 
 function updateLightmap() {
-    if (!env.global.lightEnabled) {console.warn('no tengo lighte'); return;};
+    if (!env.global.lightEnabled) return;
+    
+    // Check cooldown - skip update if not enough time has passed
+    const currentTime = Date.now();
+    if (currentTime - env.global.lastLightUpdate < env.global.lightUpdateCooldown) {
+        return; // Skip update silently
+    }
+    
+    // Update the last light update timestamp
+    env.global.lastLightUpdate = currentTime;
+    
     // start timer
     const startTime = performance.now();
     // Use getNearChunks to only update lightmap near the player
     const nearChunks = getNearChunks(env.global.simulationRadius); // radius can be adjusted as needed
+    
     // Build a collision map for only the near chunks
     const collisionMap = new Set();
     for (const {cx, cy} of nearChunks) {
@@ -184,37 +195,249 @@ function updateLightmap() {
             }
         }
     }
-    // For each chunk in nearChunks, update the lightmap column by column
+    
+    // Create height map - find highest collision block for each column
+    const heightMap = new Map();
+    const minX = Math.min(...nearChunks.map(c => c.cx * env.global.chunksize));
+    const maxX = Math.max(...nearChunks.map(c => (c.cx + 1) * env.global.chunksize - 1));
+    
+    for (let x = minX; x <= maxX; x++) {
+        let highestY = -1000; // Very low starting point
+        for (let y = 175; y >= -32; y--) {
+            if (collisionMap.has(`${x},${y}`)) {
+                highestY = y;
+                break;
+            }
+        }
+        heightMap.set(x, highestY);
+    }
+    
     (async () => {
+        // Phase 1: Calculate sky light based on height map
+        const skyLightMap = new Map();
+        
         for (const {cx, cy} of nearChunks) {
             for (let bx = 0; bx < env.global.chunksize; bx++) {
                 const x = cx * env.global.chunksize + bx;
-                let foundBlock = false;
-                let lightValue = 8; // KEEP THIS AT 8. 8. 8. 8. 8. 8. 8. 8.
-                for (let y = 175; y >= -32; y--) {
-                    // Optimization: skip setLight if value is unchanged
-                    if (!foundBlock && collisionMap.has(`${x},${y}`)) {
-                        foundBlock = true;
-                        if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
-                        continue;
+                const highestBlockY = heightMap.get(x) || -1000;
+                
+                for (let by = 0; by < env.global.chunksize; by++) {
+                    const y = cy * env.global.chunksize + by;
+                    
+                    // Only process blocks within reasonable range
+                    if (y < -32 || y > 175) continue;
+                    
+                    let skyLight = 0;
+                    if (y > highestBlockY) {
+                        // Above highest block - full sky light
+                        skyLight = env.global.skyLightLevel;
+                    } else {
+                        // Below highest block - no sky light
+                        skyLight = 0;
                     }
-                    if (foundBlock) {
-                        if (lightValue > 0) {
-                            lightValue -= 1;
-                        } else {
-                            lightValue = 0;
-                        }
-                    }
-                    if (getLight(x, y) !== lightValue) setLight(x, y, lightValue);
+                    
+                    skyLightMap.set(`${x},${y}`, skyLight);
                 }
             }
-            // Yield to event loop to avoid blocking UI
+            // Yield to event loop periodically
             await new Promise(resolve => setTimeout(resolve, 0));
         }
+        
+        // Phase 2: Propagate light in 4 directions
+        const finalLightMap = new Map();
+        
+        // Initialize with sky light values
+        for (const [pos, skyLight] of skyLightMap) {
+            finalLightMap.set(pos, skyLight);
+        }
+        
+        // Light propagation queue - process highest light levels first
+        const lightQueue = [];
+        
+        // First pass: Set maximum light for blocks directly adjacent to sky light sources
+        for (const [pos, lightLevel] of skyLightMap) {
+            if (lightLevel === env.global.skyLightLevel) { // Only from max sky light sources
+                const [x, y] = pos.split(',').map(Number);
+                
+                // Set adjacent blocks to max light level (not reduced)
+                const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                for (const [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    const nPos = `${nx},${ny}`;
+                    
+                    // Skip if out of reasonable bounds
+                    if (ny < -32 || ny > 175) continue;
+                    
+                    const currentLight = finalLightMap.get(nPos) || 0;
+                    
+                    // Set to max light if current is lower
+                    if (currentLight < env.global.skyLightLevel) {
+                        finalLightMap.set(nPos, env.global.skyLightLevel);
+                        lightQueue.push({x: nx, y: ny, light: env.global.skyLightLevel});
+                    }
+                }
+            }
+        }
+        
+        // Add remaining sky light sources to queue
+        for (const [pos, lightLevel] of skyLightMap) {
+            if (lightLevel > 0) {
+                const [x, y] = pos.split(',').map(Number);
+                lightQueue.push({x, y, light: lightLevel});
+            }
+        }
+        
+        // Sort by light level descending for better propagation
+        lightQueue.sort((a, b) => b.light - a.light);
+        
+        // Process light propagation using flood fill
+        let queueIndex = 0;
+        while (queueIndex < lightQueue.length) {
+            const {x, y, light} = lightQueue[queueIndex];
+            queueIndex++;
+            
+            // Propagate to 4 directions
+            const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            
+            for (const [dx, dy] of directions) {
+                const nx = x + dx;
+                const ny = y + dy;
+                const nPos = `${nx},${ny}`;
+                
+                // Skip if out of reasonable bounds
+                if (ny < -32 || ny > 175) continue;
+                
+                // Calculate new light level (decrease by 1, but only if not already at max from direct touch)
+                const currentLight = finalLightMap.get(nPos) || 0;
+                const newLight = Math.max(0, light - 1);
+                
+                // Only update if new light is higher
+                if (newLight > currentLight) {
+                    finalLightMap.set(nPos, newLight);
+                    
+                    // Add to queue for further propagation if light level is significant
+                    if (newLight > 0) {
+                        lightQueue.push({x: nx, y: ny, light: newLight});
+                    }
+                }
+            }
+            
+            // Yield periodically to avoid blocking
+            if (queueIndex % 500 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+        }
+        
+        // Phase 3: Add ambient light for air blocks
+        // Fill air blocks that don't have sky light with minimum light level
+        for (const {cx, cy} of nearChunks) {
+            for (let bx = 0; bx < env.global.chunksize; bx++) {
+                for (let by = 0; by < env.global.chunksize; by++) {
+                    const x = cx * env.global.chunksize + bx;
+                    const y = cy * env.global.chunksize + by;
+                    const pos = `${x},${y}`;
+                    
+                    // Check if this is an air block (no collision and no actual block)
+                    const isAirBlock = !collisionMap.has(pos) && !getBlock(x, y);
+                    
+                    if (isAirBlock) {
+                        const currentLight = finalLightMap.get(pos) || 0;
+                        
+                        // Only set minimum light if current light is less than minimum
+                        // and it's not already sky-lit
+                        if (currentLight < env.global.minLightLevel) {
+                            finalLightMap.set(pos, env.global.minLightLevel);
+                            // Add to propagation queue for ambient light spreading
+                            lightQueue.push({x, y, light: env.global.minLightLevel});
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Continue propagating ambient light with proper decay
+        while (queueIndex < lightQueue.length) {
+            const {x, y, light} = lightQueue[queueIndex];
+            queueIndex++;
+            
+            // Skip if this light level is too low to propagate
+            if (light <= 0) continue;
+            
+            // Propagate to 4 directions
+            const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            
+            for (const [dx, dy] of directions) {
+                const nx = x + dx;
+                const ny = y + dy;
+                const nPos = `${nx},${ny}`;
+                
+                // Skip if out of reasonable bounds
+                if (ny < -32 || ny > 175) continue;
+                
+                const currentLight = finalLightMap.get(nPos) || 0;
+                
+                // Calculate new light level - ambient light also decays by 1 per step
+                const newLight = Math.max(0, light - 1);
+                
+                // Only update if new light is higher than current
+                if (newLight > currentLight) {
+                    finalLightMap.set(nPos, newLight);
+                    
+                    // Add to queue for further propagation if light level is significant
+                    if (newLight > 0) {
+                        lightQueue.push({x: nx, y: ny, light: newLight});
+                    }
+                }
+            }
+            
+            // Yield periodically to avoid blocking
+            if (queueIndex % 1000 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+        }
+        
+        // Phase 4: Apply light values efficiently
+        // Set light for all positions in the processed chunks
+        for (const [pos, lightLevel] of finalLightMap) {
+            const [x, y] = pos.split(',').map(Number);
+            
+            // Only call setLight if the value changed
+            if (getLight(x, y) !== lightLevel) {
+                setLight(x, y, lightLevel);
+            }
+        }
+        
+        // Also set light for all positions in the processed area that weren't in finalLightMap
+        // This ensures areas without explicit light data get set to appropriate values
+        for (const {cx, cy} of nearChunks) {
+            for (let bx = 0; bx < env.global.chunksize; bx++) {
+                for (let by = 0; by < env.global.chunksize; by++) {
+                    const x = cx * env.global.chunksize + bx;
+                    const y = cy * env.global.chunksize + by;
+                    const pos = `${x},${y}`;
+                    
+                    // Skip if out of bounds
+                    if (y < -32 || y > 175) continue;
+                    
+                    // If this position wasn't processed, set appropriate light level
+                    if (!finalLightMap.has(pos)) {
+                        // Check if it's an air block for ambient light, otherwise 0
+                        const isAirBlock = !collisionMap.has(pos) && !getBlock(x, y);
+                        const defaultLight = isAirBlock ? env.global.minLightLevel : 0;
+                        
+                        if (getLight(x, y) !== defaultLight) {
+                            setLight(x, y, defaultLight);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // report total time spent
+        const endTime = performance.now();
+        console.log(`Advanced lightmap updated in ${Math.round(endTime - startTime)}ms`);
     })();
-    // report total time spent
-    const endTime = performance.now();
-    console.log(`Lightmap updated in ${Math.round(endTime - startTime)}ms`);
 }
 
 function spawnPlayer(spawnx) {
