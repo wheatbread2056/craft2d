@@ -42,23 +42,22 @@ function worldGen(start, end) {
     if (env.global.worldGenType == 'normal') {
         let ores = ['coal', 'copper', 'iron', 'gold', 'diamond', 'emerald', 'ruby', 'zyrite'];
         let oreProperties = {
-            coal: { size: 5, rate: 0.004, minimumStoneType: 1, maxHeight: Infinity },
-            copper: {size: 4, rate: 0.0032, minimumStoneType: 1, maxHeight: Infinity },
-            iron: { size: 4, rate: 0.0025, minimumStoneType: 1, maxHeight: Infinity },
-            gold: { size: 4, rate: 0.0015, minimumStoneType: 1, maxHeight: 32 },
-            diamond: { size: 3, rate: 0.0008, minimumStoneType: 1, maxHeight: 24 },
-            emerald: { size: 3, rate: 0.0004, minimumStoneType: 2, maxHeight: 16 },
-            ruby: { size: 3, rate: 0.00016, minimumStoneType: 2, maxHeight: 0 },
-            zyrite: { size: 1, rate: 0.0001, minimumStoneType: 3, maxHeight: -12 },
+            coal: { size: 5, rate: 0.004, maxHeight: Infinity },
+            copper: {size: 4, rate: 0.0032, maxHeight: Infinity },
+            iron: { size: 4, rate: 0.0025, maxHeight: Infinity },
+            gold: { size: 4, rate: 0.0015, maxHeight: 48 },
+            diamond: { size: 3, rate: 0.0008, maxHeight: 32 },
+            emerald: { size: 3, rate: 0.0004, maxHeight: 16 },
+            ruby: { size: 3, rate: 0.00016, maxHeight: 0 },
+            zyrite: { size: 1, rate: 0.0001, maxHeight: -12 },
         }
 
         function generateOreVein(type, x, y) {
             let veinSize = Math.round(oreProperties[type].size * veinSizeMultiplier);
             let veinRate = oreProperties[type].rate;
-            let minimumStoneType = oreProperties[type].minimumStoneType;
             let maxHeight = oreProperties[type].maxHeight;
 
-            if (Math.random() > veinRate * (1 - (y / 120))) {
+            if (Math.random() > veinRate) {
                 return;
             }
 
@@ -86,7 +85,7 @@ function worldGen(start, end) {
                 let retries = 0;
                 while (retries < 50) {
                     const block = getBlock(x, y);
-                    if (!isVisited(x, y) && block && block.startsWith('stone') && parseInt(block.replace('stone', '')) >= minimumStoneType && parseInt(block.replace('stone', '')) < 4) {
+                    if (!isVisited(x, y) && block && block.startsWith('stone') && parseInt(block.replace('stone', '')) < 4) {
                         let stoneType = getBlock(x, y).replace('stone', '');
                         setBlock(x, y, `ore_${type}${stoneType}`);
                         markVisited(x, y);
