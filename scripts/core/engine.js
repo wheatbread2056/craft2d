@@ -411,9 +411,6 @@ function updateLightmap() {
                     const y = cy * env.global.chunksize + by;
                     const pos = `${x},${y}`;
                     
-                    // Skip if out of bounds
-                    if (y < -32 || y > 175) continue;
-                    
                     // If this position wasn't processed, set appropriate light level
                     if (!finalLightMap.has(pos)) {
                         // Check if it's an air block for ambient light, otherwise 0
