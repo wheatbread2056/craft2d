@@ -135,6 +135,76 @@ function loadWorld() {
         reader.readAsText(file);
         // Clean up input after use
         document.body.removeChild(dummyInput);
+
+        // save conversion here, lots of things to convert older versions to work properly
+        function conversion() {
+            // check first block and see its structure
+            if (world.fg.size > 0) {
+                // get the first chunk
+                let chunkKey = world.fg.keys().next().value;
+                let chunk = world.fg.get(chunkKey);
+
+                // get the first block
+                let firstBlockKey = chunk.keys().next().value;
+                let firstBlock = chunk.get(firstBlockKey);
+                
+                let structureVersion = 'baby keem';
+                // structure versions so far:
+                // pre-survival: before block data, string
+                // alpha 1.12: {id, data} = block format (might not have data)
+                // check structure version
+                if (typeof firstBlock === 'string') {
+                    structureVersion = 'pre-survival';
+                } else if (typeof firstBlock === 'object' && firstBlock.id) {
+                    structureVersion = 'alpha 1.12';
+                } else {
+                    console.error('hello, i am craft2d. i do not know what structure version this is. please report this to the developers.');
+                    console.error(':(');
+                }
+
+                if (structureVersion === 'pre-survival') {
+                    // convert to alpha 1.12 format
+                    for (const [chunkKey, chunk] of world.fg.entries()) {
+                        for (const [blockKey, block] of chunk.entries()) {
+                            // convert string to object
+                            world.fg.get(chunkKey).set(blockKey, {id: block});
+                        }
+                    }
+                    for (const [chunkKey, chunk] of world.bg.entries()) {
+                        for (const [blockKey, block] of chunk.entries()) {
+                            // convert string to object
+                            world.bg.get(chunkKey).set(blockKey, {id: block});
+                        }
+                    }
+                    console.log('hello, i am craft2d. i have converted your very old world.');
+                    console.log(':D');
+                }
+            }
+
+            let someGlobalEnvValues = {
+                mobsEnabled: true, // whether mobs are enabled or not
+                lightEnabled: true, // Advanced lighting system with sky light and 4-directional propagation
+                lightUpdateCooldown: 500, // milliseconds between light updates (2 times per second)
+                lastLightUpdate: 0, // timestamp of last light update
+                skyLightLevel: 8, // maximum light level from sky
+                minLightLevel: 4, // minimum light level for air blocks (ambient light)
+            }
+            // check if env.global has these values, if not, set them
+            for (const key in someGlobalEnvValues) {
+                if (!env.global.hasOwnProperty(key)) {
+                    env.global[key] = someGlobalEnvValues[key];
+                }
+            }
+        }
+
+        // things to do after loading
+        function afterLoad() {
+            spawnMob('woman', player.x, player.y, {ai: 'follow'});
+            updateLightmap();
+        }
+
+        setTimeout(conversion, 100);
+        setTimeout(afterLoad, 200);
     };
     document.body.appendChild(dummyInput);
     dummyInput.click();
