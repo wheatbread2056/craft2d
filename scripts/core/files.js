@@ -199,6 +199,8 @@ function loadWorld() {
 
         // things to do after loading
         function afterLoad() {
+            env.global.paused = true;
+            mobs.length = 0;
             spawnMob('woman', player.x, player.y, {ai: 'follow'});
             updateLightmap();
         }
