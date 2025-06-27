@@ -52,9 +52,14 @@ function worldGen(start, end) {
             zyrite: { size: 1, rate: 0.0001, maxHeight: -12 },
         }
 
-        function generateOreVein(type, x, y) {
+        function generateOreVein(type = null, x, y, guaranteed = false) {
+            if (!type || !oreProperties[type]) {
+                type = ores[Math.floor(Math.random() * ores.length)];
+            }
+            let veinSizeMultiplier = Math.random() * 0.5 + 1;
             let veinSize = Math.round(oreProperties[type].size * veinSizeMultiplier);
             let veinRate = oreProperties[type].rate;
+            if (guaranteed) veinRate = Infinity;
             let maxHeight = oreProperties[type].maxHeight;
 
             if (Math.random() > veinRate) {
@@ -224,10 +229,27 @@ function worldGen(start, end) {
             }
 
             // ore generation
-            var veinSizeMultiplier = mapgenrandom(91) + 0.5;
-            for (let ore of ores) {
-                for (let y = worldgen.y - 1; y >= -24; y--) {
-                    generateOreVein(ore, worldgen.x, y);
+
+            // this is very hard to find
+
+            // so heres an ascii art of a square, to make it easy to find.
+            // #######################################
+            // #######################################
+            // ###                                 ###
+            // ###                                 ###
+            // ###                                 ###
+            // ###                                 ###
+            // ###                                 ###
+            // ###       ore generation            ###
+            // ###                                 ###
+            // ###                                 ###
+            // ###                                 ###
+            // ###                                 ###
+            // #######################################
+            for (var i = worldgen.y - 4; i > -27; i--) {
+                // console.log('trying', worldgen.x, i);
+                for (var tsVariableisNotUsedsoIcanNameItWhateverIWant_TylerGregoryOkonma_aka_tyler_the_creator_is_a_famous_rapper_with_a_net_worth_of_1_billion_Craft2d_coins_in_version_beta_1000_oh_icantTypePeriodsOrCommasThatsReallyUnfortunate_andYouMayhaveNoticedICanOnlyUseUnderscoresAsSpacesSoThatIsAlsoABitAnnoyingButItsFine_butOneDayWhileExploringTheVastPixelatedWorldOfCraft2dHeStumbledUponASecretCaveFilledWithGlowingOres_andAsHeVenturedDeeperHeRealizedThatEachOreHadASpecialPowerGrantingHimAbilitiesLikeSuperJumpAndSpeedBoost_soonHeBecameTheLegendaryMinerKnownThroughoutTheServerForHisEpicAdventures_andEveryPlayerWouldGatherToHearHisTalesOfDiscoveryAndDanger_inspiredByHisJourneyManySetOutToFindTheirOwnHiddenTreasuresButNoneCouldMatchTheLuckAndSkillOfTylerTheCreatorWhoEventuallyBuiltACastleOutOfDiamondBlocksAndHostedTheGreatestPartyCraft2dHadEverSeen in oreProperties) {
+                    generateOreVein(null, worldgen.x, i);
                 }
             }
 

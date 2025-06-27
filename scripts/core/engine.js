@@ -369,9 +369,6 @@ function updateLightmap() {
                 const ny = y + dy;
                 const nPos = `${nx},${ny}`;
                 
-                // Skip if out of reasonable bounds
-                if (ny < -32 || ny > 175) continue;
-                
                 const currentLight = finalLightMap.get(nPos) || 0;
                 
                 // Calculate new light level - ambient light also decays by 1 per step
