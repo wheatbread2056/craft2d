@@ -31,6 +31,7 @@ var worldgen = { x: 0, y: 0, scale: 1, treedelay: 0 };
 function mapgenrandom(id) { // makes random number generation easier, id doesn't repeat for 100k blocks
     return new Math.seedrandom(env.global.seed + worldgen.x + (id * 100000))();
 }
+var caveX = []; // store x positions where caves need to be generated, generating them during worldgen causes issues.
 
 // fix this in a later update?
 var treerate = 0.12;
@@ -361,11 +362,55 @@ function worldGen(start, end) {
                     }
                 }
             }
+
+            // make surface "noodle" caves.
+            let noodleCave = mapgenrandom(911);
+            if (noodleCave < 0.01) {
+                caveX.push(worldgen.x);
+            }
             
             worldgen.treedelay--;
 
             worldgen.x++;
             // --- END UNCHANGED CODE ---
+        }
+        // now that the loop is finished, do things that need to be done after loop
+
+        // first step. caves.
+        for (let cavepos of caveX) {
+            worldgen.x = cavepos;
+            // figure out worldgen.y by just copying how the generation does it
+            worldgen.y = (noise1d(100, 32768 + worldgen.x, 128) * 64);
+            for (var noiselayer = 1; noiselayer < 6; noiselayer++) {
+                worldgen.y += (noise1d(100 + noiselayer, 32768 + worldgen.x, 128 / (2 ** noiselayer)) * (32 / (2 ** noiselayer)));
+            }
+            worldgen.scale = noise1d(200, 32768 + worldgen.x, 256) * 1.2 + 0.8;
+            worldgen.y *= worldgen.scale;
+            worldgen.y = Math.floor(worldgen.y);
+            
+            let caveLength = Math.round(mapgenrandom(180) * 95 + 5); // 5 to 100.
+            // figure out if the cave can go past y=-16, if it can then limit its length
+            if (worldgen.y - caveLength < -16) {
+                caveLength = worldgen.y + 16;
+            }
+            // let caveWidth = Math.round(mapgenrandom(195) * 5 + 2); // 2 to 7
+            let caveWidth = 3;
+            let directions = [
+                { dx: -1, dy: -1 },
+                { dx: 1, dy: -1 },
+                { dx: 0, dy: -1 },
+            ]; // no up because the caves shouldnt go up
+            let currentCaveX = worldgen.x;
+            let currentCaveY = worldgen.y;
+            for (let i = 0; i < caveLength; i++) {
+                // explode (this is how caves are made)
+                explosion(currentCaveX, currentCaveY, caveWidth, true, false); // preserves bg blocks
+                // choose a random direction
+                let direction = directions[Math.floor(mapgenrandom(92 + Math.random()) * directions.length)];
+                currentCaveX += direction.dx;
+                currentCaveY += direction.dy;
+            }
+            console.log(`noodle. entrance: ${worldgen.x},${worldgen.y} length: ${caveLength} width: ${caveWidth}`);
         }
     }
     else if (env.global.worldGenType == 'flat') {

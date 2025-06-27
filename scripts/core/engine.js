@@ -305,9 +305,6 @@ function updateLightmap() {
                 const ny = y + dy;
                 const nPos = `${nx},${ny}`;
                 
-                // Skip if out of reasonable bounds
-                if (ny < -32 || ny > 175) continue;
-                
                 // Calculate new light level (decrease by 1, but only if not already at max from direct touch)
                 const currentLight = finalLightMap.get(nPos) || 0;
                 const newLight = Math.max(0, light - 1);
