@@ -53,7 +53,11 @@ function getChunkMap(layer, cx, cy, create = false) {
 function setBlock(x, y, block = 'test', layer = 'fg', data = '') {
     const { cx, cy, bx, by } = getChunkAndBlock(x, y);
     const chunk = getChunkMap(layer, cx, cy, true);
-    chunk.set(blockKey(bx, by), {id: block, data: data});
+    if (data == '' || data == undefined || data == null) {
+        chunk.set(blockKey(bx, by), {id: block}); // no data
+    } else {
+        chunk.set(blockKey(bx, by), {id: block, data: data});
+    }
 }
 function getBlock(x, y, layer = 'fg') {
     const { cx, cy, bx, by } = getChunkAndBlock(x, y);
@@ -346,7 +350,7 @@ function updateLightmap() {
                         if (currentLight < env.global.minLightLevel) {
                             finalLightMap.set(pos, env.global.minLightLevel);
                             // Add to propagation queue for ambient light spreading
-                            lightQueue.push({x, y, light: env.global.minLightLevel});
+                            lightQueue.push({x, y, light: env.global.minLightLevel + 1});
                         }
                     }
                 }
@@ -704,8 +708,92 @@ function getColor(c1, c2, p1, p2) {
 }
 
 function updateTime() {
+    // update the water image
     const waterImages = ['watertop_render1', 'watertop_render2', 'watertop_render3', 'watertop_render4'];
     waterimg = waterImages[Math.floor((Date.now() % 500) / 125)];
+
+    // Update the time of day (7200 game ticks = 1 day)
+    let startingHour = 7; // 7 AM is the starting hour, in Sunrise stage 2. startingHour isn't meant to be changed.
+    let hour = (env.global.gameTickNum + (startingHour * 300) % 7200) / 7200 * 24;
+    env.global.time = hour;
+
+    // code taken from an old version and slightly modified. and by slightly i mean a lot.
+    const min = env.global.minLightLevel ?? 4;
+
+    // Define cycle colors outside the daylight cycle logic for easier customization
+    const DAY_COLOR = { r: 36, g: 125, b: 207 };
+    const SUNSET_COLOR = { r: 143, g: 61, b: 7 };
+    const NIGHT_COLOR = { r: 24, g: 14, b: 41 };
+
+    if (hour >= 8 && hour < 16) {
+        // Day: full sky light
+        env.global.primarySkyboxColor = `rgb(${DAY_COLOR.r},${DAY_COLOR.g},${DAY_COLOR.b})`;
+        env.global.skyLightLevel = 8;
+    } else if (hour >= 16 && hour < 20) { // sunset
+        // Transition sky color from day to night via sunset
+        const t = (hour - 16) / (20 - 16);
+        // Blend: day -> sunset -> night
+        let c;
+        if (t < 0.5) {
+            // Day to sunset
+            const t2 = t * 2;
+            c = getColor(DAY_COLOR, SUNSET_COLOR, 1 - t2, t2);
+        } else {
+            // Sunset to night
+            const t2 = (t - 0.5) * 2;
+            c = getColor(SUNSET_COLOR, NIGHT_COLOR, 1 - t2, t2);
+        }
+        env.global.primarySkyboxColor = `rgb(${c.r},${c.g},${c.b})`;
+        // Transition sky light from 8 to min
+        env.global.skyLightLevel = Math.round(8 - (8 - min) * t);
+        updateLightmap();
+    } else if (hour >= 20 || hour < 4) { // night
+        env.global.primarySkyboxColor = `rgb(${NIGHT_COLOR.r},${NIGHT_COLOR.g},${NIGHT_COLOR.b})`;
+        env.global.skyLightLevel = min;
+    } else if (hour >= 4 && hour < 8) { // sunrise (reverse sunset)
+        const t = (hour - 4) / (8 - 4);
+        let c;
+        if (t < 0.5) {
+            // Night to sunset
+            const t2 = t * 2;
+            c = getColor(NIGHT_COLOR, SUNSET_COLOR, 1 - t2, t2);
+        } else {
+            // Sunset to day
+            const t2 = (t - 0.5) * 2;
+            c = getColor(SUNSET_COLOR, DAY_COLOR, 1 - t2, t2);
+        }
+        env.global.primarySkyboxColor = `rgb(${c.r},${c.g},${c.b})`;
+        env.global.skyLightLevel = Math.round(min + (8 - min) * t);
+        updateLightmap();
+    }
+    
+    // update the skybox
+    // Dynamically update skybox colors based on current primarySkyboxColor
+    // Parse the primary color
+    const primaryColor = env.global.primarySkyboxColor.match(/\d+/g).map(Number);
+
+    // Helper to clamp values
+    function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+    }
+
+    // High blue: darker version of primary (multiply by 0.5)
+    const highBlue = `rgb(${primaryColor.map(c => clamp(Math.round(c * 0.5), 0, 255)).join(',')})`;
+
+    // Light blue (cloud layer): blend with white, lower saturation
+    // Blend 60% primary, 40% white
+    const lightBlue = `rgb(${primaryColor.map(c => clamp(Math.round(c * 0.6 + 255 * 0.4), 0, 255)).join(',')})`;
+
+    // Compose the skybox array
+    env.global.skybox = [
+        ['rgb(0,0,0)', 800],          // Space/black at high altitudes
+        [highBlue, 400],              // Dynamic high blue
+        ['rgb(25,76,151)', 192],      // Dusk/dawn blue (static)
+        [lightBlue, 128],             // Dynamic light blue (cloud layer)
+        [env.global.primarySkyboxColor, 96], // Dynamic primary color
+        [env.global.primarySkyboxColor, 0],  // Dynamic primary color at ground
+        ['rgb(0,0,0)', -200]          // Underground/black
+    ];
 
     // Calculate the sky color based on player's y position
     let gradientStops = env.global.skybox.map(([color, y]) => {
@@ -716,13 +804,9 @@ function updateTime() {
     document.body.style.background = `linear-gradient(to bottom, ${gradientStops})`;
     document.body.style.height = '100vh';
     document.body.style.margin = '0';
-
-    // update gravity for space
-    if (player.y > 400) {
-        env.global.gravity = env.global.baseGravity / (player.y/400);
-    } else {
-        env.global.gravity = env.global.baseGravity;
-    }
+    
+    // a fragment of legacy code. avoids issues.
+    env.global.gravity = env.global.baseGravity;
 }
 
 function blockModification() {

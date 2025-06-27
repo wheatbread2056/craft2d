@@ -633,7 +633,12 @@ function renderInfoText() {
     } else {
         infoLn1.innerHTML = `Position: (<red>${Math.round(player.x)}</red>, <cyan>${Math.round(player.y)}</cyan>)`;
 
-        infoLn2.innerHTML = `Time: <yellow>${((Date.now() - finishedLoadTime) / 1000).toFixed(1)}</yellow> seconds`;
+        // make readable time
+        let hour = Math.floor(env.global.time); // easy, since env.global.time is in hours!
+        let minute = Math.floor((env.global.time - hour) * 60);
+        let hourStr = String(hour).padStart(2, '0');
+        let minuteStr = String(minute).padStart(2, '0');
+        infoLn2.innerHTML = `Time: <yellow>${hourStr}:${minuteStr}</yellow>`;
 
         if (!(camera.scale == 1)) {
             infoLn3.innerHTML = `Camera scale: <yellow>${camera.scale}x</yellow>`;

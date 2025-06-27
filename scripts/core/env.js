@@ -34,6 +34,9 @@ const env = {
         lastLightUpdate: 0, // timestamp of last light update
         skyLightLevel: 8, // maximum light level from sky
         minLightLevel: 4, // minimum light level for air blocks (ambient light)
+        daylightEnabled: true, // whether daylight cycle is enabled or not
+        time: 0, // current hour. 0 to 24.
+        primarySkyboxColor: 'rgb(36, 125, 207)', // default skybox color
     },
     player: {
         defaultMaxHealth: 1000,
