@@ -77,5 +77,5 @@ renderTick();
 
 var clock = setInterval(gameTick, 1000/env.global.tickrate);
 
-spawnMob('woman', player.x, player.y, {ai: 'follow'});
+spawnMob('player', player.x, player.y, {ai: 'follow'});
 updateLightmap();
