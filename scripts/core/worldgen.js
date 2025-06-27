@@ -194,7 +194,7 @@ function worldGen(start, end) {
                     }
                 }
             } else {
-                setBlock(worldgen.x, env.global.worldSeaLevel, 'watertop');
+                setBlock(worldgen.x, env.global.worldSeaLevel, 'water');
                 setBlock(worldgen.x, worldgen.y, 'sand');
                 setBlock(worldgen.x, worldgen.y, 'sand', 'bg');
                 setBlock(worldgen.x, worldgen.y-1, 'sand');
@@ -386,7 +386,7 @@ function worldGen(start, end) {
 
             // make surface "noodle" caves.
             let noodleCave = mapgenrandom(911);
-            if (noodleCave < 0.01) {
+            if (noodleCave < 0.008) {
                 caveX.push(worldgen.x);
             }
             
@@ -395,43 +395,70 @@ function worldGen(start, end) {
             worldgen.x++;
             // --- END UNCHANGED CODE ---
         }
-        // now that the loop is finished, do things that need to be done after loop
-
-        // first step. caves.
-        for (let cavepos of caveX) {
-            worldgen.x = cavepos;
+        function noodleCave(x, y = 'get it from worldgen', horizontal = false, branching = true) {
+            worldgen.x = x;
+            let direction = true; // if horizontal, true = right and false = left
             // figure out worldgen.y by just copying how the generation does it
-            worldgen.y = (noise1d(100, 32768 + worldgen.x, 128) * 64);
-            for (var noiselayer = 1; noiselayer < 6; noiselayer++) {
-                worldgen.y += (noise1d(100 + noiselayer, 32768 + worldgen.x, 128 / (2 ** noiselayer)) * (32 / (2 ** noiselayer)));
+            if (y == 'get it from worldgen') {
+                worldgen.y = (noise1d(100, 32768 + worldgen.x, 128) * 64);
+                for (var noiselayer = 1; noiselayer < 6; noiselayer++) {
+                    worldgen.y += (noise1d(100 + noiselayer, 32768 + worldgen.x, 128 / (2 ** noiselayer)) * (32 / (2 ** noiselayer)));
+                }
+                worldgen.scale = noise1d(200, 32768 + worldgen.x, 256) * 1.2 + 0.8;
+                worldgen.y *= worldgen.scale;
+                worldgen.y = Math.floor(worldgen.y);
             }
-            worldgen.scale = noise1d(200, 32768 + worldgen.x, 256) * 1.2 + 0.8;
-            worldgen.y *= worldgen.scale;
-            worldgen.y = Math.floor(worldgen.y);
             
             let caveLength = Math.round(mapgenrandom(180) * 95 + 5); // 5 to 100.
             // figure out if the cave can go past y=-16, if it can then limit its length
             if (worldgen.y - caveLength < -16) {
                 caveLength = worldgen.y + 16;
             }
-            // let caveWidth = Math.round(mapgenrandom(195) * 5 + 2); // 2 to 7
-            let caveWidth = 3;
+            let caveWidth = Math.round(mapgenrandom(195) * 3 + 2); // 2 to 5
             let directions = [
-                { dx: -1, dy: -1 },
-                { dx: 1, dy: -1 },
-                { dx: 0, dy: -1 },
+                { dx: -1, dy: -1 }, // small left
+                { dx: 1, dy: -1 }, // small right
+                { dx: -3, dy: -1}, // big left
+                { dx: 3, dy: -1 }, // big right
+                { dx: 0, dy: -1 }, // straight down
             ]; // no up because the caves shouldnt go up
+            if (horizontal) {
+                direction = Math.random() < 0.5;
+                directions = [
+                    { dx: 1, dy: -1 }, // small down
+                    { dx: 1, dy: 1 }, // small up
+                    { dx: 1, dy: -2 }, // big down
+                    { dx: 1, dy: 2 }, // big up
+                    { dx: 1, dy: -1 }, // straight
+                ];
+            }
             let currentCaveX = worldgen.x;
             let currentCaveY = worldgen.y;
+            if (y != 'get it from worldgen') {
+                let currentCaveY = y;
+            }
             for (let i = 0; i < caveLength; i++) {
                 // explode (this is how caves are made)
                 explosion(currentCaveX, currentCaveY, caveWidth, true, false); // preserves bg blocks
+                // if this cave is a branching cave, branch into a horizontal cave
+                if (branching && Math.random() < 0.05 && currentCaveY < env.global.worldSeaLevel) {
+                    noodleCave(currentCaveX, currentCaveY, true, false); // horizontal cave
+                }
                 // choose a random direction
                 let direction = directions[Math.floor(mapgenrandom(92 + Math.random()) * directions.length)];
+                if (horizontal) {
+                    direction.dx = direction.dx * (direction ? 1 : -1); // if horizontal, flip the direction based on the boolean
+                }
                 currentCaveX += direction.dx;
                 currentCaveY += direction.dy;
             }
-            console.log(`noodle. entrance: ${worldgen.x},${worldgen.y} length: ${caveLength} width: ${caveWidth}`);
+            console.log(`noodle. entrance: ${worldgen.x},${worldgen.y} length: ${caveLength} width: ${caveWidth}. this is ${horizontal ? 'a' : 'not a'} horizontal cave.`);
+        }
+        // now that the loop is finished, do things that need to be done after loop
+
+        // first step. caves.
+        for (let cavepos of caveX) {
+            noodleCave(cavepos);
         }
     }
     else if (env.global.worldGenType == 'flat') {

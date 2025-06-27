@@ -69,7 +69,7 @@ function renderTick() {
     }
 }
 
-worldGen(-256, 256);
+worldGen(-512, 512);
 spawnPlayer(0);
 document.dispatchEvent(GameLoaded);
 const finishedLoadTime = Date.now();
