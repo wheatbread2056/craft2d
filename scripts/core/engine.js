@@ -797,9 +797,10 @@ function updateTime() {
     ];
 
     // Calculate the sky color based on player's y position
+    // TODO: fix this being inconsistent and not actually working right on firefox
     let gradientStops = env.global.skybox.map(([color, y]) => {
-        let position = ((player.y - y)) * 10 * camera.scale + 50;
-        return `${color} ${position}%`;
+    let position = ((player.y - y)) * 10 + 50;
+    return `${color} ${position}%`;
     }).join(', ');
 
     document.body.style.background = `linear-gradient(to bottom, ${gradientStops})`;
@@ -934,23 +935,47 @@ function blockPhysics() {
     const sandUpdated = new Set();
     const watertopUpdated = new Set();
     const waterUpdated = new Set();
-    // sand physics
-    // 1. look for sand blocks in the near chunks
+
+    // sand-like
+    const fallingBlocks = ['sand', 'dirt', 'grass1', 'grass2', 'grass3', 'grass4', 'cobblestone1', 'cobblestone2', 'cobblestone3', 'flower1', 'flower2','flower3','flower4','flower5','flower6','flower7','flower8','cactus','grassbg1','grassbg2','grassbg3','grassbg4','grassbg5','grassbg6a','grassbg6b','grassbg7a','grassbg7b','crafter','crate'];
+
+    // sand/gravity block physics
+    // 1. look for falling blocks in the near chunks
     for (const {cx, cy} of nearChunks) {
         const chunk = getChunkMap('fg', cx, cy, false);
         if (!chunk) continue;
         for (const [blockKey, block] of chunk.entries()) {
-            if (block.id == 'sand') {
+            if (fallingBlocks.includes(block.id)) {
                 const [bx, by] = blockKey.split(',').map(Number);
                 const x = cx * env.global.chunksize + bx;
                 const y = cy * env.global.chunksize + by;
-                // Skip if this sand block was already updated after falling
+                // Skip if this block was already updated after falling
                 if (sandUpdated.has(`${x},${y}`)) continue;
                 // check if the block below is empty
                 if (getBlockCollision(x, y - 1) == null) {
                     deleteBlock(x, y);
                     setBlock(x, y - 1, block.id);
                     sandUpdated.add(`${x},${y-1}`);
+                }
+            }
+        }
+    }
+    // 2. same thing for background
+    for (const {cx, cy} of nearChunks) {
+        const chunk = getChunkMap('bg', cx, cy, false);
+        if (!chunk) continue;
+        for (const [blockKey, block] of chunk.entries()) {
+            if (fallingBlocks.includes(block.id)) {
+                const [bx, by] = blockKey.split(',').map(Number);
+                const x = cx * env.global.chunksize + bx;
+                const y = cy * env.global.chunksize + by;
+                // Skip if this block was already updated after falling
+                if (sandUpdated.has(`bg:${x},${y}`)) continue;
+                // check if the block below is empty in bg layer
+                if (getBlock(x, y - 1, 'bg') == null) {
+                    deleteBlock(x, y, 'bg');
+                    setBlock(x, y - 1, block.id, 'bg');
+                    sandUpdated.add(`bg:${x},${y-1}`);
                 }
             }
         }
