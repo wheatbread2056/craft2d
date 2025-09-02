@@ -460,6 +460,8 @@ function worldGen(start, end) {
         for (let cavepos of caveX) {
             noodleCave(cavepos);
         }
+        // make sure caves dont regenerate
+        caveX = [];
     }
     else if (env.global.worldGenType == 'flat') {
         // (flat world code unchanged)
