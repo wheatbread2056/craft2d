@@ -508,9 +508,7 @@ function renderBlockSelector() {
         if (player.inventory.getSlot(i) && globalImages[player.inventory.getSlot(i).id]) {
             image = globalImages[player.inventory.getSlot(i).id].cloneNode(true);
         } else {
-            image = document.createElement('img');
-            // WHAT does this do.
-            image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAFUlEQVR4nO3BMQEAAAgDoJvc6F9hAAAgwA8A9Qw2pQAAAABJRU5ErkJggg==';
+            image = document.createElement('div');
         }
         image.style.width = '48px';
         image.style.height = '48px';
