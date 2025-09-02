@@ -763,8 +763,9 @@ function updateTime() {
             c = getColor(SUNSET_COLOR, DAY_COLOR, 1 - t2, t2);
         }
         env.global.primarySkyboxColor = `rgb(${c.r},${c.g},${c.b})`;
+        let pastLightLevel = env.global.skyLightLevel;
         env.global.skyLightLevel = Math.round(min + (8 - min) * t);
-        updateLightmap();
+        if (pastLightLevel != env.global.skyLightLevel) updateLightmap();
     }
     
     // update the skybox

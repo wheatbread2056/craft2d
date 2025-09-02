@@ -78,4 +78,4 @@ renderTick();
 var clock = setInterval(gameTick, 1000/env.global.tickrate);
 
 spawnMob('player', player.x, player.y, {ai: 'follow'});
-updateLightmap();
+setTimeout(updateLightmap, 1000);
