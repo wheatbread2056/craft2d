@@ -1,4 +1,21 @@
+function textRenderInGame(x, y, text, size, color) {
+    // x, y are GAME coordinates
+    // To match block rendering, use the same math as showBlock:
+    // let drawX = (x - camera.x) * 64 * camera.scale;
+    // let drawY = (y - camera.y) * 64 * camera.scale;
+    let textx = (x - camera.x) * 64 * camera.scale
+    let texty = (y - camera.y) * -64 * camera.scale;
+    if (!color) color = 'white';
+    if (!size) size = 16;
+    globalCtx.save();
+    globalCtx.font = `${size * camera.scale}px monospace`;
+    globalCtx.fillStyle = color;
+    globalCtx.fillText(text, textx, texty);
+    globalCtx.restore();
+    // Add more types as needed (e.g., images, shapes)
+}
 // generate block images
+
 function initializeImage(src) {
     let imagekey = src.split('/').pop().split('.')[0];
     globalImages[imagekey] = new Image();
@@ -87,6 +104,8 @@ function renderMobs(ctx, camx, camy) {
         mob.cameraY = (mob.y - camy) * 64 * camera.scale;
         if (mob.cameraX < -64 || mob.cameraX > window.innerWidth + 64 || !mob.cameraY < -64 || mob.cameraY > window.innerHeight + 64) continue; // only render mobs within the viewport
         showMob(ctx, mob.x - camx, mob.y - camy, mob);
+        // render their health above them
+        if (mob.health < mob.maxHealth) textRenderInGame(mob.x, mob.y, `${Math.floor(mob.health)}/${Math.floor(mob.maxHealth)}`);
         client.mobsRendered++;
     }
 }
