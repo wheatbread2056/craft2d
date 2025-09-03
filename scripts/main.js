@@ -33,6 +33,12 @@ function gameTick() { // block physics and other things go here, but player phys
     client.lastGameTick = performance.now();
     blockPhysics();
     globalUpdateMovement();
+    // health
+    if (player.regenAllowed) { regen(player); };
+    for (const mob of mobs) {
+        updateHealth(mob);
+        if (mob.regenAllowed) { regen(mob); };
+    }
     env.global.gameTickNum++;
 }
 
@@ -45,10 +51,6 @@ function renderTick() {
     // non-visible (functional)
     updateMovementKeys();
     
-    if (player.regenAllowed) {player.health += (player.regenRate/60 / (client.renderTickrateComputed / 60)); if (player.invulnerable) {player.health = player.maxHealth}};
-    if (player.health > player.maxHealth) {
-        player.health = player.maxHealth;
-    }
     // visible
     updateCommonValues();
     playerPhysics(player);

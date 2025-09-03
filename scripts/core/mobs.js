@@ -1,4 +1,13 @@
-const mobs = [];
+const mobs = {
+    [Symbol.iterator]: function* () {
+        for (const id in this) {
+            if (Object.prototype.hasOwnProperty.call(this, id) && !isNaN(Number(id))) {
+                yield this[id];
+            }
+        }
+    }
+};
+var CurrentMobID = 1;
 
 // mob class
 class Mob {
@@ -27,6 +36,9 @@ class Mob {
         this.regenRate = env.player.defaultRegenRate;
         this.regenAllowed = true;
 
+        this.id = CurrentMobID;
+        CurrentMobID++;
+
         if (ai) this.ai = ai;
 
         // mob properties
@@ -42,7 +54,7 @@ class Mob {
         else this.minFollowDistance = 2;
     }
     init() {
-        mobs.push(this);
+        mobs[this.id] = this;
     }
     updateMovement() {
         if (typeof this.movement.direction === 'undefined') { // direction doesnt directly mess with physics, just used to determine movement
@@ -138,6 +150,12 @@ function spawnMob(type, x, y, props) { // shortcut to spawn mob
     mob.y = y || 200;
     mob.init();
     return mob;
+}
+
+function deleteMob(id) {
+    if (mobs[id]) {
+        delete mobs[id];
+    }
 }
 
 function globalPhysics() { // do physics on every mob

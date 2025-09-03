@@ -360,14 +360,14 @@ function spawnPlayer(spawnx) {
 }
 
 // do stuff for player health
-function handlePlayerHealth() {
-    if (player.health <= 0) {
-        player.health = 0;
-        player.controlAllowed = false;
-        player.modificationAllowed = false;
-        player.regenAllowed = false;
+function updateHealth(mob) {
+    if (mob.health <= 0) {
+        mob.health = 0;
+        mob.controlAllowed = false;
+        mob.modificationAllowed = false;
+        mob.regenAllowed = false;
 
-        if (!player.deathOverlay) {
+        if (!mob.deathOverlay && mob === player) {
             const overlay = document.createElement('div');
             var deathTime = Date.now();
 
@@ -388,19 +388,25 @@ function handlePlayerHealth() {
                 
                 if (timeLeft === 0) {
                     spawnPlayer(0);
-                    player.inventory.fullInit();
-                    player.health = player.maxHealth;
-                    player.controlAllowed = true;
-                    player.regenAllowed = true;
-                    player.modificationAllowed = true;
-                    player.deathOverlay = false;
+                    mob.inventory.fullInit();
+                    mob.health = mob.maxHealth;
+                    mob.controlAllowed = true;
+                    mob.regenAllowed = true;
+                    mob.modificationAllowed = true;
+                    mob.deathOverlay = false;
                     document.body.removeChild(overlay);
                     clearInterval(updateDeathOverlayTimer);
                 }
             }, 100);
-            player.deathOverlay = true;
+            mob.deathOverlay = true;
+        } else if (mob !== player) {
+            deleteMob(mob.id);
         }
     }
+}
+
+function regen(mob) {
+    mob.health < mob.maxHealth ? mob.health += mob.regenRate / env.global.tickrate : mob.health = mob.maxHealth;
 }
 
 // manages both physics/collision and movement
@@ -570,7 +576,7 @@ function playerPhysics(target) {
                 if (target.my < -21.6 && !target.invulnerable) {
                     // fall damage based on the target's vertical velocity
                     target.health -= ((target.my*2/60) * (target.my*2/60) * (target.my*2/60) * (target.my*2/60)) * 160;
-                    handlePlayerHealth(target);
+                    updateHealth(target);
                     playSound('sfx/hitHurt.wav');
                 };
                 target.air = false;
