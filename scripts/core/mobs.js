@@ -11,7 +11,7 @@ var CurrentMobID = 1;
 
 // mob class
 class Mob {
-    constructor(type, image, ai, minFollowDistance) {
+    constructor(type, image, ai, minFollowDistance, sightRange) {
         // all mob types.
         let mobTypes = ['player','woman','chicken','cow','pig','slime_blue','slime_green','slime_red','slime_yellow','slime_purple','slime_orange','zombie'];
         // properties taken from player
@@ -45,6 +45,9 @@ class Mob {
         if (!type) {
             this.type = mobTypes[Math.floor(Math.random() * mobTypes.length)];
         }
+        if (!sightRange) {
+            this.sightRange = 32;
+        }
         if (image) {
             this.image = image;
         }
@@ -59,6 +62,15 @@ class Mob {
     updateMovement() {
         if (typeof this.movement.direction === 'undefined') { // direction doesnt directly mess with physics, just used to determine movement
             this.movement.direction = Math.random() <= 0.5; // false = left, true = right
+        }
+
+        let withinPlayerRange = false;
+        // figure out if we're within the player
+        if (this.sightRange) {
+            const distanceToPlayer = Math.sqrt(Math.pow(this.x - player.x, 2) + Math.pow(this.y - player.y, 2));
+            if (distanceToPlayer < this.sightRange) {
+                withinPlayerRange = true;
+            }
         }
 
         if (this.ai == 'follow') {
@@ -127,6 +139,9 @@ class Mob {
         // Only toggle followingPlayer if not forced by alwaysFollow/neverFollow
         if (!this.alwaysFollow && !this.neverFollow && Math.random() < 0.01) {
             this.followingPlayer = !this.followingPlayer;
+        }
+        if (!withinPlayerRange) {
+            this.followingPlayer = false;
         }
     }
 }
